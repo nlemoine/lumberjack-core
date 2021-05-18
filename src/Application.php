@@ -234,7 +234,7 @@ class Application implements ContainerInterface, InteropContainerInterface
      *
      * @return boolean
      */
-    public function hasRequestBeenHandled() : bool
+    public function hasRequestBeenHandled(): bool
     {
         return $this->requestHandled;
     }
@@ -290,7 +290,7 @@ class Application implements ContainerInterface, InteropContainerInterface
         die();
     }
 
-    protected function removeSentHeadersAndMoveIntoResponse(ResponseInterface $response) : ResponseInterface
+    protected function removeSentHeadersAndMoveIntoResponse(ResponseInterface $response): ResponseInterface
     {
         // 1. Format the previously sent headers into an array of [key, value]
         // 2. Remove all headers from the output that we find
@@ -321,6 +321,6 @@ class Application implements ContainerInterface, InteropContainerInterface
      */
     public function runningInConsole()
     {
-        return in_array(php_sapi_name(), ['cli', 'phpdbg']);
+        return in_array(php_sapi_name(), ['cli', 'phpdbg'], true);
     }
 }

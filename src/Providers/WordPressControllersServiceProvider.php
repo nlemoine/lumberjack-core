@@ -2,14 +2,14 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use Laminas\Diactoros\ServerRequestFactory;
+use mindplay\middleman\Dispatcher;
 use Psr\Http\Message\RequestInterface;
 use Rareloop\Router\Invoker;
 use Rareloop\Router\ProvidesControllerMiddleware;
 use Rareloop\Router\ResponseFactory;
 use Stringy\Stringy;
 use Tightenco\Collect\Support\Collection;
-use Zend\Diactoros\ServerRequestFactory;
-use mindplay\middleman\Dispatcher;
 
 class WordPressControllersServiceProvider extends ServiceProvider
 {
@@ -44,7 +44,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
 
     public function getControllerClassFromTemplate($template)
     {
-        $controllerName = Stringy::create(basename($template, '.php'))->upperCamelize().'Controller';
+        $controllerName = Stringy::create(basename($template, '.php'))->upperCamelize() . 'Controller';
 
         // Classes can't start with a number so we have to special case the behaviour here
         if ($controllerName === '404Controller') {
@@ -54,7 +54,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
         $controllerName = apply_filters('lumberjack_controller_name', $controllerName);
         $controllerNamespace = apply_filters('lumberjack_controller_namespace', 'App\\');
 
-        return $controllerNamespace.$controllerName;
+        return $controllerNamespace . $controllerName;
     }
 
     public function handleRequest(RequestInterface $request, $controllerName, $methodName)
@@ -92,7 +92,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
         return $dispatcher->dispatch($request);
     }
 
-    private function createDispatcher(array $middlewares) : Dispatcher
+    private function createDispatcher(array $middlewares): Dispatcher
     {
         $resolver = null;
 

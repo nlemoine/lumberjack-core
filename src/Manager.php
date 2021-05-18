@@ -76,14 +76,15 @@ abstract class Manager
 
         if (is_null($driver)) {
             throw new InvalidArgumentException(sprintf(
-                'Unable to resolve NULL driver for [%s].', static::class
+                'Unable to resolve NULL driver for [%s].',
+                static::class
             ));
         }
 
         // If the given driver has not been created before, we will create the instances
         // here and cache it so we can return it next time very quickly. If there is
         // already a driver created by this name, we'll just return that instance.
-        if (! isset($this->drivers[$driver])) {
+        if (!isset($this->drivers[$driver])) {
             $this->drivers[$driver] = $this->createDriver($driver);
         }
 
@@ -106,7 +107,7 @@ abstract class Manager
         if (isset($this->customCreators[$driver])) {
             return $this->callCustomCreator($driver);
         } else {
-            $method = 'create'.Stringy::create($driver)->upperCamelize().'Driver';
+            $method = 'create' . Stringy::create($driver)->upperCamelize() . 'Driver';
 
             if (method_exists($this, $method)) {
                 return $this->$method();

@@ -18,11 +18,11 @@ class RegisterRequestHandlerTest extends TestCase
         $app = Mockery::mock(Application::class . '[detectWhenRequestHasNotBeenHandled]');
         $app->shouldReceive('detectWhenRequestHasNotBeenHandled')->once();
 
-        $config = new Config;
+        $config = new Config();
         $config->set('app.debug', true);
         $app->bind('config', $config);
 
-        $bootstrapper = new RegisterRequestHandler;
+        $bootstrapper = new RegisterRequestHandler();
         $bootstrapper->bootstrap($app);
     }
 
@@ -32,11 +32,11 @@ class RegisterRequestHandlerTest extends TestCase
         $app = Mockery::mock(Application::class . '[detectWhenRequestHasNotBeenHandled]');
         $app->shouldNotReceive('detectWhenRequestHasNotBeenHandled');
 
-        $config = new Config;
+        $config = new Config();
         $config->set('app.debug', false);
         $app->bind('config', $config);
 
-        $bootstrapper = new RegisterRequestHandler;
+        $bootstrapper = new RegisterRequestHandler();
         $bootstrapper->bootstrap($app);
     }
 }

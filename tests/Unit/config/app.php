@@ -2,7 +2,7 @@
 
 return [
     'environment' => 'production',
-    'multi' => [
+    'multi'       => [
         'level' => true,
     ],
 ];

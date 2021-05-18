@@ -48,7 +48,7 @@ class RedirectResponseTest extends TestCase
     /** @test */
     public function can_call_with_method_to_flash_data_to_the_session()
     {
-        $app = new Application;
+        $app = new Application();
         $session = Mockery::mock(SessionManager::class);
         $session->shouldReceive('flash')->with('key', 'value')->once();
         $session->shouldReceive('flash')->with('foo', 'bar')->once();
@@ -62,7 +62,7 @@ class RedirectResponseTest extends TestCase
     /** @test */
     public function can_call_with_method_to_flash_data_to_the_session_using_an_array()
     {
-        $app = new Application;
+        $app = new Application();
         $session = Mockery::mock(SessionManager::class);
         $session->shouldReceive('flash')->with([
             'key' => 'value',

@@ -40,11 +40,12 @@ class TimberResponseTest extends TestCase
 
     /**
      * @test
-     * @expectedException           Rareloop\Lumberjack\Exceptions\TwigTemplateNotFoundException
-     * @expectedExceptionMessage    template.twig
      */
     public function exception_is_thrown_if_twig_file_is_not_found()
     {
+        $this->expectException(\Rareloop\Lumberjack\Exceptions\TwigTemplateNotFoundException::class);
+        $this->expectExceptionMessage('template.twig');
+
         $context = [
             'foo' => 'bar',
         ];
@@ -102,7 +103,7 @@ class TimberResponseTest extends TestCase
         $timber = Mockery::mock('alias:' . Timber::class);
         $timber->shouldReceive('compile')
             ->with('template.twig', Mockery::on(function ($passedContext) {
-                $this->assertInternalType('array', $passedContext['foo']);
+                $this->assertIsArray($passedContext['foo']);
                 $this->assertSame(123, $passedContext['foo']['bar']);
 
                 return true;
@@ -127,8 +128,8 @@ class TimberResponseTest extends TestCase
         $timber = Mockery::mock('alias:' . Timber::class);
         $timber->shouldReceive('compile')
             ->with('template.twig', Mockery::on(function ($passedContext) {
-                $this->assertInternalType('array', $passedContext['foo']);
-                $this->assertInternalType('array', $passedContext['foo']['bar']);
+                $this->assertIsArray($passedContext['foo']);
+                $this->assertIsArray($passedContext['foo']['bar']);
                 $this->assertSame(123, $passedContext['foo']['bar']['baz']);
 
                 return true;
@@ -163,14 +164,14 @@ class TimberResponseTest extends TestCase
     {
         $context = [
             'foo' => collect([
-                ['bar' => 123,]
+                ['bar' => 123, ]
             ]),
         ];
 
         $timber = Mockery::mock('alias:' . Timber::class);
         $timber->shouldReceive('compile')
             ->with('template.twig', Mockery::on(function ($passedContext) {
-                $this->assertInternalType('array', $passedContext['foo']);
+                $this->assertIsArray($passedContext['foo']);
                 $this->assertSame(123, $passedContext['foo'][0]['bar']);
 
                 return true;
@@ -187,7 +188,7 @@ class TimberResponseTest extends TestCase
         $context = [
             'foo' => [
                 'bar' => collect([
-                    ['baz' => 123,]
+                    ['baz' => 123, ]
                 ]),
             ],
         ];
@@ -195,8 +196,8 @@ class TimberResponseTest extends TestCase
         $timber = Mockery::mock('alias:' . Timber::class);
         $timber->shouldReceive('compile')
             ->with('template.twig', Mockery::on(function ($passedContext) {
-                $this->assertInternalType('array', $passedContext['foo']);
-                $this->assertInternalType('array', $passedContext['foo']['bar']);
+                $this->assertIsArray($passedContext['foo']);
+                $this->assertIsArray($passedContext['foo']['bar']);
                 $this->assertSame(123, $passedContext['foo']['bar'][0]['baz']);
 
                 return true;
@@ -221,7 +222,7 @@ class TimberResponseTest extends TestCase
         $timber = Mockery::mock('alias:' . Timber::class);
         $timber->shouldReceive('compile')
             ->with('template.twig', Mockery::on(function ($passedContext) {
-                $this->assertInternalType('array', $passedContext['foo']);
+                $this->assertIsArray($passedContext['foo']);
                 $this->assertSame(123, $passedContext['foo'][0]['bar']);
 
                 return true;
@@ -233,12 +234,14 @@ class TimberResponseTest extends TestCase
     }
 }
 
-class TestViewModel extends ViewModel {
+class TestViewModel extends ViewModel
+{
     public $bar;
     public $baz;
 
-    public static function createFromArray(array $array) {
-        $vm = new static;
+    public static function createFromArray(array $array)
+    {
+        $vm = new static();
 
         foreach ($array as $key => $value) {
             $vm->{$key} = $value;

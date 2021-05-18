@@ -15,7 +15,7 @@ class MiddlewareAliasStoreTest extends TestCase
     /** @test */
     public function can_register_an_alias_for_a_middleware_object()
     {
-        $store = new MiddlewareAliasStore;
+        $store = new MiddlewareAliasStore();
         $middleware = Mockery::mock(MiddlewareInterface::class);
 
         $store->set('middlewarekey', $middleware);
@@ -26,7 +26,7 @@ class MiddlewareAliasStoreTest extends TestCase
     /** @test */
     public function can_register_an_alias_for_a_middleware_closure_factory()
     {
-        $store = new MiddlewareAliasStore;
+        $store = new MiddlewareAliasStore();
         $middleware = Mockery::mock(MiddlewareInterface::class);
 
         $store->set('middlewarekey', function () use ($middleware) {
@@ -49,7 +49,7 @@ class MiddlewareAliasStoreTest extends TestCase
     /** @test */
     public function can_register_an_alias_with_params_for_a_middleware_closure_factory()
     {
-        $store = new MiddlewareAliasStore;
+        $store = new MiddlewareAliasStore();
         $middleware = Mockery::mock(MiddlewareInterface::class);
 
         $store->set('middlewarekey', function ($param1, $param2) use ($middleware) {
@@ -64,7 +64,7 @@ class MiddlewareAliasStoreTest extends TestCase
     /** @test */
     public function can_register_an_alias_with_params_for_a_classname()
     {
-        $store = new MiddlewareAliasStore;
+        $store = new MiddlewareAliasStore();
 
         $store->set('middlewarekey', MASTestClassWithConstructorParams::class);
         $middleware = $store->get('middlewarekey:123,abc');
@@ -77,7 +77,7 @@ class MiddlewareAliasStoreTest extends TestCase
     /** @test */
     public function can_check_if_alias_exists()
     {
-        $store = new MiddlewareAliasStore;
+        $store = new MiddlewareAliasStore();
         $middleware = Mockery::mock(MiddlewareInterface::class);
 
         $this->assertFalse($store->has('middlewarekey'));
@@ -90,7 +90,7 @@ class MiddlewareAliasStoreTest extends TestCase
     /** @test */
     public function can_check_if_alias_exists_when_string_contains_params()
     {
-        $store = new MiddlewareAliasStore;
+        $store = new MiddlewareAliasStore();
         $middleware = Mockery::mock(MiddlewareInterface::class);
 
         $this->assertFalse($store->has('middlewarekey'));
@@ -103,7 +103,6 @@ class MiddlewareAliasStoreTest extends TestCase
 
 class MASTestClass
 {
-
 }
 
 class MASTestClassWithConstructorParams

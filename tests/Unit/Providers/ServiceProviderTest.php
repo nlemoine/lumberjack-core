@@ -16,8 +16,8 @@ class ServiceProviderTest extends TestCase
     /** @test */
     public function can_merge_config_from_a_file()
     {
-        $config = new Config;
-        $app = new Application;
+        $config = new Config();
+        $app = new Application();
         $app->bind(Config::class, $config);
         $provider = new TestServiceProvider($app);
 
@@ -29,8 +29,8 @@ class ServiceProviderTest extends TestCase
     /** @test */
     public function existing_config_takes_priority_over_merged_values()
     {
-        $config = new Config;
-        $app = new Application;
+        $config = new Config();
+        $app = new Application();
         $app->bind(Config::class, $config);
         $provider = new TestServiceProvider($app);
 
@@ -41,4 +41,6 @@ class ServiceProviderTest extends TestCase
     }
 }
 
-class TestServiceProvider extends ServiceProvider {}
+class TestServiceProvider extends ServiceProvider
+{
+}

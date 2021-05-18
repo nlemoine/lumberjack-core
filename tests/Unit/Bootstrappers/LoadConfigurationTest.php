@@ -13,7 +13,7 @@ class LoadConfigurationTest extends TestCase
     public function adds_config_object_to_the_container()
     {
         $app = new Application(__DIR__ . '/../');
-        $bootstrapper = new LoadConfiguration;
+        $bootstrapper = new LoadConfiguration();
 
         $bootstrapper->bootstrap($app);
 
@@ -26,7 +26,7 @@ class LoadConfigurationTest extends TestCase
     public function created_config_object_has_loaded_config()
     {
         $app = new Application(__DIR__ . '/../');
-        $bootstrapper = new LoadConfiguration;
+        $bootstrapper = new LoadConfiguration();
 
         $bootstrapper->bootstrap($app);
         $config = $app->get('config');

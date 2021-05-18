@@ -46,7 +46,7 @@ class Post extends TimberPost
             return call_user_func_array([$builder, $name], $arguments);
         }
 
-        trigger_error('Call to undefined method '.__CLASS__.'::'.$name.'()', E_USER_ERROR);
+        trigger_error('Call to undefined method ' . __CLASS__ . '::' . $name . '()', E_USER_ERROR);
     }
 
     /**
@@ -54,7 +54,7 @@ class Post extends TimberPost
      *
      * @return ScopedQueryBuilder
      */
-    public static function builder() : ScopedQueryBuilder
+    public static function builder(): ScopedQueryBuilder
     {
         return new ScopedQueryBuilder(static::class);
     }
@@ -116,8 +116,8 @@ class Post extends TimberPost
 
         $args = [
             'posts_per_page' => $perPage,
-            'orderby'       => $orderby,
-            'order'         => $order,
+            'orderby'        => $orderby,
+            'order'          => $order,
         ];
 
         return static::query($args);

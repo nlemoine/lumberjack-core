@@ -32,19 +32,19 @@ class PostTest extends TestCase
 
     /**
      * @test
-     * @expectedException     Rareloop\Lumberjack\Exceptions\PostTypeRegistrationException
      */
     public function register_function_throws_exception_if_post_type_is_not_provided()
     {
+        $this->expectException(\Rareloop\Lumberjack\Exceptions\PostTypeRegistrationException::class);
         UnregisterablePostTypeWithoutPostType::register();
     }
 
     /**
      * @test
-     * @expectedException     Rareloop\Lumberjack\Exceptions\PostTypeRegistrationException
      */
     public function register_function_throws_exception_if_config_is_not_provided()
     {
+        $this->expectException(\Rareloop\Lumberjack\Exceptions\PostTypeRegistrationException::class);
         UnregisterablePostTypeWithoutConfig::register();
     }
 
@@ -60,7 +60,7 @@ class PostTest extends TestCase
         $timber = Mockery::mock('alias:' . Timber::class);
         $timber->shouldReceive('get_posts')->withArgs([
             array_merge($args, [
-                'post_type' => Post::getPostType(),
+                'post_type'   => Post::getPostType(),
                 'post_status' => 'publish',
             ]),
             Post::class,
@@ -78,13 +78,13 @@ class PostTest extends TestCase
     {
         $args = [
             'posts_per_page' => 10,
-            'post_type' => 'something-else',
+            'post_type'      => 'something-else',
         ];
 
         $timber = Mockery::mock('alias:' . Timber::class);
         $timber->shouldReceive('get_posts')->withArgs([
             array_merge($args, [
-                'post_type' => Post::getPostType(),
+                'post_type'   => Post::getPostType(),
                 'post_status' => 'publish',
             ]),
             Post::class,
@@ -148,8 +148,8 @@ class PostTest extends TestCase
         $timber->shouldReceive('get_posts')->withArgs([
             Mockery::subset([
                 'posts_per_page' => -1,
-                'orderby' => 'menu_order',
-                'order' => 'ASC',
+                'orderby'        => 'menu_order',
+                'order'          => 'ASC',
             ]),
             Post::class,
         ])->once();
@@ -186,7 +186,7 @@ class PostTest extends TestCase
         $timber->shouldReceive('get_posts')->withArgs([
             Mockery::subset([
                 'orderby' => 'date',
-                'order' => 'DESC',
+                'order'   => 'DESC',
             ]),
             Post::class,
         ])->once();
@@ -201,14 +201,14 @@ class PostTest extends TestCase
      */
     public function can_extend_post_behaviour_with_macros()
     {
-	Post::macro('testFunctionAddedByMacro', function () {
-	    return 'abc123';
-	});
+        Post::macro('testFunctionAddedByMacro', function () {
+            return 'abc123';
+        });
 
-	$post = new Post(false, true);
+        $post = new Post(false, true);
 
-	$this->assertSame('abc123', $post->testFunctionAddedByMacro());
-	$this->assertSame('abc123', Post::testFunctionAddedByMacro());
+        $this->assertSame('abc123', $post->testFunctionAddedByMacro());
+        $this->assertSame('abc123', Post::testFunctionAddedByMacro());
     }
 
     /**
@@ -216,14 +216,14 @@ class PostTest extends TestCase
      */
     public function macros_set_correct_this_context_on_instances()
     {
-	Post::macro('testFunctionAddedByMacro', function () {
-	    return $this->dummyData();
-	});
+        Post::macro('testFunctionAddedByMacro', function () {
+            return $this->dummyData();
+        });
 
-	$post = new Post(false, true);
-	$post->dummyData = 'abc123';
+        $post = new Post(false, true);
+        $post->dummyData = 'abc123';
 
-	$this->assertSame('abc123', $post->testFunctionAddedByMacro());
+        $this->assertSame('abc123', $post->testFunctionAddedByMacro());
     }
 
     /**
@@ -231,43 +231,43 @@ class PostTest extends TestCase
      */
     public function can_extend_post_behaviour_with_mixin()
     {
-	Post::mixin(new PostMixin);
+        Post::mixin(new PostMixin());
 
-	$post = new Post(false, true);
+        $post = new Post(false, true);
 
-	$this->assertSame('abc123', $post->testFunctionAddedByMixin());
+        $this->assertSame('abc123', $post->testFunctionAddedByMixin());
     }
 }
 
 class PostMixin
 {
-    function testFunctionAddedByMixin()
+    public function testFunctionAddedByMixin()
     {
-	return function() {
-	    return 'abc123';
-	};
+        return function () {
+            return 'abc123';
+        };
     }
 }
 
 class RegisterablePostType extends Post
 {
-    public static function getPostType() : string
+    public static function getPostType(): string
     {
         return 'registerable_post_type';
     }
 
-    protected static function getPostTypeConfig() : array
+    protected static function getPostTypeConfig(): array
     {
         return [
             'labels' => [
-                'name' => 'Groups',
+                'name'          => 'Groups',
                 'singular_name' => 'Group'
             ],
-            'public' => true,
+            'public'      => true,
             'has_archive' => false,
-            'supports' => ['title', 'revisions'],
-            'menu_icon' => 'dashicons-groups',
-            'rewrite' => [
+            'supports'    => ['title', 'revisions'],
+            'menu_icon'   => 'dashicons-groups',
+            'rewrite'     => [
                 'slug' => 'group',
             ],
         ];
@@ -281,18 +281,18 @@ class RegisterablePostType extends Post
 
 class UnregisterablePostTypeWithoutPostType extends Post
 {
-    protected static function getPostTypeConfig() : array
+    protected static function getPostTypeConfig(): array
     {
         return [
             'labels' => [
-                'name' => 'Groups',
+                'name'          => 'Groups',
                 'singular_name' => 'Group'
             ],
-            'public' => true,
+            'public'      => true,
             'has_archive' => false,
-            'supports' => ['title', 'revisions'],
-            'menu_icon' => 'dashicons-groups',
-            'rewrite' => [
+            'supports'    => ['title', 'revisions'],
+            'menu_icon'   => 'dashicons-groups',
+            'rewrite'     => [
                 'slug' => 'group',
             ],
         ];
@@ -301,7 +301,7 @@ class UnregisterablePostTypeWithoutPostType extends Post
 
 class UnregisterablePostTypeWithoutConfig extends Post
 {
-    public static function getPostType() : string
+    public static function getPostType(): string
     {
         return 'post_type';
     }

@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use Laminas\Diactoros\ServerRequestFactory;
 use Psr\Http\Message\RequestInterface;
 use Rareloop\Lumberjack\Contracts\MiddlewareAliases;
 use Rareloop\Lumberjack\Http\MiddlewareAliasStore;
@@ -9,13 +10,12 @@ use Rareloop\Lumberjack\Http\MiddlewareResolver;
 use Rareloop\Lumberjack\Http\Router;
 use Rareloop\Lumberjack\Http\ServerRequest;
 use Rareloop\Router\MiddlewareResolver as MiddlewareResolverInterface;
-use Zend\Diactoros\ServerRequestFactory;
 
 class RouterServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $store = new MiddlewareAliasStore;
+        $store = new MiddlewareAliasStore();
         $resolver = new MiddlewareResolver($this->app, $store);
 
         $router = new Router($this->app, $resolver);

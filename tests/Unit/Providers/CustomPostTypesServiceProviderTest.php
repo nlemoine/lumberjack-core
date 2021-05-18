@@ -20,7 +20,7 @@ class CustomPostTypesServiceProviderTest extends TestCase
     {
         $app = new Application(__DIR__ . '/..');
 
-        $config = new Config;
+        $config = new Config();
 
         $config->set('posttypes.register', [
             CustomPost1::class,

@@ -2,11 +2,11 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Monolog\Logger;
-use Psr\Log\LoggerInterface;
-use Monolog\Handler\StreamHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 class LogServiceProvider extends ServiceProvider
 {

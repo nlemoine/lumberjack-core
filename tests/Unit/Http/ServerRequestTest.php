@@ -17,7 +17,7 @@ class ServerRequestTest extends TestCase
     /** @test */
     public function request_is_prs7_compliant()
     {
-        $request = new ServerRequest;
+        $request = new ServerRequest();
 
         $this->assertInstanceOf(ServerRequestInterface::class, $request);
     }
@@ -25,7 +25,7 @@ class ServerRequestTest extends TestCase
     /** @test */
     public function request_uses_extension_traits()
     {
-        $request = new ServerRequest;
+        $request = new ServerRequest();
 
         $traits = array_keys(class_uses($request));
 

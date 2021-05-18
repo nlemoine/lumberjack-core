@@ -3,13 +3,13 @@
 namespace Rareloop\Lumberjack;
 
 use Exception;
-use Rareloop\Lumberjack\Exceptions\HandlerInterface;
+use Rareloop\Lumberjack\Contracts\ExceptionHandler as ExceptionHandlerContract;
 use Rareloop\Lumberjack\Facades\Config;
+use Rareloop\Lumberjack\Facades\Log;
 use Rareloop\Lumberjack\Facades\Router;
+use Rareloop\Lumberjack\Facades\Session;
 use Rareloop\Lumberjack\Http\Responses\RedirectResponse;
 use Rareloop\Lumberjack\Http\Responses\TimberResponse;
-use Rareloop\Lumberjack\Facades\Session;
-use Rareloop\Lumberjack\Facades\Log;
 
 class Helpers
 {
@@ -56,7 +56,7 @@ class Helpers
 
     public static function report(Exception $e)
     {
-        return static::app(HandlerInterface::class)->report($e);
+        return static::app(ExceptionHandlerContract::class)->report($e);
     }
 
     public static function request()
@@ -64,23 +64,23 @@ class Helpers
         return static::app('request');
     }
 
-    public static function session($key = null, $default = null)
-    {
-        if (is_null($key)) {
-            return static::app('session');
-        }
+    // public static function session($key = null, $default = null)
+    // {
+    //     if (is_null($key)) {
+    //         return static::app('session');
+    //     }
 
-        if (is_array($key)) {
-            return Session::put($key);
-        }
+    //     if (is_array($key)) {
+    //         return Session::put($key);
+    //     }
 
-        return Session::get($key, $default);
-    }
+    //     return Session::get($key, $default);
+    // }
 
-    public static function back()
-    {
-        return static::redirect(static::session()->previousUrl());
-    }
+    // public static function back()
+    // {
+    //     return static::redirect(static::session()->previousUrl());
+    // }
 
     public static function logger($message = null, $context = [])
     {

@@ -24,7 +24,7 @@ class LumberjackTest extends TestCase
     /** @test */
     public function bootstrap_should_pass_bootstrappers_to_app()
     {
-        $app = Mockery::mock(Application::class.'[bootstrapWith]');
+        $app = Mockery::mock(Application::class . '[bootstrapWith]');
         $app->shouldReceive('bootstrapWith')->with([
             LoadConfiguration::class,
             RegisterExceptionHandler::class,

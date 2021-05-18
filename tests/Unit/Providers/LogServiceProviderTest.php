@@ -22,7 +22,7 @@ class LogServiceProviderTest extends TestCase
     {
         Functions\expect('is_admin')->once()->andReturn(false);
 
-        $app = new Application(__DIR__.'/../');
+        $app = new Application(__DIR__ . '/../');
         $lumberjack = new Lumberjack($app);
 
         $lumberjack->bootstrap();
@@ -35,11 +35,11 @@ class LogServiceProviderTest extends TestCase
     /**
      * @test
      * @codingStandardsIgnoreLine */
-    function default_handler_is_in_memory_stream()
+    public function default_handler_is_in_memory_stream()
     {
-        $app = new Application(__DIR__.'/../');
+        $app = new Application(__DIR__ . '/../');
 
-        $config = new Config;
+        $config = new Config();
         $app->bind('config', $config);
 
         $app->bootstrapWith([
@@ -52,9 +52,9 @@ class LogServiceProviderTest extends TestCase
     /** @test */
     public function default_log_warning_level_is_debug()
     {
-        $app = new Application(__DIR__.'/../');
+        $app = new Application(__DIR__ . '/../');
 
-        $config = new Config;
+        $config = new Config();
         $app->bind('config', $config);
 
         $app->bootstrapWith([
@@ -67,9 +67,9 @@ class LogServiceProviderTest extends TestCase
     /** @test */
     public function stream_is_used_when_path_is_set_but_logging_is_disabled()
     {
-        $app = new Application(__DIR__.'/../');
+        $app = new Application(__DIR__ . '/../');
 
-        $config = new Config;
+        $config = new Config();
         $config->set('app.logs.enabled', false);
         $config->set('app.logs.path', 'app.log');
         $app->bind('config', $config);
@@ -84,9 +84,9 @@ class LogServiceProviderTest extends TestCase
     /** @test */
     public function log_warning_level_can_be_set_in_config()
     {
-        $app = new Application(__DIR__.'/../');
+        $app = new Application(__DIR__ . '/../');
 
-        $config = new Config;
+        $config = new Config();
         $config->set('app.logs.level', Logger::ERROR);
         $app->bind('config', $config);
 
@@ -102,7 +102,7 @@ class LogServiceProviderTest extends TestCase
     {
         $app = new Application('/base/path');
 
-        $config = new Config;
+        $config = new Config();
         $config->set('app.logs.enabled', true);
         $config->set('app.logs.path', false);
         $app->bind('config', $config);
@@ -119,7 +119,7 @@ class LogServiceProviderTest extends TestCase
     {
         $app = new Application('/base/path');
 
-        $config = new Config;
+        $config = new Config();
         $config->set('app.logs.enabled', false);
         $config->set('app.logs.path', false);
         $app->bind('config', $config);
@@ -136,7 +136,7 @@ class LogServiceProviderTest extends TestCase
     {
         $app = new Application('/base/path');
 
-        $config = new Config;
+        $config = new Config();
         $config->set('app.logs.enabled', true);
         $config->set('app.logs.path', '/base/new.log');
         $app->bind('config', $config);

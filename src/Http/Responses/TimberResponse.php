@@ -3,10 +3,10 @@
 namespace Rareloop\Lumberjack\Http\Responses;
 
 use Illuminate\Contracts\Support\Arrayable as CollectionArrayable;
+use Laminas\Diactoros\Response\HtmlResponse;
 use Rareloop\Lumberjack\Contracts\Arrayable;
 use Rareloop\Lumberjack\Exceptions\TwigTemplateNotFoundException;
 use Timber\Timber;
-use Zend\Diactoros\Response\HtmlResponse;
 
 class TimberResponse extends HtmlResponse
 {
@@ -21,7 +21,7 @@ class TimberResponse extends HtmlResponse
         parent::__construct($template, $status, $headers);
     }
 
-    private function flattenContextToArrays(array $context) : array
+    private function flattenContextToArrays(array $context): array
     {
         // Recursively walk the array, when we find something that implements the Arrayable interface
         // flatten it to an array. Because we're passing by reference by updating what the value of

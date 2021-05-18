@@ -23,7 +23,7 @@ class TimberServiceProviderTest extends TestCase
     {
         Functions\expect('is_admin')->once()->andReturn(false);
 
-        $app = new Application(__DIR__.'/../');
+        $app = new Application(__DIR__ . '/../');
         $lumberjack = new Lumberjack($app);
 
         $app->register(new TimberServiceProvider($app));
@@ -36,9 +36,9 @@ class TimberServiceProviderTest extends TestCase
     /** @test */
     public function dirname_variable_is_set_from_config()
     {
-        $app = new Application(__DIR__.'/../');
+        $app = new Application(__DIR__ . '/../');
 
-        $config = new Config;
+        $config = new Config();
         $config->set('timber.paths', [
             'path/one',
             'path/two',

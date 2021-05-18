@@ -32,7 +32,7 @@ class Router extends RareRouter
      * @param  mixed  $callback
      * @return boolean
      */
-    private function isControllerString($callback) : bool
+    private function isControllerString($callback): bool
     {
         return is_string($callback) && strpos($callback, '@') !== false;
     }
@@ -43,7 +43,7 @@ class Router extends RareRouter
      * @param  string $callback
      * @return string
      */
-    private function normaliseCallbackString(string $callback) : string
+    private function normaliseCallbackString(string $callback): string
     {
         @list($controller, $method) = explode('@', $callback);
 

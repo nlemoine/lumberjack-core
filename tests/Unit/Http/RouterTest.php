@@ -19,7 +19,7 @@ class RouterTest extends TestCase
     public function controller_has_namespace_added()
     {
         class_alias(RouterTestController::class, 'App\Http\Controllers\MyController');
-        $router = new Router;
+        $router = new Router();
 
         $route = $router->get('/test/123', 'MyController@test');
 
@@ -29,7 +29,7 @@ class RouterTest extends TestCase
     /** @test */
     public function controller_does_not_have_namespace_added_when_it_already_exists()
     {
-        $router = new Router;
+        $router = new Router();
 
         $route = $router->get('/test/123', RouterTestController::class . '@test');
 
@@ -39,8 +39,8 @@ class RouterTest extends TestCase
     /** @test */
     public function controller_does_not_have_namespace_added_when_it_is_callable()
     {
-        $router = new Router;
-        $controller = new RouterTestController;
+        $router = new Router();
+        $controller = new RouterTestController();
 
         $route = $router->get('/test/123', [$controller, 'test']);
 
@@ -50,10 +50,11 @@ class RouterTest extends TestCase
     /** @test */
     public function controller_does_not_have_namespace_added_when_it_is_closure()
     {
-        $router = new Router;
-        $controller = new RouterTestController;
+        $router = new Router();
+        $controller = new RouterTestController();
 
-        $route = $router->get('/test/123', function () {});
+        $route = $router->get('/test/123', function () {
+        });
 
         $this->assertSame('Closure', $route->getActionName());
     }
@@ -78,7 +79,7 @@ class RouterTest extends TestCase
      */
     public function can_extend_post_behaviour_with_mixin()
     {
-        Router::mixin(new RouterMixin);
+        Router::mixin(new RouterMixin());
 
         $queryBuilder = new Router();
 
@@ -88,9 +89,9 @@ class RouterTest extends TestCase
 
 class RouterMixin
 {
-    function testFunctionAddedByMixin()
+    public function testFunctionAddedByMixin()
     {
-        return function() {
+        return function () {
             return 'abc123';
         };
     }
@@ -98,5 +99,7 @@ class RouterMixin
 
 class RouterTestController
 {
-    public function test() {}
+    public function test()
+    {
+    }
 }
