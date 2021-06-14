@@ -10,8 +10,7 @@ use Rareloop\Lumberjack\Http\Router;
 
 class RouterTest extends TestCase
 {
-    /** @test */
-    public function test_facade()
+    public function testFacade()
     {
         $app = new Application();
         FacadeFactory::setContainer($app);

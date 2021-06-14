@@ -7,8 +7,7 @@ use Rareloop\Lumberjack\Config;
 
 class ConfigTest extends TestCase
 {
-    /** @test */
-    public function config_values_can_be_set_and_get()
+    public function testConfigValuesCanBeSetAndGet()
     {
         $config = new Config();
 
@@ -17,8 +16,7 @@ class ConfigTest extends TestCase
         $this->assertSame('production', $config->get('app.environment'));
     }
 
-    /** @test */
-    public function get_returns_default_when_no_value_is_set()
+    public function testGetReturnsDefaultWhenNoValueIsSet()
     {
         $config = new Config();
 
@@ -26,8 +24,7 @@ class ConfigTest extends TestCase
         $this->assertSame('production', $config->get('app.environment', 'production'));
     }
 
-    /** @test */
-    public function get_ignores_default_when_value_is_set()
+    public function testGetIgnoresDefaultWhenValueIsSet()
     {
         $config = new Config();
 
@@ -36,8 +33,7 @@ class ConfigTest extends TestCase
         $this->assertSame('production', $config->get('app.environment', 'staging'));
     }
 
-    /** @test */
-    public function get_returns_default_when_using_dot_notation_but_not_an_array()
+    public function testGetReturnsDefaultWhenUsingDotNotationButNotAnArray()
     {
         $config = new Config();
 
@@ -46,16 +42,14 @@ class ConfigTest extends TestCase
         $this->assertSame(false, $config->get('app.logs.enabled', false));
     }
 
-    /** @test */
-    public function set_is_chainable()
+    public function testSetIsChainable()
     {
         $config = new Config();
 
         $this->assertSame($config, $config->set('app.environment', 'production'));
     }
 
-    /** @test */
-    public function can_read_config_from_files()
+    public function testCanReadConfigFromFiles()
     {
         $config = new Config();
 
@@ -66,8 +60,7 @@ class ConfigTest extends TestCase
         $this->assertSame(123, $config->get('another.test'));
     }
 
-    /** @test */
-    public function can_read_config_from_files_in_constructor()
+    public function testCanReadConfigFromFilesInConstructor()
     {
         $config = new Config(__DIR__ . '/config');
 
@@ -76,16 +69,14 @@ class ConfigTest extends TestCase
         $this->assertSame(123, $config->get('another.test'));
     }
 
-    /** @test */
-    public function read_is_chainable()
+    public function testReadIsChainable()
     {
         $config = new Config();
 
         $this->assertSame($config, $config->load(__DIR__ . '/config'));
     }
 
-    /** @test */
-    public function config_values_can_be_checked_for_existence()
+    public function testConfigValuesCanBeCheckedForExistence()
     {
         $config = new Config();
 

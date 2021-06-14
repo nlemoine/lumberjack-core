@@ -9,8 +9,7 @@ class ViewModelTest extends TestCase
 {
     use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    /** @test */
-    public function public_methods_are_serialised_by_to_array()
+    public function testPublicMethodsAreSerialisedByToArray()
     {
         $viewModel = new TestViewModel();
         $data = $viewModel->toArray();
@@ -21,8 +20,7 @@ class ViewModelTest extends TestCase
         $this->assertFalse(isset($data['privateFoo']));
     }
 
-    /** @test */
-    public function public_methods_with_params_are_not_serialised_by_to_array()
+    public function testPublicMethodsWithParamsAreNotSerialisedByToArray()
     {
         $viewModel = new TestMethodWithParamsViewModel();
         $data = $viewModel->toArray();
@@ -30,8 +28,7 @@ class ViewModelTest extends TestCase
         $this->assertFalse(isset($data['foo']));
     }
 
-    /** @test */
-    public function static_public_methods_are_not_serialised_by_to_array()
+    public function testStaticPublicMethodsAreNotSerialisedByToArray()
     {
         $viewModel = new TestStaticMethodViewModel();
         $data = $viewModel->toArray();
@@ -40,8 +37,7 @@ class ViewModelTest extends TestCase
         $this->assertFalse(isset($data['staticFoo']));
     }
 
-    /** @test */
-    public function public_properties_are_serialised_by_to_array()
+    public function testPublicPropertiesAreSerialisedByToArray()
     {
         $viewModel = new TestPropertiesViewModel();
         $data = $viewModel->toArray();
@@ -52,8 +48,7 @@ class ViewModelTest extends TestCase
         $this->assertFalse(isset($data['privateFoo']));
     }
 
-    /** @test */
-    public function static_public_properties_are_not_serialised_by_to_array()
+    public function testStaticPublicPropertiesAreNotSerialisedByToArray()
     {
         $viewModel = new TestStaticPropertiesViewModel();
         $data = $viewModel->toArray();
@@ -105,12 +100,15 @@ class TestStaticMethodViewModel extends ViewModel
 class TestPropertiesViewModel extends ViewModel
 {
     public $foo = 'bar';
-    private $privateFoo = 'private-foo';
+
     protected $protectedFoo = 'protected-foo';
+
+    private $privateFoo = 'private-foo';
 }
 
 class TestStaticPropertiesViewModel extends ViewModel
 {
     public $foo = 'bar';
+
     public static $staticFoo = 'static-bar';
 }

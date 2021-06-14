@@ -20,11 +20,15 @@ abstract class ServiceProvider
      *
      * @param  string $path
      * @param  string $key
-     * @return void
      */
     public function mergeConfigFrom($path, $key)
     {
-        $existing = $this->app->get(Config::class)->get($key, []);
-        $this->app->get(Config::class)->set($key, array_merge(require $path, $existing));
+        $existing = $this->get(Config::class)->get($key, []);
+        $this->get(Config::class)->set($key, \array_merge(require $path, $existing));
+    }
+
+    protected function get(string $key)
+    {
+        return $this->app->get($key);
     }
 }

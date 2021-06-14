@@ -10,8 +10,7 @@ use Rareloop\Lumberjack\Facades\Log as LogFacade;
 
 class LogTest extends TestCase
 {
-    /** @test */
-    public function test_facade()
+    public function testFacade()
     {
         $app = new Application();
         FacadeFactory::setContainer($app);

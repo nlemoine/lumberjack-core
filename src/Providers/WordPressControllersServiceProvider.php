@@ -15,7 +15,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        add_filter('template_include', [$this, 'handleTemplateInclude']);
+        \add_filter('template_include', [$this, 'handleTemplateInclude'], PHP_INT_MAX);
     }
 
     public function handleTemplateInclude($template)
@@ -37,29 +37,29 @@ class WordPressControllersServiceProvider extends ServiceProvider
         if ($response) {
             $this->app->shutdown($response);
         } else {
-            $this->app->bind('__wp-controller-miss-template', basename($template));
+            $this->app->bind('__wp-controller-miss-template', \basename($template));
             $this->app->bind('__wp-controller-miss-controller', $controller);
         }
     }
 
     public function getControllerClassFromTemplate($template)
     {
-        $controllerName = Stringy::create(basename($template, '.php'))->upperCamelize() . 'Controller';
+        $controllerName = Stringy::create(\basename($template, '.php'))->upperCamelize() . 'Controller';
 
         // Classes can't start with a number so we have to special case the behaviour here
         if ($controllerName === '404Controller') {
             $controllerName = 'Error' . $controllerName;
         }
 
-        $controllerName = apply_filters('lumberjack_controller_name', $controllerName);
-        $controllerNamespace = apply_filters('lumberjack_controller_namespace', 'App\\');
+        $controllerName = \apply_filters('lumberjack_controller_name', $controllerName);
+        $controllerNamespace = \apply_filters('lumberjack_controller_namespace', 'App\\');
 
         return $controllerNamespace . $controllerName;
     }
 
     public function handleRequest(RequestInterface $request, $controllerName, $methodName)
     {
-        if (!class_exists($controllerName)) {
+        if (!\class_exists($controllerName)) {
             if ($this->app->has('logger')) {
                 $this->app->get('logger')->warning('Controller class `' . $controllerName . '` not found');
             }

@@ -1,17 +1,25 @@
 <?php
 
-namespace Rareloop\Lumberjack\Providers;
+namespace Rareloop\Lumberjack\Bootstrappers;
 
-use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use Rareloop\Lumberjack\Application;
+use Rareloop\Lumberjack\Config;
 
-class LogServiceProvider extends ServiceProvider
+class RegisterLogger
 {
-    public function register()
+    private $app;
+
+    public function bootstrap(Application $app)
     {
+        $this->app = $app;
+
+        if (\is_admin()) {
+            return;
+        }
         $logger = new Logger('app');
 
         // If the `path` config is set to false then use the Apache/Nginx error logs
@@ -21,14 +29,9 @@ class LogServiceProvider extends ServiceProvider
             $handler = new StreamHandler($this->getLogsPath(), $this->getLogLevel());
         }
 
-        $formatter = new LineFormatter(null, null, true, true);
-        $formatter->includeStacktraces();
-        $handler->setFormatter($formatter);
-
         $logger->pushHandler($handler);
 
         $this->app->bind('logger', $logger);
-        $this->app->bind(Logger::class, $logger);
         $this->app->bind(LoggerInterface::class, $logger);
     }
 
@@ -37,19 +40,19 @@ class LogServiceProvider extends ServiceProvider
         $config = false;
 
         // Get the config from the container if it's been registered
-        if ($this->app->has('config')) {
-            $config = $this->app->get('config');
+        if ($this->app->has(Config::class)) {
+            $config = $this->app->get(Config::class);
         }
 
-        return $config && $config->get('app.logs.path') === false && $config->get('app.logs.enabled') === true;
+        return $config && $config->get('log.path') === false && $config->get('log.enabled') === true;
     }
 
     private function getLogLevel()
     {
         $logLevel = Logger::DEBUG;
 
-        if ($this->app->has('config')) {
-            $logLevel = $this->app->get('config')->get('app.logs.level', $logLevel);
+        if ($this->app->has(Config::class)) {
+            $logLevel = $this->app->get(Config::class)->get('log.level', $logLevel);
         }
 
         return $logLevel;
@@ -59,14 +62,14 @@ class LogServiceProvider extends ServiceProvider
     {
         $logsPath = 'app.log';
 
-        if ($this->app->has('config')) {
-            $config = $this->app->get('config');
+        if ($this->app->has(Config::class)) {
+            $config = $this->app->get(Config::class);
 
-            if (!$config->get('app.logs.enabled', false)) {
+            if (!$config->get('log.enabled', false)) {
                 return 'php://memory';
             }
 
-            $logsPath = $config->get('app.logs.path', $logsPath);
+            $logsPath = $config->get('log.path', $logsPath);
         }
 
         return $logsPath;

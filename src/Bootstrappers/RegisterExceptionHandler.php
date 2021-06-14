@@ -4,20 +4,22 @@ namespace Rareloop\Lumberjack\Bootstrappers;
 
 use DI\NotFoundException;
 use Exception;
+use function Http\Response\send;
 use Laminas\Diactoros\ServerRequestFactory;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 use Rareloop\Lumberjack\Application;
+use Rareloop\Lumberjack\Config;
 use Rareloop\Lumberjack\Contracts\ExceptionHandler;
-use Rareloop\Lumberjack\Facades\Config;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Throwable;
-use function Http\Response\send;
 
 class RegisterExceptionHandler
 {
     private $app;
+
     private $handler;
 
     public function bootstrap(Application $app)
@@ -28,22 +30,26 @@ class RegisterExceptionHandler
             return;
         }
 
-        // if (Config::get('app.debug')) {
-        //     $this->handler = Debug::enable();
-        // } else {
-        //     $this->handler = ErrorHandler::register();
-        // }
-        $this->handler = ErrorHandler::register();
+        $config = $this->app->get(Config::class);
+
+        if ($config->get('app.debug')) {
+            $this->handler = Debug::enable();
+        } else {
+            $this->handler = ErrorHandler::register();
+        }
+
+        try {
+            // Log silenced errors
+            $this->handler->screamAt(\E_ALL);
+            $this->handler->setDefaultLogger($this->app->get(LoggerInterface::class));
+        } catch (\Throwable $e) {
+        }
+
         $this->handler->setExceptionHandler([$this, 'handleException']);
     }
 
     public function handleException(\Throwable $exception)
     {
-        try {
-            $this->getExceptionHandler()->report($exception);
-        } catch (Exception $e) {
-        }
-
         if ($this->app->runningInConsole()) {
             $this->renderForConsole($exception);
         } else {
@@ -51,11 +57,13 @@ class RegisterExceptionHandler
         }
     }
 
+    public function send(ResponseInterface $response)
+    {
+        @send($response);
+    }
+
     /**
      * Render an exception to the console.
-     *
-     * @param  \Throwable  $e
-     * @return void
      */
     protected function renderForConsole(Throwable $e)
     {
@@ -64,9 +72,6 @@ class RegisterExceptionHandler
 
     /**
      * Render an exception as an HTTP response and send it.
-     *
-     * @param  \Throwable  $e
-     * @return void
      */
     protected function renderHttpResponse(Throwable $e)
     {
@@ -87,10 +92,5 @@ class RegisterExceptionHandler
     protected function getExceptionHandler()
     {
         return $this->app->get(ExceptionHandler::class);
-    }
-
-    public function send(ResponseInterface $response)
-    {
-        send($response);
     }
 }

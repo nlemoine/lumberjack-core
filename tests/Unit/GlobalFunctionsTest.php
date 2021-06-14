@@ -14,7 +14,7 @@ class GlobalFunctionsTest extends TestCase
 {
     use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         include_once(__DIR__ . '/../../src/functions.php');
 
@@ -22,19 +22,17 @@ class GlobalFunctionsTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider globalHelperFunctions
      */
-    public function global_functions_are_registered($function)
+    public function testGlobalFunctionsAreRegistered($function)
     {
-        $this->assertTrue(function_exists($function));
+        $this->assertTrue(\function_exists($function));
     }
 
     /**
-     * @test
      * @dataProvider globalHelperFunctions
      */
-    public function global_functions_proxy_calls_to_static_functions($function)
+    public function testGlobalFunctionsProxyCallsToStaticFunctions($function)
     {
         $helpers = Mockery::mock('alias:' . Helpers::class);
         $helpers->shouldReceive($function)->withArgs(['param1', 'param2'])->once();
@@ -46,8 +44,8 @@ class GlobalFunctionsTest extends TestCase
     {
         $reflection = new \ReflectionClass(Helpers::class);
 
-        return collect($reflection->getMethods(\ReflectionMethod::IS_STATIC))->map(function ($function) {
-            return [ $function->name ];
+        return \collect($reflection->getMethods(\ReflectionMethod::IS_STATIC))->map(function ($function) {
+            return [$function->name];
         })->toArray();
     }
 }

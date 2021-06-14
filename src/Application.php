@@ -4,29 +4,33 @@ namespace Rareloop\Lumberjack;
 
 use Closure;
 use DI\ContainerBuilder;
+use function Http\Response\send;
 use Illuminate\Support\Collection;
 use Interop\Container\ContainerInterface as InteropContainerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
-use Rareloop\Router\Invoker;
-use function Http\Response\send;
 
 class Application implements ContainerInterface, InteropContainerInterface
 {
     private $container;
+
     private $loadedProviders = [];
+
     private $booted = false;
+
     private $basePath;
+
     private $requestHandled = false;
 
     private $nonSingletonClassBinds = [];
+
     private $allBinds = [];
 
     public function __construct($basePath = false)
     {
         $this->container = ContainerBuilder::buildDevContainer();
 
-        $this->bind(Application::class, $this);
+        $this->bind(self::class, $this);
 
         $GLOBALS['__app__'] = $this;
 
@@ -42,12 +46,6 @@ class Application implements ContainerInterface, InteropContainerInterface
         $this->bindPathsInContainer();
     }
 
-    protected function bindPathsInContainer()
-    {
-        $this->bind('path.base', $this->basePath());
-        $this->bind('path.config', $this->configPath());
-    }
-
     public function basePath()
     {
         return $this->basePath;
@@ -61,27 +59,11 @@ class Application implements ContainerInterface, InteropContainerInterface
     public function bind($key, $value)
     {
         // Prevent PHP-DI from creating singletons from class binds or closure factories
-        if ($this->isClassString($value) || is_callable($value)) {
+        if ($this->isClassString($value) || \is_callable($value)) {
             $this->nonSingletonClassBinds[] = $key;
         }
 
         $this->addToContainer($key, $value);
-    }
-
-    protected function isClassString($value)
-    {
-        return is_string($value) && class_exists($value);
-    }
-
-    protected function addToContainer($key, $value)
-    {
-        if ($this->isClassString($value)) {
-            $value = \DI\autowire($value);
-        }
-
-        $this->container->set($key, $value);
-
-        $this->allBinds[] = $key;
     }
 
     /**
@@ -89,9 +71,8 @@ class Application implements ContainerInterface, InteropContainerInterface
      *
      * Second parameter is either a class name or a closure factory.
      *
-     * @param  String $key
-     * @param  String|Closure $value
-     * @return void
+     * @param  string $key
+     * @param  string|Closure $value
      */
     public function singleton($key, $value)
     {
@@ -102,8 +83,7 @@ class Application implements ContainerInterface, InteropContainerInterface
      * Always creates a new object instance, regardless of whether or not the $key has previously
      * been bound as a singleton.
      *
-     * @param  String $key
-     * @param  array  $params
+     * @param  string $key
      * @return mixed
      */
     public function make($key, array $params = [])
@@ -130,17 +110,6 @@ class Application implements ContainerInterface, InteropContainerInterface
         return $this->container->get($id);
     }
 
-    private function isSingletonClassBind($id)
-    {
-        if ($this->isClassString($id) && !in_array($id, $this->allBinds)) {
-            // This is a class and hasn't been previously bound to the container, we should assume
-            // it shouldn't be a singleton as this is our default stance
-            return false;
-        }
-
-        return !in_array($id, $this->nonSingletonClassBinds);
-    }
-
     /**
      * Returns true if the container can return an entry for the given identifier.
      * Returns false otherwise.
@@ -163,11 +132,11 @@ class Application implements ContainerInterface, InteropContainerInterface
             return $foundProvider;
         }
 
-        if (is_string($provider)) {
+        if (\is_string($provider)) {
             $provider = new $provider($this);
         }
 
-        if (method_exists($provider, 'register')) {
+        if (\method_exists($provider, 'register')) {
             $provider->register();
         }
 
@@ -182,10 +151,10 @@ class Application implements ContainerInterface, InteropContainerInterface
 
     public function getProvider($provider)
     {
-        $providerClass = is_string($provider) ? $provider : get_class($provider);
+        $providerClass = \is_string($provider) ? $provider : \get_class($provider);
 
         return (new Collection($this->loadedProviders))->first(function ($provider) use ($providerClass) {
-            return get_class($provider) === $providerClass;
+            return \get_class($provider) === $providerClass;
         });
     }
 
@@ -205,13 +174,6 @@ class Application implements ContainerInterface, InteropContainerInterface
         }
 
         $this->booted = true;
-    }
-
-    private function bootProvider($provider)
-    {
-        if (method_exists($provider, 'boot')) {
-            $this->container->call([$provider, 'boot']);
-        }
     }
 
     public function isBooted()
@@ -241,8 +203,6 @@ class Application implements ContainerInterface, InteropContainerInterface
 
     /**
      * Flag that the request has been handled
-     *
-     * @return void
      */
     public function requestHasBeenHandled()
     {
@@ -251,19 +211,17 @@ class Application implements ContainerInterface, InteropContainerInterface
 
     /**
      * Detect when the request has not been handled and throw an exception
-     *
-     * @return void
      */
     public function detectWhenRequestHasNotBeenHandled()
     {
-        add_action('wp_footer', function () {
+        \add_action('wp_footer', function () {
             $this->requestHasBeenHandled();
         });
 
-        add_action('shutdown', function () {
+        \add_action('shutdown', function () {
             if (!$this->hasRequestBeenHandled()) {
                 if ($this->has('__wp-controller-miss-template') && $this->has('__wp-controller-miss-controller')) {
-                    wp_die(
+                    \wp_die(
                         'Loaded template <code>' .
                         $this->get('__wp-controller-miss-template') .
                         '</code> but couldn\'t find class <code>' .
@@ -290,30 +248,6 @@ class Application implements ContainerInterface, InteropContainerInterface
         die();
     }
 
-    protected function removeSentHeadersAndMoveIntoResponse(ResponseInterface $response): ResponseInterface
-    {
-        // 1. Format the previously sent headers into an array of [key, value]
-        // 2. Remove all headers from the output that we find
-        // 3. Filter out any headers that would clash with those already in the response
-        $headersToAdd = collect(headers_list())->map(function ($header) {
-            $parts = explode(':', $header, 2);
-            header_remove($parts[0]);
-
-            return $parts;
-        })->filter(function ($header) {
-            return !in_array(strtolower($header[0]), ['content-type']);
-        });
-
-        // Add the previously sent headers into the response
-        // Note: You can't mutate a response so we need to use the reduce to end up with a response
-        // object with all the correct headers
-        $responseToSend = collect($headersToAdd)->reduce(function ($newResponse, $header) {
-            return $newResponse->withAddedHeader($header[0], $header[1]);
-        }, $response);
-
-        return $responseToSend;
-    }
-
     /**
      * Is PHP being run from a CLI
      *
@@ -321,6 +255,81 @@ class Application implements ContainerInterface, InteropContainerInterface
      */
     public function runningInConsole()
     {
-        return in_array(php_sapi_name(), ['cli', 'phpdbg'], true);
+        return \in_array(PHP_SAPI, ['cli', 'phpdbg'], true);
+    }
+
+    protected function bindPathsInContainer()
+    {
+        $this->bind('path.base', $this->basePath());
+        $this->bind('path.config', $this->configPath());
+    }
+
+    protected function isClassString($value)
+    {
+        return \is_string($value) && \class_exists($value);
+    }
+
+    protected function addToContainer($key, $value)
+    {
+        if ($this->isClassString($value)) {
+            $value = \DI\autowire($value);
+        }
+
+        $this->container->set($key, $value);
+
+        $this->allBinds[] = $key;
+    }
+
+    protected function removeSentHeadersAndMoveIntoResponse(ResponseInterface $response): ResponseInterface
+    {
+        // 1. Format the previously sent headers into an array of [key, value]
+        // 2. Remove all headers from the output that we find
+        // 3. Filter out any headers that would clash with those already in the response
+        $headersToAdd = \collect(\headers_list())->map(function ($header) {
+            $parts = \explode(':', $header, 2);
+            \header_remove($parts[0]);
+
+            return $parts;
+        })->filter(function ($header) {
+            return !\in_array(\strtolower($header[0]), ['content-type'], true);
+        });
+
+        // Add the previously sent headers into the response
+        // Note: You can't mutate a response so we need to use the reduce to end up with a response
+        // object with all the correct headers
+        $responseToSend = \collect($headersToAdd)->reduce(function ($newResponse, $header) {
+            return $newResponse->withAddedHeader($header[0], $header[1]);
+        }, $response);
+
+        return $responseToSend;
+    }
+
+    private function isSingletonClassBind($id)
+    {
+        if ($this->isClassString($id) && !\in_array($id, $this->allBinds, true)) {
+            // This is a class and hasn't been previously bound to the container, we should assume
+            // it shouldn't be a singleton as this is our default stance
+            return false;
+        }
+
+        return !\in_array($id, $this->nonSingletonClassBinds, true);
+    }
+
+    private function bootProvider($provider)
+    {
+        // boot
+        if (\method_exists($provider, 'boot')) {
+            $this->container->call([$provider, 'boot']);
+        }
+
+        // boot on front only
+        // if (!is_admin() && method_exists($provider, 'bootFront')) {
+        //     $this->container->call([$provider, 'bootFront']);
+        // }
+
+        // // boot on admin only
+        // if (is_admin() && method_exists($provider, 'bootAdmin')) {
+        //     $this->container->call([$provider, 'bootAdmin']);
+        // }
     }
 }

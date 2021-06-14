@@ -20,7 +20,6 @@ namespace Rareloop\Lumberjack;
 
 use Closure;
 use InvalidArgumentException;
-use Rareloop\Lumberjack\Application;
 use Stringy\Stringy;
 
 abstract class Manager
@@ -50,11 +49,22 @@ abstract class Manager
      * Create a new manager instance.
      *
      * @param  \Rareloop\Lumberjack\Application  $app
-     * @return void
      */
     public function __construct(Application $app)
     {
         $this->app = $app;
+    }
+
+    /**
+     * Dynamically call the default driver instance.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->driver()->{$method}(...$parameters);
     }
 
     /**
@@ -74,8 +84,8 @@ abstract class Manager
     {
         $driver = $driver ?: $this->getDefaultDriver();
 
-        if (is_null($driver)) {
-            throw new InvalidArgumentException(sprintf(
+        if ($driver === null) {
+            throw new InvalidArgumentException(\sprintf(
                 'Unable to resolve NULL driver for [%s].',
                 static::class
             ));
@@ -92,46 +102,9 @@ abstract class Manager
     }
 
     /**
-     * Create a new driver instance.
-     *
-     * @param  string  $driver
-     * @return mixed
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function createDriver($driver)
-    {
-        // We'll check to see if a creator method exists for the given driver. If not we
-        // will check for a custom driver creator, which allows developers to create
-        // drivers using their own customized driver creator Closure to create it.
-        if (isset($this->customCreators[$driver])) {
-            return $this->callCustomCreator($driver);
-        } else {
-            $method = 'create' . Stringy::create($driver)->upperCamelize() . 'Driver';
-
-            if (method_exists($this, $method)) {
-                return $this->$method();
-            }
-        }
-        throw new InvalidArgumentException("Driver [$driver] not supported.");
-    }
-
-    /**
-     * Call a custom driver creator.
-     *
-     * @param  string  $driver
-     * @return mixed
-     */
-    protected function callCustomCreator($driver)
-    {
-        return $this->customCreators[$driver]($this->app);
-    }
-
-    /**
      * Register a custom driver creator Closure.
      *
      * @param  string    $driver
-     * @param  \Closure  $callback
      * @return $this
      */
     public function extend($driver, Closure $callback)
@@ -152,14 +125,38 @@ abstract class Manager
     }
 
     /**
-     * Dynamically call the default driver instance.
+     * Create a new driver instance.
      *
-     * @param  string  $method
-     * @param  array   $parameters
+     * @param  string  $driver
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function createDriver($driver)
+    {
+        // We'll check to see if a creator method exists for the given driver. If not we
+        // will check for a custom driver creator, which allows developers to create
+        // drivers using their own customized driver creator Closure to create it.
+        if (isset($this->customCreators[$driver])) {
+            return $this->callCustomCreator($driver);
+        }
+        $method = 'create' . Stringy::create($driver)->upperCamelize() . 'Driver';
+
+        if (\method_exists($this, $method)) {
+            return $this->{$method}();
+        }
+
+        throw new InvalidArgumentException("Driver [${driver}] not supported.");
+    }
+
+    /**
+     * Call a custom driver creator.
+     *
+     * @param  string  $driver
      * @return mixed
      */
-    public function __call($method, $parameters)
+    protected function callCustomCreator($driver)
     {
-        return $this->driver()->$method(...$parameters);
+        return $this->customCreators[$driver]($this->app);
     }
 }

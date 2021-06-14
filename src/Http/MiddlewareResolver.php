@@ -9,6 +9,7 @@ use Rareloop\Router\MiddlewareResolver as MiddlewareResolverInterface;
 class MiddlewareResolver implements MiddlewareResolverInterface
 {
     protected $app;
+
     protected $store;
 
     public function __construct(ContainerInterface $app, MiddlewareAliases $store)
@@ -19,7 +20,7 @@ class MiddlewareResolver implements MiddlewareResolverInterface
 
     public function resolve($name)
     {
-        if (!is_string($name)) {
+        if (!\is_string($name)) {
             return $name;
         }
 

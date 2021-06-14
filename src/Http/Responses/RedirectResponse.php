@@ -9,7 +9,7 @@ class RedirectResponse extends DiactorosRedirectResponse
 {
     public function with($key = null, $value = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             Helpers::app('session')->flash($key);
         } else {
             Helpers::app('session')->flash($key, $value);

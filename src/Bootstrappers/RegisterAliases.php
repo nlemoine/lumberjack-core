@@ -11,7 +11,7 @@ class RegisterAliases
         $config = $app->get('config');
 
         foreach ($config->get('app.aliases', []) as $alias => $realClassname) {
-            class_alias($realClassname, $alias);
+            \class_alias($realClassname, $alias);
         }
     }
 }

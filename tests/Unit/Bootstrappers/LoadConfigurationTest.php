@@ -9,8 +9,7 @@ use Rareloop\Lumberjack\Config;
 
 class LoadConfigurationTest extends TestCase
 {
-    /** @test */
-    public function adds_config_object_to_the_container()
+    public function testAddsConfigObjectToTheContainer()
     {
         $app = new Application(__DIR__ . '/../');
         $bootstrapper = new LoadConfiguration();
@@ -22,8 +21,7 @@ class LoadConfigurationTest extends TestCase
         $this->assertSame($app->get('config'), $app->get(Config::class));
     }
 
-    /** @test */
-    public function created_config_object_has_loaded_config()
+    public function testCreatedConfigObjectHasLoadedConfig()
     {
         $app = new Application(__DIR__ . '/../');
         $bootstrapper = new LoadConfiguration();

@@ -10,8 +10,7 @@ use Rareloop\Lumberjack\Facades\Config as ConfigFacade;
 
 class ConfigTest extends TestCase
 {
-    /** @test */
-    public function test_facade()
+    public function testFacade()
     {
         $app = new Application();
         FacadeFactory::setContainer($app);

@@ -12,10 +12,7 @@ class Router extends RareRouter
     /**
      * Map a router action to a set of Http verbs and a URI
      *
-     * @param  array  $verbs
-     * @param  string $uri
      * @param  callable|string $callback
-     * @return \Rareloop\Router\Route
      */
     public function map(array $verbs, string $uri, $callback): Route
     {
@@ -34,20 +31,17 @@ class Router extends RareRouter
      */
     private function isControllerString($callback): bool
     {
-        return is_string($callback) && strpos($callback, '@') !== false;
+        return \is_string($callback) && \strpos($callback, '@') !== false;
     }
 
     /**
      * Add the default namespace to the Controller classname if required
-     *
-     * @param  string $callback
-     * @return string
      */
     private function normaliseCallbackString(string $callback): string
     {
-        @list($controller, $method) = explode('@', $callback);
+        @list($controller, $method) = \explode('@', $callback);
 
-        if (class_exists($this->defaultControllerNamespace . $controller)) {
+        if (\class_exists($this->defaultControllerNamespace . $controller)) {
             return $this->defaultControllerNamespace . $callback;
         }
 

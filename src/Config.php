@@ -3,7 +3,6 @@
 namespace Rareloop\Lumberjack;
 
 use Illuminate\Support\Arr;
-use Symfony\Component\Finder\Finder;
 
 class Config
 {
@@ -16,7 +15,7 @@ class Config
         }
     }
 
-    public function set(string $key, $value): Config
+    public function set(string $key, $value): self
     {
         Arr::set($this->data, $key, $value);
 
@@ -33,14 +32,14 @@ class Config
         return Arr::has($this->data, $key);
     }
 
-    public function load(string $path): Config
+    public function load(string $path): self
     {
-        $files = glob($path . '/*.php');
+        $files = \glob($path . '/*.php');
 
         foreach ($files as $file) {
             $configData = include $file;
 
-            $this->data[pathinfo($file)['filename']] = $configData;
+            $this->data[\pathinfo($file)['filename']] = $configData;
         }
 
         return $this;

@@ -5,17 +5,19 @@ namespace Rareloop\Lumberjack\Test\Bootstrappers;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Rareloop\Lumberjack\Application;
-use Rareloop\Lumberjack\Bootstrappers\LoadConfiguration;
 use Rareloop\Lumberjack\Bootstrappers\RegisterProviders;
 use Rareloop\Lumberjack\Config;
 use Rareloop\Lumberjack\Providers\ServiceProvider;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class RegisterProvidersTest extends TestCase
 {
     use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    /** @test */
-    public function registers_all_providers_found_in_config()
+    public function testRegistersAllProvidersFoundInConfig()
     {
         $app = new Application();
 
@@ -35,8 +37,7 @@ class RegisterProvidersTest extends TestCase
         $registerProvidersBootstrapper->bootstrap($app);
     }
 
-    /** @test */
-    public function should_not_fall_over_on_empty_config_data()
+    public function testShouldNotFallOverOnEmptyConfigData()
     {
         $app = new Application();
 

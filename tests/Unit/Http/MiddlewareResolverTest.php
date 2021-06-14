@@ -13,8 +13,7 @@ class MiddlewareResolverTest extends TestCase
 {
     use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    /** @test */
-    public function can_resolve_a_key_from_the_container()
+    public function testCanResolveAKeyFromTheContainer()
     {
         $app = new Application();
         $resolver = new MiddlewareResolver($app, new MiddlewareAliasStore());
@@ -25,8 +24,7 @@ class MiddlewareResolverTest extends TestCase
         $this->assertSame($datetime, $resolver->resolve('datetime'));
     }
 
-    /** @test */
-    public function can_resolve_an_object_from_a_classname_from_the_container()
+    public function testCanResolveAnObjectFromAClassnameFromTheContainer()
     {
         $app = new Application();
         $resolver = new MiddlewareResolver($app, new MiddlewareAliasStore());
@@ -34,8 +32,7 @@ class MiddlewareResolverTest extends TestCase
         $this->assertInstanceOf(MRTestClass::class, $resolver->resolve(MRTestClass::class));
     }
 
-    /** @test */
-    public function can_resolve_a_middleware_alias()
+    public function testCanResolveAMiddlewareAlias()
     {
         $app = new Application();
         $store = Mockery::mock(MiddlewareAliases::class);
@@ -46,8 +43,7 @@ class MiddlewareResolverTest extends TestCase
         $this->assertInstanceOf(MRTestClass::class, $resolver->resolve('middlewarekey'));
     }
 
-    /** @test */
-    public function non_string_values_are_returned_as_is()
+    public function testNonStringValuesAreReturnedAsIs()
     {
         $app = new Application();
         $resolver = new MiddlewareResolver($app, new MiddlewareAliasStore());

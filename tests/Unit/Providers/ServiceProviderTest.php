@@ -2,7 +2,6 @@
 
 namespace Rareloop\Lumberjack\Test\Providers;
 
-use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
 use Rareloop\Lumberjack\Application;
 use Rareloop\Lumberjack\Config;
@@ -13,8 +12,7 @@ class ServiceProviderTest extends TestCase
 {
     use BrainMonkeyPHPUnitIntegration;
 
-    /** @test */
-    public function can_merge_config_from_a_file()
+    public function testCanMergeConfigFromAFile()
     {
         $config = new Config();
         $app = new Application();
@@ -26,8 +24,7 @@ class ServiceProviderTest extends TestCase
         $this->assertSame(123, $config->get('another.test'));
     }
 
-    /** @test */
-    public function existing_config_takes_priority_over_merged_values()
+    public function testExistingConfigTakesPriorityOverMergedValues()
     {
         $config = new Config();
         $app = new Application();

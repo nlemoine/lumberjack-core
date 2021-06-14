@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Test\Bootstrappers;
 
+use Brain\Monkey\Functions;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Rareloop\Lumberjack\Application;
@@ -12,9 +13,10 @@ class RegisterRequestHandlerTest extends TestCase
 {
     use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    /** @test */
-    public function calls_function_on_app_when_in_debug_mode()
+    public function testCallsFunctionOnAppWhenInDebugMode()
     {
+        Functions\when('is_admin')->justReturn(false);
+
         $app = Mockery::mock(Application::class . '[detectWhenRequestHasNotBeenHandled]');
         $app->shouldReceive('detectWhenRequestHasNotBeenHandled')->once();
 
@@ -26,8 +28,7 @@ class RegisterRequestHandlerTest extends TestCase
         $bootstrapper->bootstrap($app);
     }
 
-    /** @test */
-    public function does_not_call_function_on_app_when_not_in_debug_mode()
+    public function testDoesNotCallFunctionOnAppWhenNotInDebugMode()
     {
         $app = Mockery::mock(Application::class . '[detectWhenRequestHasNotBeenHandled]');
         $app->shouldNotReceive('detectWhenRequestHasNotBeenHandled');

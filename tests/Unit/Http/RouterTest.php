@@ -2,7 +2,6 @@
 
 namespace Rareloop\Lumberjack\Test\Http;
 
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use Rareloop\Lumberjack\Http\Router;
 
@@ -15,10 +14,9 @@ class RouterTest extends TestCase
 {
     use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    /** @test */
-    public function controller_has_namespace_added()
+    public function testControllerHasNamespaceAdded()
     {
-        class_alias(RouterTestController::class, 'App\Http\Controllers\MyController');
+        \class_alias(RouterTestController::class, 'App\Http\Controllers\MyController');
         $router = new Router();
 
         $route = $router->get('/test/123', 'MyController@test');
@@ -26,8 +24,7 @@ class RouterTest extends TestCase
         $this->assertSame('App\Http\Controllers\MyController@test', $route->getActionName());
     }
 
-    /** @test */
-    public function controller_does_not_have_namespace_added_when_it_already_exists()
+    public function testControllerDoesNotHaveNamespaceAddedWhenItAlreadyExists()
     {
         $router = new Router();
 
@@ -36,8 +33,7 @@ class RouterTest extends TestCase
         $this->assertSame(RouterTestController::class . '@test', $route->getActionName());
     }
 
-    /** @test */
-    public function controller_does_not_have_namespace_added_when_it_is_callable()
+    public function testControllerDoesNotHaveNamespaceAddedWhenItIsCallable()
     {
         $router = new Router();
         $controller = new RouterTestController();
@@ -47,8 +43,7 @@ class RouterTest extends TestCase
         $this->assertSame(RouterTestController::class . '@test', $route->getActionName());
     }
 
-    /** @test */
-    public function controller_does_not_have_namespace_added_when_it_is_closure()
+    public function testControllerDoesNotHaveNamespaceAddedWhenItIsClosure()
     {
         $router = new Router();
         $controller = new RouterTestController();
@@ -59,10 +54,7 @@ class RouterTest extends TestCase
         $this->assertSame('Closure', $route->getActionName());
     }
 
-    /**
-     * @test
-     */
-    public function can_extend_post_behaviour_with_macros()
+    public function testCanExtendPostBehaviourWithMacros()
     {
         Router::macro('testFunctionAddedByMacro', function () {
             return 'abc123';
@@ -74,10 +66,7 @@ class RouterTest extends TestCase
         $this->assertSame('abc123', Router::testFunctionAddedByMacro());
     }
 
-    /**
-     * @test
-     */
-    public function can_extend_post_behaviour_with_mixin()
+    public function testCanExtendPostBehaviourWithMixin()
     {
         Router::mixin(new RouterMixin());
 

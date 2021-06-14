@@ -26,7 +26,7 @@ class Helpers
 
     public static function config($key, $default = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             $keyValues = $key;
 
             foreach ($keyValues as $key => $value) {
@@ -84,7 +84,7 @@ class Helpers
 
     public static function logger($message = null, $context = [])
     {
-        if (is_null($message)) {
+        if ($message === null) {
             return static::app('logger');
         }
 

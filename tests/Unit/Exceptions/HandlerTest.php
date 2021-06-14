@@ -3,61 +3,24 @@
 namespace Rareloop\Lumberjack\Test\Exceptions;
 
 use Blast\Facades\FacadeFactory;
-use Brain\Monkey;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\ServerRequest;
-use Mockery;
-use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Rareloop\Lumberjack\Application;
 use Rareloop\Lumberjack\Config;
 use Rareloop\Lumberjack\Exceptions\Handler;
-use Rareloop\Lumberjack\Http\Responses\TimberResponse;
 
 class HandlerTest extends TestCase
 {
     use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    /** @test */
-    public function report_should_log_exception()
-    {
-        $app = new Application();
-
-        $exception = new \Exception('Test Exception');
-
-        $logger = Mockery::mock(Logger::class);
-        $logger->shouldReceive('error')->with($exception)->once();
-        $app->bind('logger', $logger);
-
-        $handler = new Handler($app);
-
-        $handler->report($exception);
-    }
-
-    /** @test */
-    public function blacklisted_exception_types_will_not_be_logged()
-    {
-        $app = new Application();
-
-        $exception = new BlacklistedException('Test Exception');
-
-        $logger = Mockery::mock(Logger::class);
-        $logger->shouldNotReceive('error');
-        $app->bind('logger', $logger);
-
-        $handler = new HandlerWithBlacklist($app);
-
-        $handler->report($exception);
-    }
-
-    /** @test */
-    public function render_should_return_an_html_response_when_debug_is_enabled()
+    public function testRenderShouldReturnAnHtmlResponseWhenDebugIsEnabled()
     {
         $app = new Application();
         FacadeFactory::setContainer($app);
         $config = new Config();
         $config->set('app.debug', true);
-        $app->bind('config', $config);
+        $app->bind(Config::class, $config);
 
         $exception = new \Exception('Test Exception');
         $handler = new Handler($app);
@@ -67,14 +30,13 @@ class HandlerTest extends TestCase
         $this->assertInstanceOf(HtmlResponse::class, $response);
     }
 
-    /** @test */
-    // public function render_should_return_an_html_response_when_debug_is_disabled()
+    // public function test_render_should_return_an_html_response_when_debug_is_disabled()
     // {
     //     $app = new Application();
     //     FacadeFactory::setContainer($app);
     //     $config = new Config();
     //     $config->set('app.debug', false);
-    //     $app->bind('config', $config);
+    //     $app->bind(Config::class, $config);
 
     //     $exception = new \Exception('Test Exception');
     //     $handler = new Handler($app);
@@ -84,14 +46,13 @@ class HandlerTest extends TestCase
     //     $this->assertInstanceOf(HtmlResponse::class, $response);
     // }
 
-    /** @test */
-    public function render_should_include_stack_trace_when_debug_is_enabled()
+    public function testRenderShouldIncludeStackTraceWhenDebugIsEnabled()
     {
         $app = new Application();
         FacadeFactory::setContainer($app);
         $config = new Config();
         $config->set('app.debug', true);
-        $app->bind('config', $config);
+        $app->bind(Config::class, $config);
 
         $exception = new \Exception('Test Exception');
         $handler = new Handler($app);
@@ -101,13 +62,13 @@ class HandlerTest extends TestCase
     }
 
     /** @test */
-    // public function render_should_not_include_stack_trace_when_debug_is_disabled()
+    // public function test_render_should_not_include_stack_trace_when_debug_is_disabled()
     // {
     //     $app = new Application();
     //     FacadeFactory::setContainer($app);
     //     $config = new Config();
     //     $config->set('app.debug', false);
-    //     $app->bind('config', $config);
+    //     $app->bind(Config::class, $config);
 
     //     $exception = new \Exception('Test Exception');
     //     $handler = new Handler($app);
@@ -116,15 +77,4 @@ class HandlerTest extends TestCase
 
     //     $this->assertStringNotContainsString('Test Exception', $response->getBody()->getContents());
     // }
-}
-
-class HandlerWithBlacklist extends Handler
-{
-    protected $dontReport = [
-        BlacklistedException::class,
-    ];
-}
-
-class BlacklistedException extends \Exception
-{
 }

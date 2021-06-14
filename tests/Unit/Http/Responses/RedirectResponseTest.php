@@ -13,40 +13,35 @@ class RedirectResponseTest extends TestCase
 {
     use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    /** @test */
-    public function is_a_psr_response_implementation()
+    public function testIsAPsrResponseImplementation()
     {
         $response = new RedirectResponse('/another.php');
 
         $this->assertInstanceOf(ResponseInterface::class, $response);
     }
 
-    /** @test */
-    public function has_a_302_status_code_by_default()
+    public function testHasA302StatusCodeByDefault()
     {
         $response = new RedirectResponse('/another.php');
 
         $this->assertSame(302, $response->getStatusCode());
     }
 
-    /** @test */
-    public function can_specify_a_301_status_code()
+    public function testCanSpecifyA301StatusCode()
     {
         $response = new RedirectResponse('/another.php', 301);
 
         $this->assertSame(301, $response->getStatusCode());
     }
 
-    /** @test */
-    public function sets_the_location_header()
+    public function testSetsTheLocationHeader()
     {
         $response = new RedirectResponse('/another.php');
 
         $this->assertSame('/another.php', $response->getHeader('Location')[0]);
     }
 
-    /** @test */
-    public function can_call_with_method_to_flash_data_to_the_session()
+    public function testCanCallWithMethodToFlashDataToTheSession()
     {
         $app = new Application();
         $session = Mockery::mock(SessionManager::class);
@@ -59,8 +54,7 @@ class RedirectResponseTest extends TestCase
         $this->assertSame($response, $response->with('key', 'value')->with('foo', 'bar'));
     }
 
-    /** @test */
-    public function can_call_with_method_to_flash_data_to_the_session_using_an_array()
+    public function testCanCallWithMethodToFlashDataToTheSessionUsingAnArray()
     {
         $app = new Application();
         $session = Mockery::mock(SessionManager::class);

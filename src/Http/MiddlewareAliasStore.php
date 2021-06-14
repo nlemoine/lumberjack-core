@@ -3,7 +3,6 @@
 namespace Rareloop\Lumberjack\Http;
 
 use Closure;
-use Psr\Container\ContainerInterface;
 use Rareloop\Lumberjack\Contracts\MiddlewareAliases;
 
 class MiddlewareAliasStore implements MiddlewareAliases
@@ -25,20 +24,11 @@ class MiddlewareAliasStore implements MiddlewareAliases
             $middleware = $middleware(...$params);
         }
 
-        if (is_string($middleware) && class_exists($middleware)) {
+        if (\is_string($middleware) && \class_exists($middleware)) {
             $middleware = new $middleware(...$params);
         }
 
         return $middleware;
-    }
-
-    protected function parseName($name): array
-    {
-        list($name, $params) = array_pad(explode(':', $name), 2, '');
-
-        $params = explode(',', $params);
-
-        return [$name, $params];
     }
 
     public function has(string $name): bool
@@ -46,5 +36,14 @@ class MiddlewareAliasStore implements MiddlewareAliases
         list($name, $params) = $this->parseName($name);
 
         return isset($this->aliases[$name]);
+    }
+
+    protected function parseName($name): array
+    {
+        list($name, $params) = \array_pad(\explode(':', $name), 2, '');
+
+        $params = \explode(',', $params);
+
+        return [$name, $params];
     }
 }

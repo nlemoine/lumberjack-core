@@ -19,8 +19,7 @@ class TimberResponseTest extends TestCase
 {
     use \Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    /** @test */
-    public function constructor_calls_timber_compile()
+    public function testConstructorCallsTimberCompile()
     {
         $context = [
             'foo' => 'bar',
@@ -38,10 +37,7 @@ class TimberResponseTest extends TestCase
         $this->assertSame('testing123', $response->getBody()->__toString());
     }
 
-    /**
-     * @test
-     */
-    public function exception_is_thrown_if_twig_file_is_not_found()
+    public function testExceptionIsThrownIfTwigFileIsNotFound()
     {
         $this->expectException(\Rareloop\Lumberjack\Exceptions\TwigTemplateNotFoundException::class);
         $this->expectExceptionMessage('template.twig');
@@ -62,8 +58,7 @@ class TimberResponseTest extends TestCase
         $this->assertSame('testing123', $response->getBody()->__toString());
     }
 
-    /** @test */
-    public function can_set_headers()
+    public function testCanSetHeaders()
     {
         $headers = [
             'X-Test-Header' => 'testing',
@@ -80,8 +75,7 @@ class TimberResponseTest extends TestCase
         $this->assertSame('testing', $headers['X-Test-Header'][0]);
     }
 
-    /** @test */
-    public function default_status_code_is_200()
+    public function testDefaultStatusCodeIs200()
     {
         $timber = Mockery::mock('alias:' . Timber::class);
         $timber->shouldReceive('compile')->once()->andReturn('testing123');
@@ -91,8 +85,7 @@ class TimberResponseTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
     }
 
-    /** @test */
-    public function contexts_with_view_models_are_converted()
+    public function testContextsWithViewModelsAreConverted()
     {
         $context = [
             'foo' => TestViewModel::createFromArray([
@@ -114,8 +107,7 @@ class TimberResponseTest extends TestCase
         $response = new TimberResponse('template.twig', $context, 123);
     }
 
-    /** @test */
-    public function contexts_with_view_models_at_lower_levels_of_nesting_are_converted()
+    public function testContextsWithViewModelsAtLowerLevelsOfNestingAreConverted()
     {
         $context = [
             'foo' => [
@@ -140,8 +132,7 @@ class TimberResponseTest extends TestCase
         $response = new TimberResponse('template.twig', $context, 123);
     }
 
-    /** @test */
-    public function original_data_structure_is_not_mutated()
+    public function testOriginalDataStructureIsNotMutated()
     {
         $context = [
             'foo' => TestViewModel::createFromArray([
@@ -159,13 +150,15 @@ class TimberResponseTest extends TestCase
         $this->assertInstanceOf(TestViewModel::class, $context['foo']);
     }
 
-    /** @test */
-    public function contexts_with_collections_are_converted()
+    public function testContextsWithCollectionsAreConverted()
     {
         $context = [
-            'foo' => collect([
-                ['bar' => 123, ]
+            'foo' => \collect([
+                [
+                    'bar' => 123,
+                ],
             ]),
+
         ];
 
         $timber = Mockery::mock('alias:' . Timber::class);
@@ -182,14 +175,16 @@ class TimberResponseTest extends TestCase
         $response = new TimberResponse('template.twig', $context, 123);
     }
 
-    /** @test */
-    public function contexts_with_collections_at_lower_levels_of_nesting_are_converted()
+    public function testContextsWithCollectionsAtLowerLevelsOfNestingAreConverted()
     {
         $context = [
             'foo' => [
-                'bar' => collect([
-                    ['baz' => 123, ]
+                'bar' => \collect([
+                    [
+                        'baz' => 123,
+                    ],
                 ]),
+
             ],
         ];
 
@@ -208,11 +203,10 @@ class TimberResponseTest extends TestCase
         $response = new TimberResponse('template.twig', $context, 123);
     }
 
-    /** @test */
-    public function contexts_with_view_models_in_collections_are_converted()
+    public function testContextsWithViewModelsInCollectionsAreConverted()
     {
         $context = [
-            'foo' => collect([
+            'foo' => \collect([
                 TestViewModel::createFromArray([
                     'bar' => 123,
                 ]),
@@ -237,6 +231,7 @@ class TimberResponseTest extends TestCase
 class TestViewModel extends ViewModel
 {
     public $bar;
+
     public $baz;
 
     public static function createFromArray(array $array)

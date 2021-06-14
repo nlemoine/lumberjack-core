@@ -33,7 +33,7 @@ class RouterServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        add_action('wp_loaded', function () {
+        \add_action('wp_loaded', function () {
             $request = ServerRequest::fromRequest(ServerRequestFactory::fromGlobals(
                 $_SERVER,
                 $_GET,
@@ -46,30 +46,13 @@ class RouterServiceProvider extends ServiceProvider
         });
     }
 
-    private function getBasePathFromWPConfig()
-    {
-        // Infer the base path from the site's URL
-        $siteUrl = get_bloginfo('url');
-        $siteUrlParts = explode('/', rtrim($siteUrl, ' //'));
-        $siteUrlParts = array_slice($siteUrlParts, 3);
-        $basePath = implode('/', $siteUrlParts);
-
-        if (!$basePath) {
-            $basePath = '/';
-        } else {
-            $basePath = '/' . $basePath . '/';
-        }
-
-        return $basePath;
-    }
-
     public function processRequest(RequestInterface $request)
     {
         $this->app->bind('request', $request);
 
         $response = $this->app->get('router')->match($request);
 
-        $response = apply_filters('lumberjack_router_response', $response, $request);
+        $response = \apply_filters('lumberjack_router_response', $response, $request);
 
         if ($response->getStatusCode() === 404) {
             return;
@@ -78,5 +61,22 @@ class RouterServiceProvider extends ServiceProvider
         $this->app->requestHasBeenHandled();
 
         $this->app->shutdown($response);
+    }
+
+    private function getBasePathFromWPConfig()
+    {
+        // Infer the base path from the site's URL
+        $siteUrl = \get_bloginfo('url');
+        $siteUrlParts = \explode('/', \rtrim($siteUrl, ' //'));
+        $siteUrlParts = \array_slice($siteUrlParts, 3);
+        $basePath = \implode('/', $siteUrlParts);
+
+        if (!$basePath) {
+            $basePath = '/';
+        } else {
+            $basePath = '/' . $basePath . '/';
+        }
+
+        return $basePath;
     }
 }

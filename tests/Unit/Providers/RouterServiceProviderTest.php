@@ -2,7 +2,6 @@
 
 namespace Rareloop\Lumberjack\Test\Providers;
 
-use Brain\Monkey;
 use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
 use Mockery;
@@ -18,7 +17,6 @@ use Rareloop\Lumberjack\Http\Router;
 use Rareloop\Lumberjack\Providers\RouterServiceProvider;
 use Rareloop\Lumberjack\Test\Unit\BrainMonkeyPHPUnitIntegration;
 use Rareloop\Router\MiddlewareResolver;
-use Zend\Diactoros\Request;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ServerRequest;
@@ -27,10 +25,9 @@ class RouterServiceProviderTest extends TestCase
 {
     use BrainMonkeyPHPUnitIntegration;
 
-    /** @test */
-    public function router_object_is_configured()
+    public function testRouterObjectIsConfigured()
     {
-        Functions\expect('is_admin')->once()->andReturn(false);
+        Functions\when('is_admin')->justReturn(false);
 
         $this->setSiteUrl('http://example.com/sub-path/');
         $app = new Application(__DIR__ . '/../');
@@ -43,10 +40,9 @@ class RouterServiceProviderTest extends TestCase
         $this->assertSame($app->get('router'), $app->get(Router::class));
     }
 
-    /** @test */
-    public function middleware_alias_objects_are_configured()
+    public function testMiddlewareAliasObjectsAreConfigured()
     {
-        Functions\expect('is_admin')->once()->andReturn(false);
+        Functions\when('is_admin')->justReturn(false);
 
         $this->setSiteUrl('http://example.com/sub-path/');
         $app = new Application(__DIR__ . '/../');
@@ -62,10 +58,9 @@ class RouterServiceProviderTest extends TestCase
         $this->assertSame($app->get('middleware-resolver'), $app->get(MiddlewareResolver::class));
     }
 
-    /** @test */
-    public function configured_router_can_resolve_middleware_aliases()
+    public function testConfiguredRouterCanResolveMiddlewareAliases()
     {
-        Functions\expect('is_admin')->once()->andReturn(false);
+        Functions\when('is_admin')->justReturn(false);
 
         $this->setSiteUrl('http://example.com/');
         $app = new Application(__DIR__ . '/../');
@@ -87,10 +82,9 @@ class RouterServiceProviderTest extends TestCase
         $this->assertSame('abc', $response->getHeader('X-Key')[0]);
     }
 
-    /** @test */
-    public function basedir_is_set_from_wordpress_config()
+    public function testBasedirIsSetFromWordpressConfig()
     {
-        Functions\expect('is_admin')->once()->andReturn(false);
+        Functions\when('is_admin')->justReturn(false);
 
         $this->setSiteUrl('http://example.com/sub-path/');
         $request = new ServerRequest([], [], '/sub-path/test/123', 'GET');
@@ -111,10 +105,9 @@ class RouterServiceProviderTest extends TestCase
         $this->assertSame('abc123', $response->getBody()->__toString());
     }
 
-    /** @test */
-    public function wp_loaded_action_is_bound()
+    public function testWpLoadedActionIsBound()
     {
-        Functions\expect('is_admin')->once()->andReturn(false);
+        Functions\when('is_admin')->justReturn(false);
 
         $this->setSiteUrl('http://example.com/sub-path/');
         $app = new Application(__DIR__ . '/../');
@@ -124,13 +117,12 @@ class RouterServiceProviderTest extends TestCase
         $app->register($provider);
         $lumberjack->bootstrap();
 
-        $this->assertSame(10, has_action('wp_loaded', 'function ()'));
+        $this->assertSame(10, \has_action('wp_loaded', 'function ()'));
     }
 
-    /** @test */
-    public function request_object_is_bound_into_the_container()
+    public function testRequestObjectIsBoundIntoTheContainer()
     {
-        Functions\expect('is_admin')->once()->andReturn(false);
+        Functions\when('is_admin')->justReturn(false);
 
         $this->setSiteUrl('http://example.com/sub-path/');
         $request = new ServerRequest([], [], '/test/123', 'GET');
@@ -146,10 +138,9 @@ class RouterServiceProviderTest extends TestCase
         $this->assertSame($request, $app->get('request'));
     }
 
-    /** @test */
-    public function unmatched_request_will_not_call_app_shutdown_method()
+    public function testUnmatchedRequestWillNotCallAppShutdownMethod()
     {
-        Functions\expect('is_admin')->once()->andReturn(false);
+        Functions\when('is_admin')->justReturn(false);
 
         $this->setSiteUrl('http://example.com/sub-path/');
         $response = new TextResponse('Testing 123', 404);
@@ -170,10 +161,9 @@ class RouterServiceProviderTest extends TestCase
         $provider->processRequest(new ServerRequest([], [], '/test/123', 'GET'));
     }
 
-    /** @test */
-    public function matched_request_will_call_app_shutdown_method()
+    public function testMatchedRequestWillCallAppShutdownMethod()
     {
-        Functions\expect('is_admin')->once()->andReturn(false);
+        Functions\when('is_admin')->justReturn(false);
 
         $this->setSiteUrl('http://example.com/sub-path/');
         $response = new TextResponse('Testing 123', 200);
@@ -194,10 +184,10 @@ class RouterServiceProviderTest extends TestCase
         $provider->processRequest(new ServerRequest([], [], '/test/123', 'GET'));
     }
 
-    /** @test */
-    public function lumberjack_router_response_filter_is_fired_when_request_is_processed()
+    public function testLumberjackRouterResponseFilterIsFiredWhenRequestIsProcessed()
     {
-        Functions\expect('is_admin')->once()->andReturn(false);
+        Functions\when('is_admin')->justReturn(false);
+
         $this->setSiteUrl('http://example.com/sub-path/');
 
         $request = new ServerRequest([], [], '/test/123', 'GET');
@@ -223,10 +213,9 @@ class RouterServiceProviderTest extends TestCase
         $provider->processRequest($request);
     }
 
-    /** @test */
-    public function matched_request_will_mark_request_handled_in_app()
+    public function testMatchedRequestWillMarkRequestHandledInApp()
     {
-        Functions\expect('is_admin')->once()->andReturn(false);
+        Functions\when('is_admin')->justReturn(false);
 
         $this->setSiteUrl('http://example.com/sub-path/');
         $response = new TextResponse('Testing 123', 200);
@@ -249,10 +238,9 @@ class RouterServiceProviderTest extends TestCase
         $this->assertTrue($app->hasRequestBeenHandled());
     }
 
-    /** @test */
-    public function unmatched_request_will_not_mark_request_handled_in_app()
+    public function testUnmatchedRequestWillNotMarkRequestHandledInApp()
     {
-        Functions\expect('is_admin')->once()->andReturn(false);
+        Functions\when('is_admin')->justReturn(false);
 
         $this->setSiteUrl('http://example.com/sub-path/');
         $response = new TextResponse('Testing 123', 404);
@@ -288,6 +276,7 @@ class RouterServiceProviderTest extends TestCase
 class RSPAddHeaderMiddleware implements MiddlewareInterface
 {
     private $key;
+
     private $value;
 
     public function __construct($key, $value)

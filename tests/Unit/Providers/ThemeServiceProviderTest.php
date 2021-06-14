@@ -3,25 +3,22 @@
 namespace Rareloop\Lumberjack\Test;
 
 use Brain\Monkey\Functions;
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use Rareloop\Lumberjack\Application;
 use Rareloop\Lumberjack\Config;
-use Rareloop\Lumberjack\Providers\ThemeSupportServiceProvider;
+use Rareloop\Lumberjack\Providers\ThemeServiceProvider;
 use Rareloop\Lumberjack\Test\Unit\BrainMonkeyPHPUnitIntegration;
 
-class ThemeSupportServiceProviderTest extends TestCase
+class ThemeServiceProviderTest extends TestCase
 {
     use BrainMonkeyPHPUnitIntegration;
 
-    /** @test */
-    public function should_call_add_theme_support_for_key_in_config()
+    public function testShouldCallAddThemeSupportForKeyInConfig()
     {
         $app = new Application(__DIR__ . '/..');
-
         $config = new Config();
 
-        $config->set('app.themeSupport', [
+        $config->set('theme.support', [
             'post-thumbnail',
         ]);
 
@@ -29,18 +26,17 @@ class ThemeSupportServiceProviderTest extends TestCase
             ->with('post-thumbnail')
             ->once();
 
-        $provider = new ThemeSupportServiceProvider($app);
-        $provider->boot($config);
+        $provider = new ThemeServiceProvider($app);
+        $provider->addThemeSupport($config);
     }
 
-    /** @test */
-    public function should_call_add_theme_support_for_key_value_in_config()
+    public function testShouldCallAddThemeSupportForKeyValueInConfig()
     {
         $app = new Application(__DIR__ . '/..');
 
         $config = new Config();
 
-        $config->set('app.themeSupport', [
+        $config->set('theme.support', [
             'post-formats' => ['aside', 'gallery'],
         ]);
 
@@ -48,7 +44,7 @@ class ThemeSupportServiceProviderTest extends TestCase
             ->with('post-formats', ['aside', 'gallery'])
             ->once();
 
-        $provider = new ThemeSupportServiceProvider($app);
-        $provider->boot($config);
+        $provider = new ThemeServiceProvider($app);
+        $provider->addThemeSupport($config);
     }
 }

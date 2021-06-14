@@ -9,15 +9,16 @@ use Rareloop\Psr7ServerRequestExtension\InteractsWithUri;
 
 class ServerRequest extends DiactorosServerRequest
 {
-    use InteractsWithInput, InteractsWithUri;
+    use InteractsWithInput;
+    use InteractsWithUri;
 
     public static function fromRequest(ServerRequestInterface $request)
     {
         $parsedBody = $request->getParsedBody();
 
         // Is this a JSON request?
-        if (stripos($request->getHeaderLine('Content-Type'), 'application/json') !== false) {
-            $parsedBody = @json_decode($request->getBody()->getContents(), true);
+        if (\stripos($request->getHeaderLine('Content-Type'), 'application/json') !== false) {
+            $parsedBody = @\json_decode($request->getBody()->getContents(), true);
         }
 
         return new static(
@@ -40,11 +41,11 @@ class ServerRequest extends DiactorosServerRequest
             return false;
         }
 
-        return 'XMLHttpRequest' === $this->getHeader('X-Requested-With')[0];
+        return $this->getHeader('X-Requested-With')[0] === 'XMLHttpRequest';
     }
 
     public function getMethod(): string
     {
-        return strtoupper(parent::getMethod());
+        return \strtoupper(parent::getMethod());
     }
 }

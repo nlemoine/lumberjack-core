@@ -15,9 +15,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Rareloop\Lumberjack\Application;
 use Rareloop\Lumberjack\Contracts\MiddlewareAliases;
 use Rareloop\Lumberjack\Http\Controller;
-use Rareloop\Lumberjack\Http\Kernal;
-use Rareloop\Lumberjack\Http\MiddlewareAliasStore;
-use Rareloop\Lumberjack\Http\MiddlewareResolver;
 use Rareloop\Lumberjack\Providers\RouterServiceProvider;
 use Rareloop\Lumberjack\Providers\WordPressControllersServiceProvider;
 use Rareloop\Lumberjack\Test\Unit\BrainMonkeyPHPUnitIntegration;
@@ -29,8 +26,7 @@ class WordPressControllersServiceProviderTest extends TestCase
 {
     use BrainMonkeyPHPUnitIntegration;
 
-    /** @test */
-    public function template_include_filter_is_applied_on_boot()
+    public function testTemplateIncludeFilterIsAppliedOnBoot()
     {
         $app = new Application(__DIR__ . '/../');
         $provider = new WordPressControllersServiceProvider($app);
@@ -38,24 +34,22 @@ class WordPressControllersServiceProviderTest extends TestCase
         $app->register($provider);
         $app->boot();
 
-        $this->assertSame(10, has_filter('template_include', [$provider, 'handleTemplateInclude']));
+        $this->assertSame(PHP_INT_MAX, \has_filter('template_include', [$provider, 'handleTemplateInclude']));
     }
 
-    /** @test */
-    public function handle_template_include_method_includes_the_requested_file()
+    public function testHandleTemplateIncludeMethodIncludesTheRequestedFile()
     {
         $app = new Application(__DIR__ . '/../');
 
-        $this->assertNotContains(__DIR__ . '/includes/single.php', get_included_files());
+        $this->assertNotContains(__DIR__ . '/includes/single.php', \get_included_files());
 
         $provider = new WordPressControllersServiceProvider($app);
         $provider->handleTemplateInclude(__DIR__ . '/includes/single.php');
 
-        $this->assertContains(__DIR__ . '/includes/single.php', get_included_files());
+        $this->assertContains(__DIR__ . '/includes/single.php', \get_included_files());
     }
 
-    /** @test */
-    public function handle_template_include_method_sets_details_in_container_when_controller_is_not_present()
+    public function testHandleTemplateIncludeMethodSetsDetailsInContainerWhenControllerIsNotPresent()
     {
         $app = new Application(__DIR__ . '/../');
 
@@ -68,8 +62,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertSame('App\SingleController', $app->get('__wp-controller-miss-controller'));
     }
 
-    /** @test */
-    public function handle_template_include_method_does_not_set_details_in_container_when_controller_is_present()
+    public function testHandleTemplateIncludeMethodDoesNotSetDetailsInContainerWhenControllerIsPresent()
     {
         $response = new TextResponse('Testing 123', 200);
         $app = Mockery::mock(Application::class . '[shutdown]', [__DIR__ . '/..']);
@@ -85,8 +78,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertFalse($app->has('__wp-controller-miss-controller'));
     }
 
-    /** @test */
-    public function can_get_name_of_controller_from_template()
+    public function testCanGetNameOfControllerFromTemplate()
     {
         $app = new Application(__DIR__ . '/../');
         $provider = new WordPressControllersServiceProvider($app);
@@ -102,8 +94,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         }
     }
 
-    /** @test */
-    public function can_get_special_case_name_of_404_controller_from_template()
+    public function testCanGetSpecialCaseNameOf404ControllerFromTemplate()
     {
         $app = new Application(__DIR__ . '/../');
         $provider = new WordPressControllersServiceProvider($app);
@@ -111,8 +102,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertSame('App\\Error404Controller', $provider->getControllerClassFromTemplate(__DIR__ . 'includes/404.php'));
     }
 
-    /** @test */
-    public function handle_template_include_applies_filters_on_controller_name_and_namespace()
+    public function testHandleTemplateIncludeAppliesFiltersOnControllerNameAndNamespace()
     {
         $app = new Application(__DIR__ . '/../');
         $provider = new WordPressControllersServiceProvider($app);
@@ -128,8 +118,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $provider->getControllerClassFromTemplate(__DIR__ . 'includes/single.php');
     }
 
-    /** @test */
-    public function handle_request_returns_false_if_controller_does_not_exist()
+    public function testHandleRequestReturnsFalseIfControllerDoesNotExist()
     {
         $app = new Application(__DIR__ . '/../');
         $provider = new WordPressControllersServiceProvider($app);
@@ -139,8 +128,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertFalse($response);
     }
 
-    /** @test */
-    public function handle_request_writes_warning_to_logs_if_controller_does_not_exist()
+    public function testHandleRequestWritesWarningToLogsIfControllerDoesNotExist()
     {
         $log = Mockery::mock(Logger::class);
         $log->shouldReceive('warning')->once()->with('Controller class `Does\Not\Exist` not found');
@@ -153,8 +141,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $response = $provider->handleRequest(new ServerRequest(), 'Does\\Not\\Exist', 'handle');
     }
 
-    /** @test */
-    public function handle_request_will_mark_request_handled_in_app_if_controller_does_exist()
+    public function testHandleRequestWillMarkRequestHandledInAppIfControllerDoesExist()
     {
         $app = new Application(__DIR__ . '/../');
 
@@ -166,8 +153,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertTrue($app->hasRequestBeenHandled());
     }
 
-    /** @test */
-    public function handle_request_will_not_mark_request_handled_in_app_if_controller_does_not_exist()
+    public function testHandleRequestWillNotMarkRequestHandledInAppIfControllerDoesNotExist()
     {
         $app = new Application(__DIR__ . '/../');
 
@@ -179,8 +165,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertFalse($app->hasRequestBeenHandled());
     }
 
-    /** @test */
-    public function handle_request_returns_response_when_controller_does_exist()
+    public function testHandleRequestReturnsResponseWhenControllerDoesExist()
     {
         $app = new Application(__DIR__ . '/../');
 
@@ -192,8 +177,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertInstanceOf(ResponseInterface::class, $response);
     }
 
-    /** @test */
-    public function handle_request_returns_response_when_controller_returns_a_responsable()
+    public function testHandleRequestReturnsResponseWhenControllerReturnsAResponsable()
     {
         $app = new Application(__DIR__ . '/../');
 
@@ -206,8 +190,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertSame('testing123', $response->getBody()->getContents());
     }
 
-    /** @test */
-    public function handle_request_resolves_constructor_params_from_container()
+    public function testHandleRequestResolvesConstructorParamsFromContainer()
     {
         $app = new Application(__DIR__ . '/../');
 
@@ -219,8 +202,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertInstanceOf(ResponseInterface::class, $response);
     }
 
-    /** @test */
-    public function handle_request_resolves_controller_method_params_from_container()
+    public function testHandleRequestResolvesControllerMethodParamsFromContainer()
     {
         $app = new Application(__DIR__ . '/../');
 
@@ -232,11 +214,10 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertInstanceOf(ResponseInterface::class, $response);
     }
 
-    /** @test */
-    public function handle_request_supports_middleware()
+    public function testHandleRequestSupportsMiddleware()
     {
         $app = new Application(__DIR__ . '/../');
-        $controller = new TestControllerWithMiddleware();
+        $controller = new TestControllerWithMiddleware($app);
         $controller->middleware(new AddHeaderMiddleware('X-Header', 'testing123'));
         $app->bind(TestControllerWithMiddleware::class, $controller);
 
@@ -249,11 +230,10 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertSame('testing123', $response->getHeader('X-Header')[0]);
     }
 
-    /** @test */
-    public function handle_request_supports_middleware_applied_to_a_specific_method_using_only()
+    public function testHandleRequestSupportsMiddlewareAppliedToASpecificMethodUsingOnly()
     {
         $app = new Application(__DIR__ . '/../');
-        $controller = new TestControllerWithMiddleware();
+        $controller = new TestControllerWithMiddleware($app);
         $controller->middleware(new AddHeaderMiddleware('X-Header', 'testing123'))->only('notHandle');
         $app->bind(TestControllerWithMiddleware::class, $controller);
 
@@ -265,11 +245,10 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertFalse($response->hasHeader('X-Header'));
     }
 
-    /** @test */
-    public function handle_request_supports_middleware_applied_to_a_specific_method_using_except()
+    public function testHandleRequestSupportsMiddlewareAppliedToASpecificMethodUsingExcept()
     {
         $app = new Application(__DIR__ . '/../');
-        $controller = new TestControllerWithMiddleware();
+        $controller = new TestControllerWithMiddleware($app);
         $controller->middleware(new AddHeaderMiddleware('X-Header', 'testing123'))->except('handle');
         $app->bind(TestControllerWithMiddleware::class, $controller);
 
@@ -281,8 +260,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertFalse($response->hasHeader('X-Header'));
     }
 
-    /** @test */
-    public function handle_request_supports_middleware_aliases()
+    public function testHandleRequestSupportsMiddlewareAliases()
     {
         Functions\when('get_bloginfo')->alias(function ($key) {
             if ($key === 'url') {
@@ -292,7 +270,7 @@ class WordPressControllersServiceProviderTest extends TestCase
 
         $app = new Application(__DIR__ . '/../');
 
-        $controller = new TestControllerWithMiddleware();
+        $controller = new TestControllerWithMiddleware($app);
         $controller->middleware('middleware-key');
         $app->bind(TestControllerWithMiddleware::class, $controller);
 
@@ -311,8 +289,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $this->assertSame('testing123', $response->getHeader('X-Header')[0]);
     }
 
-    /** @test */
-    public function handle_template_include_will_call_app_shutdown_when_it_has_handled_a_request()
+    public function testHandleTemplateIncludeWillCallAppShutdownWhenItHasHandledARequest()
     {
         $response = new TextResponse('Testing 123', 404);
         $app = Mockery::mock(Application::class . '[shutdown]', [__DIR__ . '/..']);
@@ -325,8 +302,7 @@ class WordPressControllersServiceProviderTest extends TestCase
         $provider->handleTemplateInclude(__DIR__ . '/includes/single.php');
     }
 
-    /** @test */
-    public function handle_template_include_will_not_call_app_shutdown_when_it_has_not_handled_a_request()
+    public function testHandleTemplateIncludeWillNotCallAppShutdownWhenItHasNotHandledARequest()
     {
         $app = Mockery::mock(Application::class . '[shutdown]', [__DIR__ . '/..']);
         $app->shouldReceive('shutdown')->times(0);
@@ -390,6 +366,7 @@ class TestControllerWithMiddleware extends Controller
 class AddHeaderMiddleware implements MiddlewareInterface
 {
     private $key;
+
     private $value;
 
     public function __construct($key, $value)
