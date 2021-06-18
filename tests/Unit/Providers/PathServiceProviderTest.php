@@ -9,7 +9,7 @@ use Rareloop\Lumberjack\Http\Lumberjack;
 use Rareloop\Lumberjack\Providers\PathServiceProvider;
 use Rareloop\Lumberjack\Test\Unit\BrainMonkeyPHPUnitIntegration;
 
-class PAthServiceProviderTest extends TestCase
+class PathServiceProviderTest extends TestCase
 {
     use BrainMonkeyPHPUnitIntegration;
 

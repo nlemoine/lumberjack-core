@@ -23,7 +23,7 @@ class TemplateServiceProvider extends ServiceProvider
 
     public function registerTemplates(array $post_templates, WP_Theme $wp_theme, ?WP_Post $post, string $post_type)
     {
-        $templates = $this->app->get('config')->get('templates', []);
+        $templates = $this->getConfig('templates', []);
 
         $templates = \array_filter($templates, function (string $template) use ($post_type) {
             $allowed_post_types = $template::getPostTypes();
@@ -45,7 +45,7 @@ class TemplateServiceProvider extends ServiceProvider
 
     public function setTemplateCachePolicy()
     {
-        $templates = $this->app->get('config')->get('templates', []);
+        $templates = $this->getConfig('templates', []);
         foreach ($templates as $template) {
             if (!$template::isCurrentTemplate()) {
                 return;

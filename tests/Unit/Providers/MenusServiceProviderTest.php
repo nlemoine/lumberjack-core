@@ -23,6 +23,7 @@ class MenusServiceProviderTest extends TestCase
                 'menu-name' => 'Menu Name',
             ],
         ]);
+        $app->bind(Config::class, $config);
 
         Functions\expect('register_nav_menus')
             ->once()
@@ -31,7 +32,7 @@ class MenusServiceProviderTest extends TestCase
             ]]);
 
         $provider = new MenusServiceProvider($app);
-        $provider->registerNavMenus($config);
+        $provider->registerNavMenus();
     }
 
     public function testMultipleMenusShouldBeSetFromConfig()
@@ -47,6 +48,7 @@ class MenusServiceProviderTest extends TestCase
                 'another-menu-name' => 'Another Menu Name',
             ],
         ]);
+        $app->bind(Config::class, $config);
 
         Functions\expect('register_nav_menus')
             ->once()
@@ -57,6 +59,6 @@ class MenusServiceProviderTest extends TestCase
             ]]);
 
         $provider = new MenusServiceProvider($app);
-        $provider->registerNavMenus($config);
+        $provider->registerNavMenus();
     }
 }

@@ -21,6 +21,7 @@ class ThemeServiceProviderTest extends TestCase
         $config->set('theme.support', [
             'post-thumbnail',
         ]);
+        $app->bind(Config::class, $config);
 
         Functions\expect('add_theme_support')
             ->with('post-thumbnail')
@@ -39,6 +40,7 @@ class ThemeServiceProviderTest extends TestCase
         $config->set('theme.support', [
             'post-formats' => ['aside', 'gallery'],
         ]);
+        $app->bind(Config::class, $config);
 
         Functions\expect('add_theme_support')
             ->with('post-formats', ['aside', 'gallery'])

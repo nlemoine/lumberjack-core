@@ -6,18 +6,16 @@ use Rareloop\Lumberjack\Config;
 
 class ThemeServiceProvider extends ServiceProvider
 {
-    public function boot(Config $config)
+    public function boot()
     {
-        \add_action('after_setup_theme', function () use ($config) {
-            $this->addThemeSupport($config);
-            $this->addTranslations($config);
-        });
+        \add_action('after_setup_theme', [$this, 'addThemeSupport']);
+        \add_action('after_setup_theme', [$this, 'addTranslations']);
     }
 
-    public function addThemeSupport(Config $config): void
+    public function addThemeSupport(): void
     {
         // Theme support
-        $support = $config->get('theme.support', []);
+        $support = $this->getConfig('theme.support', []);
         foreach ($support as $key => $value) {
             if (\is_numeric($key)) {
                 \add_theme_support($value);
@@ -30,7 +28,7 @@ class ThemeServiceProvider extends ServiceProvider
     public function addTranslations(Config $config): void
     {
         // Translations
-        $text_domain = $config->get('theme.text_domain');
+        $text_domain = $this->getConfig('theme.text_domain');
         if ($text_domain) {
             \load_theme_textdomain($text_domain, $this->app->get('paths.languages'));
         }

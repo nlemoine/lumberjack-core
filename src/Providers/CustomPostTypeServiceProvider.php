@@ -2,8 +2,6 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Rareloop\Lumberjack\Config;
-
 class CustomPostTypeServiceProvider extends ServiceProvider
 {
     public function boot()
@@ -13,7 +11,7 @@ class CustomPostTypeServiceProvider extends ServiceProvider
 
     public function registerPostTypes()
     {
-        $postTypes = $this->get(Config::class)->get('posttypes.register', []);
+        $postTypes = $this->getConfig('posttypes.register', []);
         if (empty($postTypes)) {
             return;
         }

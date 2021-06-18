@@ -3,7 +3,6 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Psr\Log\LoggerInterface;
-use Rareloop\Lumberjack\Config;
 use Timber\Timber;
 
 class OembedServiceProvider extends ServiceProvider
@@ -55,13 +54,13 @@ class OembedServiceProvider extends ServiceProvider
         ];
 
         try {
-            $embed_html = $this->app->get(Timber::class)::fetch(
+            $embed_html = $this->get(Timber::class)::fetch(
                 $templates,
                 $embed_data
             );
             return empty($embed_html) ? $html : $embed_html;
         } catch (\Throwable $th) {
-            $this->app->get(LoggerInterface::class)->error($th);
+            $this->get(LoggerInterface::class)->error($th);
             return $html;
         }
     }
@@ -71,7 +70,7 @@ class OembedServiceProvider extends ServiceProvider
      */
     public function filterProviders(array $providers): array
     {
-        $allowed_providers = $this->app->get(Config::class)->get('oembed.allowed_providers', []);
+        $allowed_providers = $this->getConfig('oembed.allowed_providers', []);
         if (empty($providers)) {
             return [];
         }

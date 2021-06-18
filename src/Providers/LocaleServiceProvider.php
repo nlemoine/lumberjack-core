@@ -6,7 +6,7 @@ class LocaleServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        \locale_set_default(\str_replace('_', '-', $this->app->get('locale')));
+        \locale_set_default(\str_replace('_', '-', $this->get('locale')));
     }
 
     public function register()
@@ -16,7 +16,7 @@ class LocaleServiceProvider extends ServiceProvider
         });
 
         $this->app->bind('locale.short', function () {
-            return \substr($this->app->get('locale'), 0, 2);
+            return \substr($this->get('locale'), 0, 2);
         });
     }
 }

@@ -47,10 +47,8 @@ class TimberServiceProvider extends ServiceProvider
 
     /**
      * Add Symfony form theme path
-     *
-     * @param LoaderInterface $loader
      */
-    public function addSymfonyFormThemePath($loader): LoaderInterface
+    public function addSymfonyFormThemePath(LoaderInterface $loader): LoaderInterface
     {
         $appVariableReflection = new \ReflectionClass('\Symfony\Bridge\Twig\AppVariable');
         $vendorTwigBridgeDirectory = \dirname($appVariableReflection->getFileName());
@@ -64,7 +62,7 @@ class TimberServiceProvider extends ServiceProvider
      */
     public function setCacheLocation(string $location): string
     {
-        return $this->app->get('path.project') . '/var/cache/twig';
+        return $this->get('path.project') . '/var/cache/twig';
     }
 
     /**

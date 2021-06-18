@@ -2,8 +2,6 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Rareloop\Lumberjack\Config;
-
 class RestApiServiceProvider extends ServiceProvider
 {
     public function boot()
@@ -15,7 +13,7 @@ class RestApiServiceProvider extends ServiceProvider
 
     public function filterEndpoints($endpoints): array
     {
-        $endpoints_whitelist = $this->app->get(Config::class)->get('rest-api.endpoints', []);
+        $endpoints_whitelist = $this->getConfig('rest-api.endpoints', []);
         if (empty($endpoints_whitelist)) {
             return $endpoints;
         }
@@ -27,7 +25,7 @@ class RestApiServiceProvider extends ServiceProvider
 
     public function registerRestControllers(): void
     {
-        $controllers = $this->app->get(Config::class)->get('rest-api.controllers', []);
+        $controllers = $this->getConfig('rest-api.controllers', []);
         foreach ($controllers as $controller) {
             $controller = new $controller();
             $controller->register_routes();
@@ -36,7 +34,7 @@ class RestApiServiceProvider extends ServiceProvider
 
     public function setPrefix(string $prefix): string
     {
-        $customPrefix = $this->app->get(Config::class)->get('rest-api.prefix', null);
+        $customPrefix = $this->getConfig('rest-api.prefix', null);
         return $customPrefix ?? $prefix;
     }
 }

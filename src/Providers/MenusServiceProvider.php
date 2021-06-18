@@ -2,20 +2,16 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Rareloop\Lumberjack\Config;
-
 class MenusServiceProvider extends ServiceProvider
 {
-    public function boot(Config $config)
+    public function boot()
     {
-        \add_action('after_setup_theme', function () use ($config) {
-            $this->registerNavMenus($config);
-        });
+        \add_action('after_setup_theme', [$this, 'registerNavMenus']);
     }
 
-    public function registerNavMenus(Config $config): void
+    public function registerNavMenus(): void
     {
-        $menus = $config->get('menus.menus', []);
+        $menus = $this->getConfig('menus.menus', []);
         if (\count($menus)) {
             \register_nav_menus($menus);
         }

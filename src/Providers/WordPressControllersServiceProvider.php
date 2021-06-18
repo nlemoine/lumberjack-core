@@ -18,7 +18,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
         \add_filter('template_include', [$this, 'handleTemplateInclude'], PHP_INT_MAX);
     }
 
-    public function handleTemplateInclude($template)
+    public function handleTemplateInclude(string $template)
     {
         include $template;
 

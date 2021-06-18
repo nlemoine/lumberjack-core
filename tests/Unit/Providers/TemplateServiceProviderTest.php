@@ -23,7 +23,7 @@ class TemplateServiceProviderTest extends TestCase
             CustomTemplate::class,
             ContactTemplate::class,
         ]);
-        $app->bind('config', $config);
+        $app->bind(Config::class, $config);
 
         $provider = new TemplateServiceProvider($app);
         $provider->boot();
@@ -41,7 +41,7 @@ class TemplateServiceProviderTest extends TestCase
             CustomTemplate::class,
             ContactTemplate::class,
         ]);
-        $app->bind('config', $config);
+        $app->bind(Config::class, $config);
 
         $provider = new TemplateServiceProvider($app);
         $templates_for_page = $provider->registerTemplates([], Mockery::mock('WP_Theme'), Mockery::mock('WP_Post'), 'page');
