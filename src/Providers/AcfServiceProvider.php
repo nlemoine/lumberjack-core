@@ -2,12 +2,11 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Rareloop\Lumberjack\Config;
 use Timber\Image;
 
 class AcfServiceProvider extends ServiceProvider
 {
-    public function boot(Config $config)
+    public function boot()
     {
         // Hide menu
         \add_filter('acf/settings/show_admin', function (bool $show): bool {

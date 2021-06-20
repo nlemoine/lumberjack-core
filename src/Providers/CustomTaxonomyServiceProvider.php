@@ -12,7 +12,7 @@ class CustomTaxonomyServiceProvider extends ServiceProvider
 
     public function registerTaxonomies()
     {
-        $taxonomies = $this->get('taxonomies.register', []);
+        $taxonomies = $this->getConfig('taxonomies.register', []);
         foreach ($taxonomies as $taxonomy) {
             $taxonomy::register();
         }
@@ -20,7 +20,7 @@ class CustomTaxonomyServiceProvider extends ServiceProvider
 
     public function unregisterTaxonomies()
     {
-        $taxonomies = $this->get('taxonomies.unregister', []);
+        $taxonomies = $this->getConfig('taxonomies.unregister', []);
         foreach ($taxonomies as $taxonomy => $postType) {
             \unregister_taxonomy_for_object_type($taxonomy, $postType::getPostType());
         }

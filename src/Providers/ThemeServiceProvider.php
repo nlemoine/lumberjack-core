@@ -2,8 +2,6 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Rareloop\Lumberjack\Config;
-
 class ThemeServiceProvider extends ServiceProvider
 {
     public function boot()
@@ -25,7 +23,7 @@ class ThemeServiceProvider extends ServiceProvider
         }
     }
 
-    public function addTranslations(Config $config): void
+    public function addTranslations(): void
     {
         // Translations
         $text_domain = $this->getConfig('theme.text_domain');
