@@ -34,7 +34,8 @@
         "symfony/twig-bridge": "^5.0",
         "tightenco/collect": "^8.0",
         "timber/timber": "^1.8",
-        "twig/html-extra": "^3.0"
+        "twig/html-extra": "^3.0",
+        "inpsyde/wp-context": "^1.2"
     },
     "require-dev": {
         "antecedent/patchwork": "^2.1.8",
