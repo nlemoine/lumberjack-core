@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use Inpsyde\WpContext;
 use Timber\Image;
 
 class AcfServiceProvider extends ServiceProvider
@@ -15,6 +16,11 @@ class AcfServiceProvider extends ServiceProvider
 
         // Remove default filters
         \add_action('acf/init', function () {
+            $context = WpContext::determine();
+            if ($context->isRest()) {
+                return;
+            }
+
             // Image
             $field_type = \acf_get_field_type('image');
             \remove_filter('acf/format_value/type=image', [$field_type, 'format_value']);

@@ -2,8 +2,6 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Rareloop\Lumberjack\Config;
-
 class AdminPageServiceProvider extends ServiceProvider
 {
     public function boot()
