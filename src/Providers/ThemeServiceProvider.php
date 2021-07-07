@@ -28,7 +28,7 @@ class ThemeServiceProvider extends ServiceProvider
         // Translations
         $text_domain = $this->getConfig('theme.text_domain');
         if ($text_domain) {
-            \load_theme_textdomain($text_domain, $this->app->get('paths.languages'));
+            \load_theme_textdomain($text_domain, $this->app->get('path.languages'));
         }
     }
 }
