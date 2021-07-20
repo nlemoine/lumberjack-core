@@ -7,6 +7,7 @@
         "blast/facades": "^1.0",
         "http-interop/response-sender": "^1.0",
         "inpsyde/assets": "^2.5",
+        "inpsyde/wp-context": "^1.2",
         "jawira/case-converter": "^3.4",
         "johnbillion/extended-cpts": "^4.5",
         "laminas/laminas-diactoros": "^2.4",
@@ -22,10 +23,11 @@
         "rareloop/psr7-server-request-extension": "^2.1",
         "rareloop/router": "^4.4",
         "spatie/macroable": "^1.0",
-        "spatie/schema-org": "^3.3",
         "spatie/once": "^2.2",
+        "spatie/schema-org": "^3.3",
         "statamic/stringy": "^3.1",
         "stoutlogic/acf-builder": "dev-master",
+        "symfony/asset": "^5.3",
         "symfony/console": "^5.2",
         "symfony/error-handler": "^5.1",
         "symfony/http-foundation": "^5.2",
@@ -35,7 +37,7 @@
         "tightenco/collect": "^8.0",
         "timber/timber": "^1.8",
         "twig/html-extra": "^3.0",
-        "inpsyde/wp-context": "^1.2"
+        "twig/string-extra": "^3.3"
     },
     "require-dev": {
         "antecedent/patchwork": "^2.1.8",
