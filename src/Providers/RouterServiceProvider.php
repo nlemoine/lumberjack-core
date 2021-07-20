@@ -29,6 +29,23 @@ class RouterServiceProvider extends ServiceProvider
 
         $this->app->bind('middleware-resolver', $resolver);
         $this->app->bind(MiddlewareResolverInterface::class, $resolver);
+
+        $this->app->bind('router.generator', function () use ($router) {
+            $locale = $this->app->get('locale.short');
+            $base_url = $this->app->get('url.home');
+            $router::macro('generateUrl', function ($name, $arguments = [], $relative = false) use ($locale, $base_url) {
+                $route_name = $name . '_' . $locale;
+                if (!$this->has($route_name)) {
+                    $route_name = $name;
+                }
+
+                $path = $this->url($route_name, $arguments = []);
+
+                return ($relative ? '' : \rtrim($base_url, '/')) . $path;
+            });
+
+            return $router;
+        });
     }
 
     public function boot()

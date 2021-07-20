@@ -64,7 +64,10 @@ abstract class AbstractPostType extends Post
             throw new PostTypeRegistrationException('Post type not set');
         }
 
-        if (empty($config) && !\in_array($postType, ['page', 'post'], true)) {
+        if (empty($config) && !\in_array($postType, \get_post_types([
+            '_builtin' => true,
+            'public' => true,
+        ]), true)) {
             throw new PostTypeRegistrationException('Config not set');
         }
 
@@ -138,9 +141,8 @@ abstract class AbstractPostType extends Post
      * arguments that mean we're selecting the right post type
      *
      * @param  array $args standard WP_Query array
-     * @return \Illuminate\Support\Collection
      */
-    public static function query(array $args = []): PostQuery
+    public static function query(array $args = []): array
     {
         // Set the correct post type
         $args = \array_merge($args, [
@@ -219,7 +221,7 @@ abstract class AbstractPostType extends Post
      * and casts the returning data in instances of ourself.
      *
      * @param  array $args standard WP_Query array
-     * @return \Illuminate\Support\Collection
+     * @return array
      */
     private static function posts(array $args = [])
     {

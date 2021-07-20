@@ -3,10 +3,12 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Rareloop\Lumberjack\Config;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Timber\Loader;
 use Timber\Timber;
 use Twig\Environment;
 use Twig\Extra\Html\HtmlExtension;
+use Twig\Extra\String\StringExtension;
 use Twig\Loader\LoaderInterface;
 
 class TimberServiceProvider extends ServiceProvider
@@ -20,6 +22,10 @@ class TimberServiceProvider extends ServiceProvider
 
         $this->app->singleton('twig', function () {
             return (new Loader())->get_twig();
+        });
+
+        $this->app->singleton('slugger', function () {
+            return new AsciiSlugger($this->app->get('locale'));
         });
     }
 
@@ -73,6 +79,7 @@ class TimberServiceProvider extends ServiceProvider
         // $twig->addExtension(new AssetExtension($this->app->get('assets.packages')));
         // $twig->addExtension(new SvgHelpersExtension($this->app->get('assets.packages')->getPackage('path')));
         $twig->addExtension(new HtmlExtension());
+        $twig->addExtension(new StringExtension($this->app->get('slugger')));
         // $twig->addExtension(
         //     new ImageFactoryExtension($this->app->get('image.factory'))
         // );

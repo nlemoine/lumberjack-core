@@ -2,11 +2,14 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use Timber\Menu;
+
 class MenusServiceProvider extends ServiceProvider
 {
     public function boot()
     {
         \add_action('after_setup_theme', [$this, 'registerNavMenus']);
+        \add_filter('timber/context', [$this, 'addMenusToContext']);
     }
 
     public function registerNavMenus(): void
@@ -15,5 +18,26 @@ class MenusServiceProvider extends ServiceProvider
         if (\count($menus)) {
             \register_nav_menus($menus);
         }
+    }
+
+    public function addMenusToContext(array $context): array
+    {
+        $menus = $this->app->get('config')->get('menus.menus');
+        $context['menus'] = !isset($context['menus']) ? [] : $context['menus'];
+
+        foreach (\array_keys($menus) as $location) {
+            if (!\has_nav_menu($location)) {
+                continue;
+            }
+            // $cache_key = 'menu_' . $location . '_' . $current_language;
+
+            if (isset($context['menus'][\str_replace('-', '_', $location)])) {
+                continue;
+            }
+
+            $context['menus'][\str_replace('-', '_', $location)] = new Menu($location);
+        }
+
+        return $context;
     }
 }
