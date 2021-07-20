@@ -13,4 +13,11 @@ class Attachment extends AbstractPostType
     {
         return 'attachment';
     }
+
+    public static function query(array $args = []): array
+    {
+        $args['post_status'] = 'inherit';
+
+        return parent::query($args);
+    }
 }

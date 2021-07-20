@@ -6,7 +6,7 @@
         "php": ">=7.1.0",
         "blast/facades": "^1.0",
         "http-interop/response-sender": "^1.0",
-        "inpsyde/assets": "^2.5",
+        "inpsyde/assets": "^2.6",
         "inpsyde/wp-context": "^1.2",
         "jawira/case-converter": "^3.4",
         "johnbillion/extended-cpts": "^4.5",
