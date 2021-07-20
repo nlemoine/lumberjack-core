@@ -75,7 +75,10 @@ abstract class AbstractTerm extends TimberTerm
             throw new TaxonomyRegistrationException('Taxonomy object type not set');
         }
 
-        if (empty($config)) {
+        if (empty($config) && !\in_array($taxonomy, \get_taxonomies([
+            'public' => true,
+            '_builtin' => true,
+        ]), true)) {
             throw new TaxonomyRegistrationException('Config not set');
         }
 
@@ -142,7 +145,7 @@ abstract class AbstractTerm extends TimberTerm
      * arguments that mean we're selecting the right taxonomy type
      *
      * @param  array $args standard WP_Term_Query array
-     * @return Illuminate\Support\Collection
+     * @return
      */
     public static function query($args = null)
     {
@@ -150,7 +153,7 @@ abstract class AbstractTerm extends TimberTerm
 
         // Set the correct post type
         $args = \array_merge($args, [
-            'taxonomy' => static::getTaxonomyType(),
+            'taxonomy' => static::getTaxonomy(),
         ]);
 
         return static::terms($args);
@@ -188,10 +191,10 @@ abstract class AbstractTerm extends TimberTerm
      * and casts the returning data in instances of ourself.
      *
      * @param  array $args standard WP_Query array
-     * @return Illuminate\Support\Collection
+     * @return
      */
-    private static function terms($args = null)
+    private static function terms($args = [])
     {
-        return \collect(Timber::get_terms($args, [], static::class));
+        return Timber::get_terms($args, [], static::class);
     }
 }

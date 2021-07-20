@@ -10,6 +10,7 @@ use Rareloop\Lumberjack\Models\AbstractPostType;
 use Rareloop\Lumberjack\Models\AbstractTerm;
 use Rareloop\Lumberjack\Template\AbstractTemplate;
 use Rareloop\Lumberjack\Template\FrontPage;
+use Rareloop\Lumberjack\Blocks\AbstractAcfBlock;
 
 class CustomFieldsServiceProvider extends ServiceProvider
 {
@@ -59,6 +60,9 @@ class CustomFieldsServiceProvider extends ServiceProvider
                 $f->setGroupConfig('menu_order', $order[$group_position]);
 
                 $location = $this->getFieldsLocation($class);
+                if (!$location) {
+                    continue;
+                }
 
                 // Remove duplicate field with different locations
                 // and merge locations
@@ -91,6 +95,7 @@ class CustomFieldsServiceProvider extends ServiceProvider
             (array) $config->get('entities', []),
             (array) $config->get('templates', []),
             (array) $config->get('fields', []),
+            (array) $config->get('blocks', []),
         );
 
         return \array_values(\array_filter($classes, [$this, 'filterFieldsAwareClasses']));
@@ -146,6 +151,11 @@ class CustomFieldsServiceProvider extends ServiceProvider
             // option
             case \is_subclass_of($class, AbstractAcfOptionPage::class):
                 return ['options_page', '==', $class::getPageSlug()];
+                break;
+
+            // block
+            case \is_subclass_of($class, AbstractAcfBlock::class):
+                return ['block', '==', 'acf/' . $class::getName()];
                 break;
         }
 

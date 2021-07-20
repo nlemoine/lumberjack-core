@@ -6,7 +6,7 @@ class CustomPostTypeServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        \add_action('init', [$this, 'registerPostTypes']);
+        \add_action('init', [$this, 'registerPostTypes'], 1);
     }
 
     public function registerPostTypes()

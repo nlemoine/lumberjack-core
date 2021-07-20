@@ -4,6 +4,7 @@ namespace Rareloop\Lumberjack\Providers;
 
 use App\Asset\Helper;
 use Inpsyde\Assets\AssetManager;
+use Inpsyde\Assets\AssetFactory;
 use Inpsyde\Assets\Loader\ArrayLoader;
 use Rareloop\Lumberjack\Config;
 use Symfony\Component\Asset\Packages;
@@ -102,15 +103,40 @@ class AssetsServiceProvider extends ServiceProvider
                 return $asset;
             }, $config));
         });
+
+        $this->app->singleton('assets.store', function ($app) {
+            $packages = $app->get('assets.packages');
+
+            return new class($packages) extends \ArrayObject {
+                private $packages;
+
+                public function __construct(Packages $packages)
+                {
+                    $this->packages = $packages;
+                }
+
+                public function append($asset)
+                {
+                    if (isset($asset['url'])) {
+                        $asset['url'] = $this->packages->getUrl($asset['url']);
+                    }
+                    parent::append(AssetFactory::create($asset)->disableAutodiscoverVersion());
+                }
+            };
+        });
+
     }
 
-    public function boot()
+    public function boot(Config $config)
     {
         $this->app->bind('assets.base_urls', $this->app->get('url.assets'));
         $this->app->bind('assets.named_packages', [
             'path' => [
                 'base_path' => $this->app->get('path.assets'),
                 'version'   => '',
+            ],
+            'editor' => [
+                'base_path' => 'assets',
             ],
         ]);
 
@@ -122,11 +148,15 @@ class AssetsServiceProvider extends ServiceProvider
             ]));
         }
 
+        foreach ($config->get('assets', []) as $asset) {
+            $this->app->get('assets.store')->append($asset);
+        }
+
         // Enqueue scripts & styles
         \add_action(
             AssetManager::ACTION_SETUP,
             function (AssetManager $assetManager) {
-                $assets = $this->app->get('assets.loader');
+                $assets = $this->app->get('assets.store');
                 foreach ($assets as $asset) {
                     $assetManager->register($asset);
                 }

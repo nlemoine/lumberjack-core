@@ -6,7 +6,7 @@ class CustomTaxonomyServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        \add_action('init', [$this, 'registerTaxonomies']);
+        \add_action('init', [$this, 'registerTaxonomies'], 2);
         \add_action('init', [$this, 'unregisterTaxonomies'], 20);
     }
 
