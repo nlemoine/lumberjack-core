@@ -60,7 +60,7 @@ class RouterServiceProvider extends ServiceProvider
             ));
 
             $this->processRequest($request);
-        });
+        }, 100); // Load after inpsyde/assets
     }
 
     public function processRequest(RequestInterface $request)

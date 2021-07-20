@@ -96,7 +96,7 @@ class AssetsServiceProvider extends ServiceProvider
             $loader = new ArrayLoader();
             $loader->disableAutodiscoverVersion();
             $config = $this->app->get(Config::class)->get('assets');
-            // @var Asset[] $assets
+            /* @var Asset[] $assets */
             return $loader->load(\array_map(function ($asset) {
                 $asset['url'] = $this->app->get('assets.packages')->getUrl($asset['url']);
 
@@ -120,7 +120,7 @@ class AssetsServiceProvider extends ServiceProvider
                     if (isset($asset['url'])) {
                         $asset['url'] = $this->packages->getUrl($asset['url']);
                     }
-                    parent::append(AssetFactory::create($asset)->disableAutodiscoverVersion());
+                    parent::append(AssetFactory::create($asset));
                 }
             };
         });
