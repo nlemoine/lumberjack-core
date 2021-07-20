@@ -2,7 +2,6 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Laminas\Diactoros\ServerRequestFactory;
 use mindplay\middleman\Dispatcher;
 use Psr\Http\Message\RequestInterface;
 use Rareloop\Router\Invoker;
@@ -10,6 +9,7 @@ use Rareloop\Router\ProvidesControllerMiddleware;
 use Rareloop\Router\ResponseFactory;
 use Stringy\Stringy;
 use Tightenco\Collect\Support\Collection;
+use Laminas\Diactoros\ServerRequestFactory;
 
 class WordPressControllersServiceProvider extends ServiceProvider
 {
@@ -18,7 +18,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
         \add_filter('template_include', [$this, 'handleTemplateInclude'], PHP_INT_MAX);
     }
 
-    public function handleTemplateInclude(string $template)
+    public function handleTemplateInclude($template)
     {
         include $template;
 
@@ -85,7 +85,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
         $middlewares[] = function ($request) use ($controller, $methodName) {
             $invoker = new Invoker($this->app);
             $output = $invoker->setRequest($request)->call([$controller, $methodName]);
-            return ResponseFactory::create($output, $request);
+            return ResponseFactory::create($request, $output);
         };
 
         $dispatcher = $this->createDispatcher($middlewares);

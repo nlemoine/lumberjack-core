@@ -3,8 +3,8 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use App\Asset\Helper;
-use Inpsyde\Assets\AssetManager;
 use Inpsyde\Assets\AssetFactory;
+use Inpsyde\Assets\AssetManager;
 use Inpsyde\Assets\Loader\ArrayLoader;
 use Rareloop\Lumberjack\Config;
 use Symfony\Component\Asset\Packages;
@@ -96,7 +96,7 @@ class AssetsServiceProvider extends ServiceProvider
             $loader = new ArrayLoader();
             $loader->disableAutodiscoverVersion();
             $config = $this->app->get(Config::class)->get('assets');
-            /* @var Asset[] $assets */
+            /** @var Asset[] $assets */
             return $loader->load(\array_map(function ($asset) {
                 $asset['url'] = $this->app->get('assets.packages')->getUrl($asset['url']);
 
@@ -124,7 +124,6 @@ class AssetsServiceProvider extends ServiceProvider
                 }
             };
         });
-
     }
 
     public function boot(Config $config)

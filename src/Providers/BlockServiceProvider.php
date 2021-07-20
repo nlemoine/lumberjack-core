@@ -2,13 +2,11 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Rareloop\Lumberjack\Providers\ServiceProvider;
-
 class BlockServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        add_action('acf/init', [$this, 'registerAcfBlocks']);
+        \add_action('acf/init', [$this, 'registerAcfBlocks']);
     }
 
     public function registerAcfBlocks()
@@ -17,7 +15,7 @@ class BlockServiceProvider extends ServiceProvider
         if (empty($blocks)) {
             return;
         }
-        foreach($blocks as $block) {
+        foreach ($blocks as $block) {
             $block::register();
         }
     }

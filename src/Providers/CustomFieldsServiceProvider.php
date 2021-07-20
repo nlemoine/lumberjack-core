@@ -3,6 +3,7 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Rareloop\Lumberjack\Admin\Option\AbstractAcfOptionPage;
+use Rareloop\Lumberjack\Blocks\AbstractAcfBlock;
 use Rareloop\Lumberjack\Config;
 use Rareloop\Lumberjack\Contracts\HasAcfFields;
 use Rareloop\Lumberjack\Fields\FieldsBuilder;
@@ -10,7 +11,6 @@ use Rareloop\Lumberjack\Models\AbstractPostType;
 use Rareloop\Lumberjack\Models\AbstractTerm;
 use Rareloop\Lumberjack\Template\AbstractTemplate;
 use Rareloop\Lumberjack\Template\FrontPage;
-use Rareloop\Lumberjack\Blocks\AbstractAcfBlock;
 
 class CustomFieldsServiceProvider extends ServiceProvider
 {
