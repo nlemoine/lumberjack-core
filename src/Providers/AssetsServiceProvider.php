@@ -2,7 +2,6 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use App\Asset\Helper;
 use Inpsyde\Assets\AssetFactory;
 use Inpsyde\Assets\AssetManager;
 use Inpsyde\Assets\Loader\ArrayLoader;
@@ -86,10 +85,6 @@ class AssetsServiceProvider extends ServiceProvider
             }
 
             return new UrlPackage($baseUrls, $version);
-        });
-
-        $this->app->bind('assets.helper', function () {
-            return new Helper($this->app->get('assets.packages')->getPackage('path'));
         });
 
         $this->app->bind('assets.loader', function () {
