@@ -51,9 +51,15 @@ abstract class AbstractController extends Controller
         return $this->container->get('form.factory')->createBuilder(FormType::class, $data, $options);
     }
 
-    protected function render($template, $context, int $status = 200): TimberResponse
+    /**
+     * Undocumented function
+     *
+     * @param array|string $templates
+     * @param integer $status
+     */
+    protected function render($templates, array $context = [], int $status = 200): TimberResponse
     {
-        return new TimberResponse($template, $context, $status);
+        return new TimberResponse($templates, $context, $status);
     }
 
     /**
