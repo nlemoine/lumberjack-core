@@ -2,7 +2,7 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Timber\Menu;
+use Rareloop\Lumberjack\Models\NavMenu;
 
 class MenusServiceProvider extends ServiceProvider
 {
@@ -12,6 +12,9 @@ class MenusServiceProvider extends ServiceProvider
         \add_filter('timber/context', [$this, 'addMenusToContext']);
     }
 
+    /**
+     * Register nav menus
+     */
     public function registerNavMenus(): void
     {
         $menus = $this->getConfig('menus.menus', []);
@@ -20,6 +23,9 @@ class MenusServiceProvider extends ServiceProvider
         }
     }
 
+    /**
+     * Add menus to context
+     */
     public function addMenusToContext(array $context): array
     {
         $menus = $this->app->get('config')->get('menus.menus');
@@ -35,7 +41,7 @@ class MenusServiceProvider extends ServiceProvider
                 continue;
             }
 
-            $context['menus'][\str_replace('-', '_', $location)] = new Menu($location);
+            $context['menus'][\str_replace('-', '_', $location)] = new NavMenu($location);
         }
 
         return $context;

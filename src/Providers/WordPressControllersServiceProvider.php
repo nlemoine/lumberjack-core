@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use Laminas\Diactoros\ServerRequestFactory;
 use mindplay\middleman\Dispatcher;
 use Psr\Http\Message\RequestInterface;
 use Rareloop\Router\Invoker;
@@ -9,7 +10,6 @@ use Rareloop\Router\ProvidesControllerMiddleware;
 use Rareloop\Router\ResponseFactory;
 use Stringy\Stringy;
 use Tightenco\Collect\Support\Collection;
-use Laminas\Diactoros\ServerRequestFactory;
 
 class WordPressControllersServiceProvider extends ServiceProvider
 {

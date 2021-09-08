@@ -9,6 +9,7 @@ use Rareloop\Lumberjack\Contracts\HasAcfFields;
 use Rareloop\Lumberjack\Fields\FieldsBuilder;
 use Rareloop\Lumberjack\Models\AbstractPostType;
 use Rareloop\Lumberjack\Models\AbstractTerm;
+use Rareloop\Lumberjack\Models\NavMenuItem;
 use Rareloop\Lumberjack\Template\AbstractTemplate;
 use Rareloop\Lumberjack\Template\FrontPage;
 
@@ -92,7 +93,6 @@ class CustomFieldsServiceProvider extends ServiceProvider
             (array) $config->get('posttypes.register', []),
             (array) $config->get('taxonomies.register', []),
             (array) $config->get('admin-pages', []),
-            (array) $config->get('entities', []),
             (array) $config->get('templates', []),
             (array) $config->get('fields', []),
             (array) $config->get('blocks', []),
@@ -146,6 +146,11 @@ class CustomFieldsServiceProvider extends ServiceProvider
             // taxonomy
             case \is_subclass_of($class, AbstractTerm::class):
                 return ['taxonomy', '==', $class::getTaxonomy()];
+                break;
+
+            // nav menu item
+            case \is_subclass_of($class, NavMenuItem::class) && \method_exists($class, 'getCustomFieldsLocation'):
+                return ['nav_menu_item', '==', $class::getCustomFieldsLocation()];
                 break;
 
             // option

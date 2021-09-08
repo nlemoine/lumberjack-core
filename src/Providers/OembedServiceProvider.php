@@ -34,14 +34,13 @@ class OembedServiceProvider extends ServiceProvider
     /**
      * Wrap embeds
      */
-    public function wrapEmbed(string $html, string $url, array $attr, int $post_id): string
+    public function wrapEmbed(string $html, string $url, array $attr, ?int $post_id): string
     {
         if (\is_admin() || (\defined('REST_REQUEST') && REST_REQUEST)) {
             return $html;
         }
 
         $embed_data = \get_post_meta($post_id, '_oembed_data_' . \md5($url), true);
-        $embed_data['canonical_url'] = $url;
 
         if (!isset($embed_data['type'])) {
             return $html;

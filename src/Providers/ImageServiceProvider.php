@@ -3,7 +3,6 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Rareloop\Lumberjack\Config;
-use Rareloop\Lumberjack\Providers\ServiceProvider;
 
 class ImageServiceProvider extends ServiceProvider
 {
