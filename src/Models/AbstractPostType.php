@@ -13,6 +13,7 @@ abstract class AbstractPostType extends Post
 {
     use Macroable {
         Macroable::__call as __macroableCall;
+
         Macroable::__callStatic as __macroableCallStatic;
     }
 
@@ -83,6 +84,35 @@ abstract class AbstractPostType extends Post
             'admin_filters' => static::getAdminFilters(),
         ]);
 
+        // Rewrite rules cleanup
+        \add_filter("{$postType}_rewrite_rules", function ($rules) use ($config) {
+            return \array_filter($rules, function ($query, $regex) use ($config) {
+                global $wp_rewrite;
+
+                // Remove embed rules
+                if (\strpos($query, 'embed=true') !== false) {
+                    return false;
+                }
+                // Remove trackback rules
+                if (\strpos($regex, 'trackback/') !== false) {
+                    return false;
+                }
+                // Remove attachments rules
+                if (\strpos($regex, '/attachment/([^/]+)/') !== false) {
+                    return false;
+                }
+                // Remove feed rules
+                if (empty($config['rewrite']['feeds']) && \strpos($regex, '(feed|rdf|rss|rss2|atom)') !== false) {
+                    return false;
+                }
+                // Remove comments rules
+                if (empty($config['supports']['comments']) && \strpos($regex, $wp_rewrite->comments_pagination_base) !== false) {
+                    return false;
+                }
+                return true;
+            }, ARRAY_FILTER_USE_BOTH);
+        });
+
         \register_extended_post_type($postType, $config);
 
         \add_filter('Timber\PostClassMap', function ($post_class) use ($postType) {
@@ -95,26 +125,22 @@ abstract class AbstractPostType extends Post
         });
 
         // Set default query
-        $args = static::getDefaultQuery();
-        if (!empty($args)) {
-            \add_filter('pre_get_posts', function (WP_Query $wp_query) use ($args, $postType) {
-                if (\is_admin()) {
-                    return;
-                }
-                if (!$wp_query->is_main_query()) {
-                    return;
-                }
-                if ($wp_query->is_singular()) {
-                    return;
-                }
-                if (!\in_array($postType, (array) $wp_query->get('post_type'), true)) {
-                    return;
-                }
-                foreach ($args as $key => $value) {
-                    $wp_query->set($key, $value);
-                }
-            });
-        }
+        \add_filter('pre_get_posts', function (WP_Query $query) {
+            if (\is_admin()) {
+                return;
+            }
+            if (!$query->is_main_query()) {
+                return;
+            }
+            if ($query->is_singular()) {
+                return;
+            }
+            $post_type = static::getPostType();
+            if (!\in_array($post_type, (array) $query->get('post_type'), true)) {
+                return;
+            }
+            \call_user_func([static::class, 'setDefaultQuery'], $query);
+        });
     }
 
     /**
@@ -168,9 +194,8 @@ abstract class AbstractPostType extends Post
         return \get_post_type_archive_link(static::getPostType());
     }
 
-    public static function getDefaultQuery(): array
+    public static function setDefaultQuery(WP_Query $query): void
     {
-        return [];
     }
 
     public function embed($url)

@@ -6,11 +6,13 @@ use Rareloop\Lumberjack\Exceptions\TaxonomyRegistrationException;
 use Spatie\Macroable\Macroable;
 use Timber\Term as TimberTerm;
 use Timber\Timber;
+use WP_Query;
 
 abstract class AbstractTerm extends TimberTerm
 {
     use Macroable {
         Macroable::__call as __macroableCall;
+
         Macroable::__callStatic as __macroableCallStatic;
     }
 
@@ -57,9 +59,8 @@ abstract class AbstractTerm extends TimberTerm
      */
     abstract public static function getTaxonomyObjectTypes(): array;
 
-    public static function getDefaultQuery(): array
+    public static function setDefaultQuery(WP_Query $query): void
     {
-        return [];
     }
 
     /**
@@ -92,33 +93,30 @@ abstract class AbstractTerm extends TimberTerm
         ]);
 
         $taxonomy_object = \get_taxonomy($taxonomy);
+        // Waiting for https://github.com/johnbillion/extended-cpts/pull/162
         if ($taxonomy_object && $taxonomy_object->_builtin) {
             $config_builtin = \get_object_vars($taxonomy_object);
             if (isset($config_builtin['labels'])) {
-                $config_builtin['labels'] = \get_object_vars($config_builtin['labels']);
+                $config['labels'] = \get_object_vars($config_builtin['labels']);
             }
-            $config = \array_merge($config, $config_builtin);
+            $config = \array_merge($config_builtin, $config);
         }
 
         \register_extended_taxonomy($taxonomy, $taxonomyObjectTypes, $config);
 
-        $args = static::getDefaultQuery();
-        if (!empty($args)) {
-            \add_filter('pre_get_posts', function ($wp_query) use ($args, $taxonomy) {
-                if (\is_admin()) {
-                    return;
-                }
-                if (!$wp_query->is_main_query()) {
-                    return;
-                }
-                if (!$wp_query->is_tax($taxonomy)) {
-                    return;
-                }
-                foreach ($args as $key => $value) {
-                    $wp_query->set($key, $value);
-                }
-            });
-        }
+        \add_filter('pre_get_posts', function ($wp_query) {
+            if (\is_admin()) {
+                return;
+            }
+            if (!$wp_query->is_main_query()) {
+                return;
+            }
+            $taxonomy = static::getTaxonomy();
+            if (!$wp_query->is_tax($taxonomy)) {
+                return;
+            }
+            \call_user_func([static::class, 'setDefaultQuery'], $wp_query);
+        });
     }
 
     /**
@@ -157,6 +155,12 @@ abstract class AbstractTerm extends TimberTerm
         ]);
 
         return static::terms($args);
+    }
+
+    public function getQueryVar(): string
+    {
+        $config = \get_taxonomy(static::getTaxonomy());
+        return \get_query_var($config->query_var ?? static::getTaxonomy());
     }
 
     /**
