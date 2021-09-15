@@ -21,7 +21,7 @@
         "psr/http-server-middleware": "^1.0",
         "psr/log": "^1.1",
         "rareloop/psr7-server-request-extension": "^2.1",
-        "rareloop/router": "^5.0",
+        "rareloop/router": "dev-fix-zend-namespace",
         "spatie/macroable": "^1.0",
         "spatie/once": "^2.2",
         "spatie/schema-org": "^3.3",
@@ -37,7 +37,8 @@
         "tightenco/collect": "^8.0",
         "timber/timber": "^1.8",
         "twig/html-extra": "^3.0",
-        "twig/string-extra": "^3.3"
+        "twig/string-extra": "^3.3",
+        "deliciousbrains/wp-migrations": "^2.0"
     },
     "require-dev": {
         "antecedent/patchwork": "^2.1.8",
@@ -60,6 +61,14 @@
             "Rareloop\\Lumberjack\\Test\\": "tests"
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/nlemoine/router"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "scripts": {
         "lint": [
             "vendor/bin/ecs check"
