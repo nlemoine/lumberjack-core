@@ -66,7 +66,7 @@ class ContextServiceProvider extends ServiceProvider
             }
             if (!$has_multiple_types) {
                 $context[$post_type . 's'] = $context['posts'];
-                unset($context['posts']);
+                // unset($context['posts']);
             }
         }
 
