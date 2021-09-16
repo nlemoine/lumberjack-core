@@ -104,18 +104,28 @@ abstract class AbstractTerm extends TimberTerm
 
         \register_extended_taxonomy($taxonomy, $taxonomyObjectTypes, $config);
 
-        \add_filter('pre_get_posts', function ($wp_query) {
+        \add_filter('pre_get_posts', function ($query) {
             if (\is_admin()) {
                 return;
             }
-            if (!$wp_query->is_main_query()) {
+
+            if (!$query->is_main_query()) {
                 return;
             }
             $taxonomy = static::getTaxonomy();
-            if (!$wp_query->is_tax($taxonomy)) {
+
+            if ( !in_array($taxonomy, ['category', 'post_tag'], true) && !$query->is_tax($taxonomy)) {
                 return;
             }
-            \call_user_func([static::class, 'setDefaultQuery'], $wp_query);
+
+            if ($taxonomy === 'category' && !$query->is_category()) {
+                return;
+            }
+            if ($taxonomy === 'post_tag' && !$query->is_tag()) {
+                return;
+            }
+
+            \call_user_func([static::class, 'setDefaultQuery'], $query);
         });
     }
 

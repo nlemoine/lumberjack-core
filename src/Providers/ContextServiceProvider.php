@@ -3,7 +3,6 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Rareloop\Lumberjack\Context;
-use Rareloop\Lumberjack\Models\Category;
 use Rareloop\Lumberjack\Models\Page;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -55,10 +54,20 @@ class ContextServiceProvider extends ServiceProvider
         } elseif (
             (\is_home() || \is_post_type_archive() || \is_tax() || \is_category() || \is_tag())
             && $post_type !== 'post'
+            && $post_type
             && isset($context['posts'])
         ) {
-            $context[$post_type . 's'] = $context['posts'];
-            unset($context['posts']);
+            $has_multiple_types = false;
+            if(\is_tax() || \is_category() || \is_tag()) {
+                $term = \get_queried_object();
+                $taxonomy = \get_queried_object()->taxonomy;
+                $types = $GLOBALS['wp_taxonomies'][$taxonomy]->object_type;
+                $has_multiple_types = \count($types) > 1;
+            }
+            if (!$has_multiple_types) {
+                $context[$post_type . 's'] = $context['posts'];
+                unset($context['posts']);
+            }
         }
 
         // terms
