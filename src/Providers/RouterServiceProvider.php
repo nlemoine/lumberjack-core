@@ -53,17 +53,20 @@ class RouterServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        \add_action('wp_loaded', function () {
-            $request = ServerRequest::fromRequest(ServerRequestFactory::fromGlobals(
-                $_SERVER,
-                $_GET,
-                $_POST,
-                $_COOKIE,
-                $_FILES
-            ));
+        \add_action('wp_loaded', [$this, 'handleRequest'], 100); // Load after inpsyde/assets
+    }
 
-            $this->processRequest($request);
-        }, 100); // Load after inpsyde/assets
+    public function handleRequest()
+    {
+        $request = ServerRequest::fromRequest(ServerRequestFactory::fromGlobals(
+            $_SERVER,
+            $_GET,
+            $_POST,
+            $_COOKIE,
+            $_FILES
+        ));
+
+        $this->processRequest($request);
     }
 
     public function processRequest(RequestInterface $request)
@@ -71,7 +74,8 @@ class RouterServiceProvider extends ServiceProvider
         $this->app->bind('request', $request);
 
         // Until https://github.com/dannyvankooten/AltoRouter/pull/247 is merged
-        if ($request->getUri()->getPath() === '/' && $request->getMethod() === 'GET') {
+        $path = $request->getUri()->getPath();
+        if ($path === '/' || empty($path)) {
             return;
         }
 
