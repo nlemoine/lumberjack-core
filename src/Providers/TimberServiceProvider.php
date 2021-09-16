@@ -3,13 +3,14 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Rareloop\Lumberjack\Config;
-use Rareloop\Lumberjack\Timber;
+// use Rareloop\Lumberjack\Timber;
 use Rareloop\Lumberjack\Twig\Extensions\AssetExtension;
 use Rareloop\Lumberjack\Twig\Extensions\RoutingExtension;
 use Rareloop\Lumberjack\Twig\Extensions\SvgHelpersExtension;
 use Rareloop\Lumberjack\Twig\Extensions\TextHelpersExtension;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Timber\Loader;
+use Timber\Timber;
 use Twig\Environment;
 use Twig\Extra\Html\HtmlExtension;
 use Twig\Extra\String\StringExtension;
