@@ -4,6 +4,8 @@ namespace Rareloop\Lumberjack\Providers;
 
 use Inpsyde\WpContext;
 use Timber\Image;
+use Timber\Term;
+use Timber\Timber;
 
 class AcfServiceProvider extends ServiceProvider
 {
@@ -42,6 +44,10 @@ class AcfServiceProvider extends ServiceProvider
             // oEmbed
             $field_type = \acf_get_field_type('oembed');
             \remove_filter('acf/format_value/type=oembed', [$field_type, 'format_value']);
+
+            // Taxonomy
+            $field_type = \acf_get_field_type('taxonomy');
+            \remove_filter('acf/format_value/type=taxonomy', [$field_type, 'format_value']);
         });
 
         // Add new filters
@@ -53,6 +59,26 @@ class AcfServiceProvider extends ServiceProvider
         \add_filter('acf/update_value/type=date_time_picker', [$this, 'updateAcfDateTimePicker'], 10, 3);
         \add_filter('acf/format_value/type=oembed', [$this, 'formatAcfoEmbed'], 10, 3);
         \add_filter('acf/update_value/type=oembed', [$this, 'updateAcfoEmbed'], 10, 3);
+        \add_filter('acf/format_value/type=taxonomy', [$this, 'formatTaxonomy'], 10, 3);
+    }
+
+    public function formatTaxonomy($value, $post_id, $field)
+    {
+        if (empty($value)) {
+            return false;
+        }
+
+        $taxonomy_class = $this->app->has('taxonomy.class_getter') ? $this->app->get('taxonomy.class_getter')->getTaxonomyClass($field['taxonomy']) : Term::class;
+
+        // Multiple terms
+        if (\in_array($field['field_type'], ['multi_select', 'checkbox'], true) && \is_array($value)) {
+            return Timber::get_terms([
+                'terms'    => $value,
+                'taxonomy' => $field['taxonomy'],
+            ], $taxonomy_class);
+        }
+
+        return Timber::get_term($value, $field['taxonomy'], $taxonomy_class);
     }
 
     /**

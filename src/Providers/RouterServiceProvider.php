@@ -19,7 +19,10 @@ class RouterServiceProvider extends ServiceProvider
         $resolver = new MiddlewareResolver($this->app, $store);
 
         $router = new Router($this->app, $resolver);
-        $router->setBasePath($this->getBasePathFromWPConfig());
+        $basePath = $this->getBasePathFromWPConfig();
+        if ($basePath !== '/') {
+            $router->setBasePath($this->getBasePathFromWPConfig());
+        }
 
         $this->app->bind('router', $router);
         $this->app->bind(Router::class, $router);
@@ -66,6 +69,11 @@ class RouterServiceProvider extends ServiceProvider
     public function processRequest(RequestInterface $request)
     {
         $this->app->bind('request', $request);
+
+        // Until https://github.com/dannyvankooten/AltoRouter/pull/247 is merged
+        if ($request->getUri()->getPath() === '/' && $request->getMethod() === 'GET') {
+            return;
+        }
 
         $response = $this->app->get('router')->match($request);
 

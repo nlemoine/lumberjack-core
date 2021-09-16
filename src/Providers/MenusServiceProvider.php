@@ -9,7 +9,7 @@ class MenusServiceProvider extends ServiceProvider
     public function boot()
     {
         \add_action('after_setup_theme', [$this, 'registerNavMenus']);
-        \add_filter('timber/context', [$this, 'addMenusToContext']);
+        // \add_filter('timber/context', [$this, 'addMenusToContext']);
     }
 
     /**

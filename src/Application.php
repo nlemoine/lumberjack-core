@@ -128,7 +128,8 @@ class Application implements ContainerInterface, InteropContainerInterface
 
     public function register($provider)
     {
-        if ($foundProvider = $this->getProvider($provider)) {
+        $foundProvider = $this->getProvider($provider);
+        if ($foundProvider) {
             return $foundProvider;
         }
 

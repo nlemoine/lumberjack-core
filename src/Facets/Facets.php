@@ -29,11 +29,6 @@ class Facets
     protected $wpdb;
 
     /**
-     * @var array
-     */
-    protected $calculatedFacets;
-
-    /**
      * used on filters to remember on wich current facet we need to work
      *
      * @var string
@@ -70,32 +65,19 @@ class Facets
             return [];
         }
 
-        if ($this->calculatedFacets) {
-            return $this->calculatedFacets;
-        }
-        $this->calculatedFacets = [];
-
         foreach ($this->facets as $facet) {
             $query = clone $this->query;
-            $this->currentFacet = $facet;
+            $currentFacet = $facet;
             $facet->setQuery($query);
 
-            // dump('current: ' . $facet->getName());
-
-            // // apply filters but the current
             foreach ($this->facets as $f) {
-                if ($f->getKey() === $this->currentFacet->getKey()) {
+                if ($f->getKey() === $currentFacet->getKey()) {
                     continue;
                 }
-                // dump('filter:'. $f->getName());
                 $f->filter($query);
             }
-            // dump($query->tax_query);
-            // $facet->setQuery($query);
-            // $this->calculatedFacets[$name] = $facet->getItems($query);
         }
 
-        // return $this->calculatedFacets;
         return $this->facets;
     }
 

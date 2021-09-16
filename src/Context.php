@@ -1,0 +1,172 @@
+<?php
+
+namespace Rareloop\Lumberjack;
+
+use Rareloop\Lumberjack\Models\NavMenu;
+use Symfony\Component\HttpFoundation\Request;
+
+class Context extends \ArrayObject
+{
+    private $app;
+
+    private $option;
+
+    private $acfOption;
+
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+        $this->option = new class() {
+            public function __call($name, $args)
+            {
+                return $this->__get($name);
+            }
+
+            public function get($name)
+            {
+                return $this->__get($name);
+            }
+
+            public function __get(string $name)
+            {
+                return \once(function () use ($name) {
+                    return \get_option($name);
+                });
+            }
+        };
+        $this->acfOption = new class() {
+            public function __call($name, $args)
+            {
+                return $this->__get($name);
+            }
+
+            public function __get(string $name)
+            {
+                return \once(function () use ($name) {
+                    return \get_field($name, 'option');
+                });
+            }
+        };
+        $this->menu = new class() {
+            public function __call($location, $args)
+            {
+                return $this->__get($location);
+            }
+
+            public function __get(string $location): NavMenu
+            {
+                return \once(function () use ($location) {
+                    return new NavMenu($location);
+                });
+            }
+        };
+    }
+
+    public function getArrayCopy()
+    {
+        return [
+            'option' => $this->option,
+            'menu'   => $this->menu,
+        ];
+    }
+
+    public function getMenu()
+    {
+        return $this->menu;
+    }
+
+    public function getOption()
+    {
+        return $this->option;
+    }
+
+    public function getAcfOption()
+    {
+        return $this->acfOption;
+    }
+
+    public function getRequest()
+    {
+        return Request::createFromGlobals();
+    }
+
+    public function getEnv()
+    {
+        return \defined('WP_ENV') ? WP_ENV : false;
+    }
+
+    /**
+     * Get post type by different ways
+     *
+     * @return string|false
+     */
+    public function getPostType()
+    {
+        $post_type = \get_post_type();
+        if (!$post_type) {
+            if (isset($GLOBALS['wp_query']->is_page_for_custom_post_type)) {
+                $post_type = $GLOBALS['wp_query']->is_page_for_custom_post_type;
+            } elseif (\get_query_var('post_type')) {
+                $post_type = \get_query_var('post_type');
+            }
+        }
+        return $post_type;
+    }
+
+    public function getQuery()
+    {
+        return $GLOBALS['wp_query'];
+    }
+
+    /**
+     * Get page title
+     *
+     * @see wp_get_document_title()
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        $title = \get_bloginfo('name', 'display');
+
+        switch (true) {
+            case \is_404():
+                $title = \__('Page not found');
+                break;
+            case \is_search():
+                /* translators: %s: Search query. */
+                $title = \sprintf(\__('Search Results for &#8220;%s&#8221;'), \get_search_query());
+                break;
+            case \is_front_page():
+                $title = \get_bloginfo('name', 'display');
+                break;
+            case \is_post_type_archive():
+                $title = \post_type_archive_title('', false);
+                break;
+            case \is_tax():
+                $title = \single_term_title('', false);
+                break;
+            case \is_home() || \is_singular():
+                $title = \single_post_title('', false);
+                break;
+            case \is_category() || \is_tag():
+                $title = \single_term_title('', false);
+                break;
+            case \is_author() && \get_queried_object():
+                $author = \get_queried_object();
+                $title = $author->display_name;
+                break;
+            case \is_year():
+                $title = \get_the_date(\_x('Y', 'yearly archives date format'));
+                break;
+            case \is_month():
+                $title = \get_the_date(\_x('F Y', 'monthly archives date format'));
+                break;
+            case \is_day():
+                $title = \get_the_date();
+                break;
+        }
+
+        return $title;
+    }
+}

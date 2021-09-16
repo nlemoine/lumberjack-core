@@ -3,9 +3,13 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Rareloop\Lumberjack\Config;
+use Rareloop\Lumberjack\Timber;
+use Rareloop\Lumberjack\Twig\Extensions\AssetExtension;
+use Rareloop\Lumberjack\Twig\Extensions\RoutingExtension;
+use Rareloop\Lumberjack\Twig\Extensions\SvgHelpersExtension;
+use Rareloop\Lumberjack\Twig\Extensions\TextHelpersExtension;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Timber\Loader;
-use Timber\Timber;
 use Twig\Environment;
 use Twig\Extra\Html\HtmlExtension;
 use Twig\Extra\String\StringExtension;
@@ -15,6 +19,7 @@ class TimberServiceProvider extends ServiceProvider
 {
     public function register()
     {
+        // Timber::$context_cache = true;
         $timber = new Timber();
 
         $this->app->singleton('timber', $timber);
@@ -49,6 +54,17 @@ class TimberServiceProvider extends ServiceProvider
 
         // Add extensions
         \add_filter('timber/loader/twig', [$this, 'addTwigExtensions']);
+
+        // Configure Twig
+        \add_filter('timber/loader/twig', [$this, 'configureTwig']);
+    }
+
+    public function configureTwig(Environment $twig)
+    {
+        if (WP_DEBUG) {
+            $twig->enableStrictVariables();
+        }
+        return $twig;
     }
 
     /**
@@ -76,15 +92,28 @@ class TimberServiceProvider extends ServiceProvider
      */
     public function addTwigExtensions(Environment $twig): Environment
     {
-        // $twig->addExtension(new AssetExtension($this->app->get('assets.packages')));
-        // $twig->addExtension(new SvgHelpersExtension($this->app->get('assets.packages')->getPackage('path')));
         $twig->addExtension(new HtmlExtension());
-        $twig->addExtension(new StringExtension($this->app->get('slugger')));
+        $twig->addExtension(new TextHelpersExtension());
+        if ($this->app->has('slugger')) {
+            $twig->addExtension(new StringExtension($this->get('slugger')));
+        }
+
+        if ($this->app->has('router.generator')) {
+            $twig->addExtension(new RoutingExtension($this->get('router.generator')));
+        }
+
+        if ($this->app->has('assets.packages')) {
+            $packages = $this->get('assets.packages');
+            $twig->addExtension(new AssetExtension($packages));
+            if ($packages->getPackage('path')) {
+                $twig->addExtension(new SvgHelpersExtension($packages->getPackage('path')));
+            }
+        }
+
         // $twig->addExtension(
         //     new ImageFactoryExtension($this->app->get('image.factory'))
         // );
 
-        // $twig->addExtension(new RoutingExtension($this->app->get('router.generator')));
         // $twig->addExtension(new TranslationExtension());
 
         // $fixer = new Fixer(['Ellipsis', 'Dimension', 'Unit', 'Dash', 'SmartQuotes', 'FrenchNoBreakSpace', 'NoSpaceBeforeComma', 'CurlyQuote', 'Trademark']);

@@ -123,11 +123,10 @@ class AssetsServiceProvider extends ServiceProvider
 
     public function boot(Config $config)
     {
-        $this->app->bind('assets.base_urls', $this->app->get('url.assets'));
+        $this->app->singleton('assets.base_urls', $this->app->get('url.assets'));
         $this->app->bind('assets.named_packages', [
             'path' => [
                 'base_path' => $this->app->get('path.assets'),
-                'version'   => '',
             ],
             'editor' => [
                 'base_path' => 'assets',
@@ -136,8 +135,10 @@ class AssetsServiceProvider extends ServiceProvider
 
         if (!WP_DEBUG && \in_array(WP_ENV, ['staging', 'production'], true)) {
             $manifest_path = $this->app->get('path.assets') . '/manifest.json';
-            $this->app->bind('assets.json_manifest_path', $manifest_path);
-            $this->app->bind('assets.named_packages', \array_merge_recursive($this->app->get('assets.named_packages'), [
+            if (\is_file($manifest_path)) {
+                $this->app->singleton('assets.json_manifest_path', $manifest_path);
+            }
+            $this->app->singleton('assets.named_packages', \array_merge_recursive($this->app->get('assets.named_packages'), [
                 'path',
             ]));
         }
