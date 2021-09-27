@@ -12,28 +12,6 @@ class CustomTaxonomyServiceProvider extends ServiceProvider
         \add_action('init', [$this, 'unregisterTaxonomies'], 20);
     }
 
-    public function register()
-    {
-        $this->app->singleton('taxonomy.class_getter', function ($app) {
-            $class_map = $this->app->get('taxonomy.class_map');
-            return new class($class_map) {
-                private $classMap;
-
-                private $defaultClass = Timber\Term::class;
-
-                public function __construct(array $class_map)
-                {
-                    $this->classMap = $class_map;
-                }
-
-                public function getTaxonomyClass($taxonomy)
-                {
-                    return $this->classMap[$taxonomy] ?? $this->defaultClass;
-                }
-            };
-        });
-    }
-
     public function registerTaxonomies()
     {
         $taxonomies = $this->getConfig('taxonomies.register', []);

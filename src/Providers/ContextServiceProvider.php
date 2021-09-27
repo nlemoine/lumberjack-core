@@ -12,18 +12,18 @@ class ContextServiceProvider extends ServiceProvider
     public function boot()
     {
         \add_filter('timber/context', [$this, 'removeUnneededContext'], 1);
-        // \add_filter('timber/context', function ($context) {
-        //     $context['app'] = $this->app->get('context');
-        //     $context['option'] = $context['app']->getOption();
-        //     $context['menu'] = $context['app']->getMenu();
-        //     return $context;
-        // });
+        \add_filter('timber/context', function ($context) {
+            $context['app'] = $this->app->get('context');
+            $context['option'] = $context['app']->getOption();
+            $context['menu'] = $context['app']->getMenu();
+            return $context;
+        });
+        // Temp, time that Timber fixes collections/post global issues
         \add_filter('timber/context', [$this, 'addDebugContext'], 1);
         \add_filter('timber/context', [$this, 'addLanguagesContext'], 1);
         \add_filter('timber/context', [$this, 'addQueryContext'], 1);
         \add_filter('timber/context', [$this, 'addDataContext'], 20);
         \add_filter('timber/context', [$this, 'renameCollections'], 20);
-        \add_filter('timber/context', [$this, 'fixContext'], 20);
     }
 
     public function register()
@@ -33,25 +33,16 @@ class ContextServiceProvider extends ServiceProvider
         });
     }
 
-    public function fixContext(array $context): array
-    {
-        if (\is_home()) {
-            $context['page'] = new Page();
-        }
-        return $context;
-    }
-
     /**
      * Undocumented function
      */
     public function renameCollections(array $context): array
     {
-        // posts
         $post_type = $this->app->get('context')->getPostType();
         $post_type = \str_replace('-', '_', $post_type);
-        if (\is_singular() && isset($context['posts'][0])) {
-            $context[$post_type] = $context['posts'][0];
-            unset($context['posts']);
+        if (\is_singular() && isset($context['post']) && $post_type !== 'post') {
+            $context[$post_type] = $context['post'];
+            unset($context['post']);
         } elseif (
             (\is_home() || \is_post_type_archive() || \is_tax() || \is_category() || \is_tag())
             && $post_type !== 'post'
@@ -61,12 +52,9 @@ class ContextServiceProvider extends ServiceProvider
             unset($context['posts']);
         }
 
-        // terms
-        if (is_tax() || is_tag() || is_category()) {
-            $term = \get_queried_object();
-            $taxonomy = \get_queried_object()->taxonomy;
-            $taxonomy_class = $this->app->has('taxonomy.class_getter') ? $this->app->get('taxonomy.class_getter')->getTaxonomyClass($taxonomy) : Term::class;
-            $context[$taxonomy] = new $taxonomy_class($term->term_id);
+        if(is_home() && isset($context['post'])) {
+            $context['page'] = $context['post'];
+            unset($context['post']);
         }
 
         return $context;
@@ -87,8 +75,8 @@ class ContextServiceProvider extends ServiceProvider
      */
     public function addLanguagesContext(array $context): array
     {
-        $context['current_lang'] = \once(fn () => $this->app->get('locale.short'));
-        $context['locale'] = \once(fn () => $this->app->get('locale'));
+        $context['current_lang'] = $this->app->get('locale.short');
+        $context['locale'] = $this->app->get('locale');
         return $context;
     }
 

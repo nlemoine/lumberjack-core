@@ -3,82 +3,40 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Inpsyde\WpContext;
-use Timber\Image;
-use Timber\Term;
-use Timber\Timber;
 
 class AcfServiceProvider extends ServiceProvider
 {
     public function boot()
     {
+        // Transform raw value to Timber objects/PHP standard object
+        add_filter('timber/meta/transform_value', '__return_true');
+
         // Hide menu
         \add_filter('acf/settings/show_admin', function (bool $show): bool {
             return WP_DEBUG;
         });
 
         // Remove default filters
-        \add_action('acf/init', function () {
-            $context = WpContext::determine();
-            if ($context->isRest()) {
-                return;
-            }
+        // \add_action('acf/init', function () {
+        //     $context = WpContext::determine();
+        //     if ($context->isRest()) {
+        //         return;
+        //     }
 
-            // Image
-            $field_type = \acf_get_field_type('image');
-            \remove_filter('acf/format_value/type=image', [$field_type, 'format_value']);
+        //     // oEmbed
+        //     $field_type = \acf_get_field_type('oembed');
+        //     \remove_filter('acf/format_value/type=oembed', [$field_type, 'format_value']);
 
-            // Gallery
-            $field_type = \acf_get_field_type('gallery');
-            \remove_filter('acf/format_value/type=gallery', [$field_type, 'format_value']);
-
-            // Date
-            $field_type = \acf_get_field_type('date_picker');
-            \remove_filter('acf/format_value/type=date_picker', [$field_type, 'format_value']);
-            \remove_filter('acf/update_value/type=date_picker', [$field_type, 'update_value']);
-
-            // Datetime
-            $field_type = \acf_get_field_type('date_time_picker');
-            \remove_filter('acf/format_value/type=date_time_picker', [$field_type, 'format_value']);
-            \remove_filter('acf/update_value/type=date_time_picker', [$field_type, 'update_value']);
-
-            // oEmbed
-            $field_type = \acf_get_field_type('oembed');
-            \remove_filter('acf/format_value/type=oembed', [$field_type, 'format_value']);
-
-            // Taxonomy
-            $field_type = \acf_get_field_type('taxonomy');
-            \remove_filter('acf/format_value/type=taxonomy', [$field_type, 'format_value']);
-        });
+        //     // Taxonomy
+        //     $field_type = \acf_get_field_type('taxonomy');
+        //     \remove_filter('acf/format_value/type=taxonomy', [$field_type, 'format_value']);
+        // });
 
         // Add new filters
-        \add_filter('acf/format_value/type=image', [$this, 'formatAcfImage'], 10, 3);
-        \add_filter('acf/format_value/type=gallery', [$this, 'formatAcfGallery'], 10, 3);
-        \add_filter('acf/format_value/type=date_picker', [$this, 'formatAcfDatePicker'], 10, 3);
         \add_filter('acf/update_value/type=date_picker', [$this, 'updateAcfDatePicker'], 10, 3);
-        \add_filter('acf/format_value/type=date_time_picker', [$this, 'formatAcfDateTimePicker'], 10, 3);
         \add_filter('acf/update_value/type=date_time_picker', [$this, 'updateAcfDateTimePicker'], 10, 3);
         \add_filter('acf/format_value/type=oembed', [$this, 'formatAcfoEmbed'], 10, 3);
         \add_filter('acf/update_value/type=oembed', [$this, 'updateAcfoEmbed'], 10, 3);
-        \add_filter('acf/format_value/type=taxonomy', [$this, 'formatTaxonomy'], 10, 3);
-    }
-
-    public function formatTaxonomy($value, $post_id, $field)
-    {
-        if (empty($value)) {
-            return false;
-        }
-
-        $taxonomy_class = $this->app->has('taxonomy.class_getter') ? $this->app->get('taxonomy.class_getter')->getTaxonomyClass($field['taxonomy']) : Term::class;
-
-        // Multiple terms
-        if (\in_array($field['field_type'], ['multi_select', 'checkbox'], true) && \is_array($value)) {
-            return Timber::get_terms([
-                'terms'    => $value,
-                'taxonomy' => $field['taxonomy'],
-            ], $taxonomy_class);
-        }
-
-        return Timber::get_term($value, $field['taxonomy'], $taxonomy_class);
     }
 
     /**
@@ -115,18 +73,6 @@ class AcfServiceProvider extends ServiceProvider
     }
 
     /**
-     * Undocumented function.
-     *
-     * @param string $value
-     * @param int    $post_id
-     * @param array  $field
-     */
-    public function formatAcfDatePicker($value, $post_id, $field)
-    {
-        return new \DateTime($value);
-    }
-
-    /**
      * Saves ACF Datepicker field to a standard MySQL format.
      *
      * This enforces standards and makes queries on dates easier with WP_Meta_Query
@@ -143,18 +89,6 @@ class AcfServiceProvider extends ServiceProvider
     }
 
     /**
-     * Undocumented function.
-     *
-     * @param string $value
-     * @param int    $post_id
-     * @param array  $field
-     */
-    public function formatAcfDateTimePicker($value, $post_id, $field)
-    {
-        return new \DateTime($value);
-    }
-
-    /**
      * Saves ACF DateTimepicker field to a standard MySQL format.
      *
      * This enforces standards and makes queries on dates easier with WP_Meta_Query
@@ -168,46 +102,6 @@ class AcfServiceProvider extends ServiceProvider
     public function updateAcfDateTimePicker($value, $post_id, $field)
     {
         return \acf_format_date($value, 'Y-m-d H:i:s');
-    }
-
-    /**
-     * Undocumented function.
-     *
-     * @param array $value
-     * @param int   $post_id
-     * @param array $field
-     */
-    public function formatAcfGallery($value, $post_id, $field)
-    {
-        if (empty($value)) {
-            return false;
-        }
-
-        return \array_map(function ($attachment_id) {
-            return new Image($attachment_id);
-        }, $value);
-    }
-
-    /**
-     * Undocumented function.
-     *
-     * @param string $value
-     * @param int    $post_id
-     * @param array  $field
-     */
-    public function formatAcfImage($value, $post_id, $field)
-    {
-        if (empty($value)) {
-            return false;
-        }
-
-        if (!\is_numeric($value)) {
-            return false;
-        }
-
-        $value = \intval($value);
-
-        return new Image($value);
     }
 
     /**

@@ -3,6 +3,9 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Rareloop\Lumberjack\Models\NavMenu;
+use Rareloop\Lumberjack\Models\NavMenuItem;
+use Timber\Post;
+use WP_Term;
 
 class MenusServiceProvider extends ServiceProvider
 {
@@ -10,6 +13,18 @@ class MenusServiceProvider extends ServiceProvider
     {
         \add_action('after_setup_theme', [$this, 'registerNavMenus']);
         // \add_filter('timber/context', [$this, 'addMenusToContext']);
+        add_filter('timber/menu/classmap', [$this, 'setDefaultNavMenuClass'], 10, 2);
+        add_filter('timber/menuitem/classmap', [$this, 'setDefaultNavMenuItemClass'], 10, 2);
+    }
+
+    public function setDefaultNavMenuClass(string $classes, WP_Term $term)
+    {
+        return NavMenu::class;
+    }
+
+    public function setDefaultNavMenuItemClass(string $classes, Post $post)
+    {
+        return NavMenuItem::class;
     }
 
     /**

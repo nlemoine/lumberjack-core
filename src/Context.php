@@ -56,7 +56,7 @@ class Context extends \ArrayObject
             public function __get(string $location): NavMenu
             {
                 return \once(function () use ($location) {
-                    return new NavMenu($location);
+                    return Timber::get_menu($location);
                 });
             }
         };

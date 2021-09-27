@@ -115,7 +115,7 @@ abstract class AbstractPostType extends Post
 
         \register_extended_post_type($postType, $config);
 
-        \add_filter('Timber\PostClassMap', function ($post_class) use ($postType) {
+        \add_filter('timber/post/classmap', function ($post_class) use ($postType) {
             return \array_merge(
                 [
                     $postType => static::class,
