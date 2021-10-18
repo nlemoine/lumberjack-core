@@ -21,6 +21,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
 use Twig\Environment;
+use Twig\Loader\LoaderInterface;
 use Twig\RuntimeLoader\FactoryRuntimeLoader;
 use WP_Error;
 
@@ -94,6 +95,19 @@ class FormServiceProvider extends ServiceProvider
         });
 
         \add_filter('timber/twig', [$this, 'addTwigExtension']);
+        \add_filter('timber/loader/loader', [$this, 'addSymfonyFormThemePath']);
+    }
+
+    /**
+     * Add Symfony form theme path
+     */
+    public function addSymfonyFormThemePath(LoaderInterface $loader): LoaderInterface
+    {
+        $appVariableReflection = new \ReflectionClass('\Symfony\Bridge\Twig\AppVariable');
+        $vendorTwigBridgeDirectory = \dirname($appVariableReflection->getFileName());
+        $loader->addPath($vendorTwigBridgeDirectory . '/Resources/views/Form');
+
+        return $loader;
     }
 
     /**

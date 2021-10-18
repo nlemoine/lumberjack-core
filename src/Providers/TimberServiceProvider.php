@@ -14,7 +14,6 @@ use Timber\Timber as TimberCore;
 use Twig\Environment;
 use Twig\Extra\Html\HtmlExtension;
 use Twig\Extra\String\StringExtension;
-use Twig\Loader\LoaderInterface;
 
 class TimberServiceProvider extends ServiceProvider
 {
@@ -41,9 +40,6 @@ class TimberServiceProvider extends ServiceProvider
         if ($paths) {
             Timber::$dirname = $paths;
         }
-
-        // Add Symfony form theme path
-        \add_filter('timber/loader/loader', [$this, 'addSymfonyFormThemePath']);
 
         // Extensions, functions & filters
         // \add_filter('timber/twig/filters', [$this, 'filterTimberFilters']);
@@ -115,18 +111,6 @@ class TimberServiceProvider extends ServiceProvider
             'bloginfo',
         ];
         return \array_intersect_key($functions, \array_flip($whitelist));
-    }
-
-    /**
-     * Add Symfony form theme path
-     */
-    public function addSymfonyFormThemePath(LoaderInterface $loader): LoaderInterface
-    {
-        $appVariableReflection = new \ReflectionClass('\Symfony\Bridge\Twig\AppVariable');
-        $vendorTwigBridgeDirectory = \dirname($appVariableReflection->getFileName());
-        $loader->addPath($vendorTwigBridgeDirectory . '/Resources/views/Form');
-
-        return $loader;
     }
 
     /**

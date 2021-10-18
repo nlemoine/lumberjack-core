@@ -17,14 +17,12 @@ class FormTypeInvalidFeedbackExtension extends AbstractTypeExtension
         }
     }
 
-
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
 
         $resolver->setDefault('invalid_feedback', null);
     }
-
 
     public static function getExtendedTypes(): iterable
     {

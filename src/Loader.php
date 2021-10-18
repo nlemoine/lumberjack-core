@@ -14,6 +14,6 @@ class Loader extends TimberLoader
     public function get_loader()
     {
         $loader = new FilesystemLoader(\get_template_directory() . '/views');
-        return $loader;
+        return \apply_filters('timber/loader/loader', $loader);
     }
 }
