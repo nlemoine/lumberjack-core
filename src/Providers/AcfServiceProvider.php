@@ -9,7 +9,7 @@ class AcfServiceProvider extends ServiceProvider
     public function boot()
     {
         // Transform raw value to Timber objects/PHP standard object
-        add_filter('timber/meta/transform_value', '__return_true');
+        \add_filter('timber/meta/transform_value', '__return_true');
 
         // Hide menu
         \add_filter('acf/settings/show_admin', function (bool $show): bool {

@@ -2,8 +2,6 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Timber\Timber;
-
 class CustomTaxonomyServiceProvider extends ServiceProvider
 {
     public function boot()

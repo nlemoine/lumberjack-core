@@ -19,13 +19,4 @@ abstract class AbstractTemplate
     {
         return true;
     }
-
-    protected static function isCurrentTemplate(): bool
-    {
-        if (!\is_singular()) {
-            return false;
-        }
-
-        return static::getTemplate() . '.php' === \get_page_template_slug();
-    }
 }

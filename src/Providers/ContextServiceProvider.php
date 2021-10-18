@@ -3,8 +3,6 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Rareloop\Lumberjack\Context;
-use Rareloop\Lumberjack\Models\Category;
-use Rareloop\Lumberjack\Models\Page;
 use Symfony\Component\HttpFoundation\Request;
 
 class ContextServiceProvider extends ServiceProvider
@@ -52,7 +50,7 @@ class ContextServiceProvider extends ServiceProvider
             unset($context['posts']);
         }
 
-        if(is_home() && isset($context['post'])) {
+        if (\is_home() && isset($context['post'])) {
             $context['page'] = $context['post'];
             unset($context['post']);
         }

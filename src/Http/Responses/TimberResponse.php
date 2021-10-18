@@ -6,7 +6,9 @@ use Illuminate\Contracts\Support\Arrayable as CollectionArrayable;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Rareloop\Lumberjack\Contracts\Arrayable;
 use Rareloop\Lumberjack\Exceptions\TwigTemplateNotFoundException;
-use Timber\Timber;
+use Rareloop\Lumberjack\Timber;
+
+// use Timber\Timber;
 
 class TimberResponse extends HtmlResponse
 {

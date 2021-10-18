@@ -56,25 +56,19 @@ class TimberServiceProvider extends ServiceProvider
 
     /**
      * Configure Twig options
-     *
-     * @param array $options
-     * @return array
      */
     public function configureTwigOptions(array $options): array
     {
         $default_options = [
             'strict_variables' => $options['debug'],
-            'autoescape' => 'html',
-            'cache' => $options['debug'] ? false : $this->get('path.project') . '/var/cache/twig',
+            'autoescape'       => 'html',
+            'cache'            => $options['debug'] ? false : $this->get('path.project') . '/var/cache/twig',
         ];
-        return array_merge($options, $default_options);
+        return \array_merge($options, $default_options);
     }
 
     /**
      * Whitelist Timber filters
-     *
-     * @param array $filters
-     * @return array
      */
     public function filterTimberFilters(array $filters): array
     {
@@ -89,14 +83,11 @@ class TimberServiceProvider extends ServiceProvider
             'time_ago',
             'apply_filters',
         ];
-        return array_intersect_key($filters, array_flip($whitelist));
+        return \array_intersect_key($filters, \array_flip($whitelist));
     }
 
     /**
      * Whitelist Timber functions
-     *
-     * @param array $functions
-     * @return array
      */
     public function filterTimberFunctions(array $functions): array
     {
@@ -123,7 +114,7 @@ class TimberServiceProvider extends ServiceProvider
             'shortcode',
             'bloginfo',
         ];
-        return array_intersect_key($functions, array_flip($whitelist));
+        return \array_intersect_key($functions, \array_flip($whitelist));
     }
 
     /**
@@ -140,9 +131,6 @@ class TimberServiceProvider extends ServiceProvider
 
     /**
      * Add Twig extensions
-     *
-     * @param Environment $twig
-     * @return Environment
      */
     public function addTwigExtensions(Environment $twig): Environment
     {

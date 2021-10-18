@@ -1,0 +1,16 @@
+<?php
+
+namespace Rareloop\Lumberjack\Form\Extension\Sanitizer;
+
+use Rareloop\Lumberjack\Form\Extension\Sanitizer\Type\FormTypeSanitizerExtension;
+use Symfony\Component\Form\AbstractExtension;
+
+class SanitizerExtension extends AbstractExtension
+{
+    protected function loadTypeExtensions()
+    {
+        return [
+            new FormTypeSanitizerExtension(),
+        ];
+    }
+}

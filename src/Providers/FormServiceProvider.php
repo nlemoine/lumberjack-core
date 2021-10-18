@@ -1,0 +1,117 @@
+<?php
+
+namespace Rareloop\Lumberjack\Providers;
+
+use Rareloop\Lumberjack\Form\Extension\HoneyPot\HoneyPotExtension;
+use Rareloop\Lumberjack\Form\Extension\InvalidFeedback\InvalidFeedbackExtension;
+use Rareloop\Lumberjack\Form\Extension\MagicQuotes\MagicQuotesExtension;
+use Rareloop\Lumberjack\Form\Extension\Sanitizer\SanitizerExtension;
+use Symfony\Bridge\Twig\Extension\FormExtension;
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Symfony\Bridge\Twig\Form\TwigRendererEngine;
+use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormRenderer;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
+use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
+use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
+use Symfony\Component\Translation\Translator;
+use Symfony\Component\Validator\Validation;
+use Twig\Environment;
+use Twig\RuntimeLoader\FactoryRuntimeLoader;
+use WP_Error;
+
+class FormServiceProvider extends ServiceProvider
+{
+    public function register()
+    {
+        $this->app->singleton('translator', function () {
+            return new Translator($this->app->get('locale.short'));
+        });
+
+        $this->app->singleton('form.wp_error_handler', function (FormInterface $form, WP_Error $errors) {
+            foreach ($errors->get_error_messages() as $message) {
+                $form->addError(new FormError($message));
+            }
+
+            return $form;
+        });
+
+        $this->app->singleton('validator', function () {
+            return Validation::createValidatorBuilder()
+                ->setTranslator($this->app->get('translator'))
+                ->addMethodMapping('loadValidatorMetadata')
+                ->getValidator()
+            ;
+        });
+
+        $this->app->singleton('form.factory', function () {
+            $form_factory = Forms::createFormFactoryBuilder();
+            foreach ($this->app->get('form.extensions') as $extension) {
+                $form_factory->addExtension($extension);
+            }
+
+            return $form_factory->getFormFactory();
+        });
+
+        $this->app->singleton('form.csrf_manager', function () {
+            if (!$this->app->has('session')) {
+                throw new \RuntimeException('You must register a session service provider to use the CSRF extension.');
+            }
+
+            $csrfGenerator = new UriSafeTokenGenerator();
+            $csrfStorage = new SessionTokenStorage($this->app->get('session'));
+
+            return new CsrfTokenManager($csrfGenerator, $csrfStorage);
+        });
+
+        $this->app->singleton('form.extensions', function () {
+            $extensions = [];
+            if ($this->app->has('validator')) {
+                $extensions[] = new ValidatorExtension($this->app->get('validator'));
+            }
+            $extensions[] = new InvalidFeedbackExtension();
+            $extensions[] = new MagicQuotesExtension();
+            $extensions[] = new SanitizerExtension();
+
+            $honeypot_config = $this->app->get('config')->get('form.honeypot', []);
+            $extensions[] = new HoneyPotExtension($honeypot_config);
+            $extensions[] = new CsrfExtension($this->app->get('form.csrf_manager'));
+
+            return $extensions;
+        });
+
+        $this->app->singleton('form.default_theme', $this->app->get('config')->get('form.default_theme', null));
+    }
+
+    public function boot()
+    {
+        $this->app->bind('app.request', function () {
+            return \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+        });
+
+        \add_filter('timber/twig', [$this, 'addTwigExtension']);
+    }
+
+    /**
+     * Add the form extension to the Twig environment
+     */
+    public function addTwigExtension(Environment $twig): Environment
+    {
+        $defaultFormTheme = $this->app->get('form.default_theme') ?? 'bootstrap_5_layout.html.twig';
+
+        $formEngine = new TwigRendererEngine([$defaultFormTheme], $twig);
+        $twig->addRuntimeLoader(new FactoryRuntimeLoader([
+            FormRenderer::class => function () use ($formEngine) {
+                return new FormRenderer($formEngine);
+            },
+        ]));
+        $twig->addExtension(new FormExtension());
+        $twig->addExtension(new TranslationExtension());
+
+        return $twig;
+    }
+}

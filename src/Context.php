@@ -2,7 +2,6 @@
 
 namespace Rareloop\Lumberjack;
 
-use Rareloop\Lumberjack\Models\NavMenu;
 use Symfony\Component\HttpFoundation\Request;
 
 class Context extends \ArrayObject
@@ -53,7 +52,7 @@ class Context extends \ArrayObject
                 return $this->__get($location);
             }
 
-            public function __get(string $location): NavMenu
+            public function __get(string $location)
             {
                 return \once(function () use ($location) {
                     return Timber::get_menu($location);
