@@ -49,6 +49,7 @@ class Facets
             'post_type'      => $args['post_type'] ?? false,
             'posts_per_page' => $args['posts_per_page'] ?? false,
             'paged'          => $args['paged'] ?? false,
+            'ignore_sticky_posts' => true,
         ];
 
         $args = \array_merge($default_args, \array_filter($args_list));
