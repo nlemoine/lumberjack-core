@@ -17,24 +17,22 @@ class AcfServiceProvider extends ServiceProvider
         });
 
         // Remove default filters
-        // \add_action('acf/init', function () {
-        //     $context = WpContext::determine();
-        //     if ($context->isRest()) {
-        //         return;
-        //     }
+        \add_action('acf/init', function () {
+            $context = WpContext::determine();
+            if ($context->isRest()) {
+                return;
+            }
 
-        //     // oEmbed
-        //     $field_type = \acf_get_field_type('oembed');
-        //     \remove_filter('acf/format_value/type=oembed', [$field_type, 'format_value']);
-
-        //     // Taxonomy
-        //     $field_type = \acf_get_field_type('taxonomy');
-        //     \remove_filter('acf/format_value/type=taxonomy', [$field_type, 'format_value']);
-        // });
+            // oEmbed
+            $field_type = \acf_get_field_type('oembed');
+            \remove_filter('acf/format_value/type=oembed', [$field_type, 'format_value']);
+        });
 
         // Add new filters
         \add_filter('acf/update_value/type=date_picker', [$this, 'updateAcfDatePicker'], 10, 3);
         \add_filter('acf/update_value/type=date_time_picker', [$this, 'updateAcfDateTimePicker'], 10, 3);
+
+        // Trigger oembed cache
         \add_filter('acf/format_value/type=oembed', [$this, 'formatAcfoEmbed'], 10, 3);
         \add_filter('acf/update_value/type=oembed', [$this, 'updateAcfoEmbed'], 10, 3);
     }

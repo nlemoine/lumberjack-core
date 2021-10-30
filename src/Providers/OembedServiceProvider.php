@@ -3,7 +3,7 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Psr\Log\LoggerInterface;
-use Timber\Timber;
+use Rareloop\Lumberjack\Timber;
 
 class OembedServiceProvider extends ServiceProvider
 {
@@ -53,7 +53,7 @@ class OembedServiceProvider extends ServiceProvider
         ];
 
         try {
-            $embed_html = $this->get(Timber::class)::fetch(
+            $embed_html = $this->get(Timber::class)::compile(
                 $templates,
                 $embed_data
             );
