@@ -43,18 +43,21 @@ class Facets
             'update_post_term_cache' => false,
             'update_post_meta_cache' => false,
             'no_found_rows'          => true,
+            'ignore_sticky_posts' => true,
         ];
 
         $args_list = [
             'post_type'      => $args['post_type'] ?? false,
             'posts_per_page' => $args['posts_per_page'] ?? false,
             'paged'          => $args['paged'] ?? false,
-            'ignore_sticky_posts' => true,
         ];
 
         $args = \array_merge($default_args, \array_filter($args_list));
 
-        $this->query = new WP_Query($args);
+        $this->query = new WP_Query;
+        foreach($args as $key => $value) {
+            $this->query->set($key, $value);
+        }
     }
 
     /**
