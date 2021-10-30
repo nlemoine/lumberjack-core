@@ -8,21 +8,30 @@ use Psr\Http\Message\RequestInterface;
 use Rareloop\Router\Invoker;
 use Rareloop\Router\ProvidesControllerMiddleware;
 use Rareloop\Router\ResponseFactory;
-use Stringy\Stringy;
 use Tightenco\Collect\Support\Collection;
+use Brain\Hierarchy\Finder\CallbackTemplateFinder;
+use Brain\Hierarchy\QueryTemplate;
+use function Symfony\Component\String\u;
 
 class WordPressControllersServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        \add_filter('template_include', [$this, 'handleTemplateInclude'], PHP_INT_MAX);
+        \add_filter('template_redirect', [$this, 'handleWordPressController'], PHP_INT_MAX);
+        \add_filter('lumberjack_controller_namespace', function ($namespace) {
+            return 'App\\Http\\Controllers\\';
+        }, 1);
     }
 
-    public function handleTemplateInclude($template)
-    {
-        include $template;
+    /**
+     * Handle WordPress controllers
+     */
+    public function handleWordPressController() {
+        $finder = new CallbackTemplateFinder([$this, 'getControllerClass']);
 
-        $controller = $this->getControllerClassFromTemplate($template);
+        $queryTemplate = new QueryTemplate($finder);
+
+        $controller = $queryTemplate->findTemplate();
 
         $request = ServerRequestFactory::fromGlobals(
             $_SERVER,
@@ -37,24 +46,27 @@ class WordPressControllersServiceProvider extends ServiceProvider
         if ($response) {
             $this->app->shutdown($response);
         } else {
-            $this->app->bind('__wp-controller-miss-template', \basename($template));
+            $this->app->bind('__wp-controller-miss-template', $controller);
             $this->app->bind('__wp-controller-miss-controller', $controller);
         }
     }
 
-    public function getControllerClassFromTemplate($template)
+    public function getControllerClass(string $template): string
     {
-        $controllerName = Stringy::create(\basename($template, '.php'))->upperCamelize() . 'Controller';
-
-        // Classes can't start with a number so we have to special case the behaviour here
-        if ($controllerName === '404Controller') {
-            $controllerName = 'Error' . $controllerName;
+        if ($template === '404') {
+            $template = 'error-404';
         }
 
-        $controllerName = \apply_filters('lumberjack_controller_name', $controllerName);
+        $template = $template . '-controller';
+
+        $controllerClass = u($template)->camel()->title();
+
+        $controllerName = \apply_filters('lumberjack_controller_name', $controllerClass);
         $controllerNamespace = \apply_filters('lumberjack_controller_namespace', 'App\\');
 
-        return $controllerNamespace . $controllerName;
+        $controllerFqns = $controllerNamespace . $controllerName;
+
+        return class_exists($controllerFqns) ? $controllerFqns : '';
     }
 
     public function handleRequest(RequestInterface $request, $controllerName, $methodName)
