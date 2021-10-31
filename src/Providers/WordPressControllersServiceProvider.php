@@ -27,6 +27,12 @@ class WordPressControllersServiceProvider extends ServiceProvider
      * Handle WordPress controllers
      */
     public function handleWordPressController() {
+
+        // Don't handle those requests (robots.txt, HEAD, etc.)
+        if(!QueryTemplate::mainQueryTemplateAllowed()) {
+            return;
+        }
+
         $finder = new CallbackTemplateFinder([$this, 'getControllerClass']);
 
         $queryTemplate = new QueryTemplate($finder);
@@ -71,17 +77,10 @@ class WordPressControllersServiceProvider extends ServiceProvider
 
     public function handleRequest(RequestInterface $request, $controllerName, $methodName)
     {
-        if (!\class_exists($controllerName)) {
-            if ($this->app->has('logger')) {
-                $this->app->get('logger')->warning('Controller class `' . $controllerName . '` not found');
-            }
-
-            return false;
-        }
-
         $this->app->requestHasBeenHandled();
 
         $controller = $this->app->get($controllerName);
+
         $middlewares = [];
 
         if ($controller instanceof ProvidesControllerMiddleware) {
