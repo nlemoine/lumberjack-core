@@ -6,7 +6,9 @@ class LocaleServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        \locale_set_default(\str_replace('_', '-', $this->get('locale')));
+        if (\function_exists('locale_set_default')) {
+            \locale_set_default(\str_replace('_', '-', $this->get('locale')));
+        }
     }
 
     public function register()
