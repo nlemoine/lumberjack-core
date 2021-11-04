@@ -2,11 +2,13 @@
 
 namespace Rareloop\Lumberjack\Admin\Page;
 
+use function Symfony\Component\String\u;
+
 abstract class AbstractPage
 {
     public static function getPageSlug(): ?string
     {
-        return null;
+        return u(static::class)->replace('\\', '-')->lower()->toString();
     }
 
     public static function register(): void
