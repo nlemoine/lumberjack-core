@@ -16,17 +16,6 @@ abstract class AbstractTerm extends TimberTerm
         Macroable::__callStatic as __macroableCallStatic;
     }
 
-    public function __construct($id = null, $tax = '', $preventTimberInit = false)
-    {
-        /**
-         * There are occasions where we do not want the bootstrap the data. At the moment this is
-         * designed to make Query Scopes possible
-         */
-        if (!$preventTimberInit) {
-            parent::__construct($id, $tax);
-        }
-    }
-
     public function __call($name, $arguments)
     {
         if (static::hasMacro($name)) {
@@ -180,6 +169,9 @@ abstract class AbstractTerm extends TimberTerm
         ];
     }
 
+    /**
+     * @return array<string>
+     */
     protected static function getLabels(): array
     {
         return [];

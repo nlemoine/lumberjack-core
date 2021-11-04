@@ -4,12 +4,12 @@ namespace Rareloop\Lumberjack\Admin\Page;
 
 abstract class AbstractPage
 {
-    public static function getPageSlug()
+    public static function getPageSlug(): ?string
     {
         return null;
     }
 
-    public static function register()
+    public static function register(): void
     {
         $config = static::getConfig();
 
@@ -23,11 +23,11 @@ abstract class AbstractPage
         }, 100);
     }
 
-    public static function render()
+    public static function render(): void
     {
     }
 
-    protected static function getConfigRaw()
+    protected static function getConfigRaw(): array
     {
         $config = static::getPageConfig();
         $default_config = static::getDefaultConfig();
@@ -77,7 +77,7 @@ abstract class AbstractPage
         return $config_ordered;
     }
 
-    protected static function getPageConfig()
+    protected static function getPageConfig(): array
     {
         return [];
     }

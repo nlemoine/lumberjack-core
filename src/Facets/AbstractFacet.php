@@ -53,7 +53,7 @@ abstract class AbstractFacet
     /**
      * Get name
      */
-    abstract public function getName(): string;
+    abstract public function getName(): ?string;
 
     /**
      * Get type

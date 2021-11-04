@@ -18,7 +18,7 @@ class CustomTaxonomyServiceProvider extends ServiceProvider
             $taxonomy::register();
             $map[$taxonomy::getTaxonomy()] = $taxonomy;
         }
-        $this->app->singleton('taxonomy.class_map', $map);
+        $this->app->singleton('taxonomy.class_map', $map); // TODO: remove this
     }
 
     public function unregisterTaxonomies()

@@ -10,7 +10,10 @@ abstract class AbstractTemplate
 
     abstract public static function getTemplateName(): string;
 
-    public static function getPostTypes()
+    /**
+     * @return array<string>
+     */
+    public static function getPostTypes(): array
     {
         return [Page::getPostType()];
     }

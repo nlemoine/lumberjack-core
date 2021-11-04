@@ -43,7 +43,7 @@ class Facets
             'update_post_term_cache' => false,
             'update_post_meta_cache' => false,
             'no_found_rows'          => true,
-            'ignore_sticky_posts' => true,
+            'ignore_sticky_posts'    => true,
         ];
 
         $args_list = [
@@ -54,8 +54,8 @@ class Facets
 
         $args = \array_merge($default_args, \array_filter($args_list));
 
-        $this->query = new WP_Query;
-        foreach($args as $key => $value) {
+        $this->query = new WP_Query();
+        foreach ($args as $key => $value) {
             $this->query->set($key, $value);
         }
     }

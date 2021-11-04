@@ -65,8 +65,8 @@ class PathServiceProvider extends ServiceProvider
         $this->app->singleton('url.home', function () {
             $homeUrl = \home_url('/');
             $path = \parse_url($homeUrl, PHP_URL_PATH);
-            if ($path !== '/') {
-                $home_url = \str_replace($path, '', $homeUrl);
+            if ($path !== '/' && \is_string($path)) {
+                $homeUrl = \str_replace($path, '', $homeUrl);
             }
 
             return \trailingslashit($homeUrl);

@@ -9,6 +9,9 @@ class PostTag extends AbstractTerm
         return 'post_tag';
     }
 
+    /**
+     * @return array<string>
+     */
     public static function getTaxonomyObjectTypes(): array
     {
         return [

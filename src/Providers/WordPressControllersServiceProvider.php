@@ -2,16 +2,17 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use Brain\Hierarchy\Finder\CallbackTemplateFinder;
+use Brain\Hierarchy\QueryTemplate;
 use Laminas\Diactoros\ServerRequestFactory;
 use mindplay\middleman\Dispatcher;
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Router\Invoker;
 use Rareloop\Router\ProvidesControllerMiddleware;
 use Rareloop\Router\ResponseFactory;
-use Tightenco\Collect\Support\Collection;
-use Brain\Hierarchy\Finder\CallbackTemplateFinder;
-use Brain\Hierarchy\QueryTemplate;
 use function Symfony\Component\String\u;
+use Tightenco\Collect\Support\Collection;
 
 class WordPressControllersServiceProvider extends ServiceProvider
 {
@@ -26,10 +27,11 @@ class WordPressControllersServiceProvider extends ServiceProvider
     /**
      * Handle WordPress controllers
      */
-    public function handleWordPressController() {
+    public function handleWordPressController(): void
+    {
 
         // Don't handle those requests (robots.txt, HEAD, etc.)
-        if(!QueryTemplate::mainQueryTemplateAllowed()) {
+        if (!QueryTemplate::mainQueryTemplateAllowed()) {
             return;
         }
 
@@ -38,6 +40,9 @@ class WordPressControllersServiceProvider extends ServiceProvider
         $queryTemplate = new QueryTemplate($finder);
 
         $controller = $queryTemplate->findTemplate();
+        if (!$controller) {
+            return;
+        }
 
         $request = ServerRequestFactory::fromGlobals(
             $_SERVER,
@@ -48,13 +53,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
         );
 
         $response = $this->handleRequest($request, $controller, 'handle');
-
-        if ($response) {
-            $this->app->shutdown($response);
-        } else {
-            $this->app->bind('__wp-controller-miss-template', $controller);
-            $this->app->bind('__wp-controller-miss-controller', $controller);
-        }
+        $this->app->shutdown($response);
     }
 
     public function getControllerClass(string $template): string
@@ -72,10 +71,10 @@ class WordPressControllersServiceProvider extends ServiceProvider
 
         $controllerFqns = $controllerNamespace . $controllerName;
 
-        return class_exists($controllerFqns) ? $controllerFqns : '';
+        return \class_exists($controllerFqns) ? $controllerFqns : '';
     }
 
-    public function handleRequest(RequestInterface $request, $controllerName, $methodName)
+    public function handleRequest(ServerRequestInterface $request, string $controllerName, string $methodName): ResponseInterface
     {
         $this->app->requestHasBeenHandled();
 

@@ -7,7 +7,7 @@ use Rareloop\Lumberjack\Config;
 
 abstract class ServiceProvider
 {
-    protected $app;
+    protected Application $app;
 
     public function __construct(Application $app)
     {

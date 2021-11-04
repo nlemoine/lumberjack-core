@@ -37,6 +37,9 @@ class CustomFieldsServiceProvider extends ServiceProvider
         return $groups;
     }
 
+    /**
+     * @return FieldsBuilder[]
+     */
     private function getRegisteredFields(): array
     {
         $classes = $this->getClasses();
@@ -69,9 +72,7 @@ class CustomFieldsServiceProvider extends ServiceProvider
                 // and merge locations
                 if (\in_array($field_hash, \array_keys($groups), true)) {
                     $field_location = $groups[$field_hash]->getLocation();
-                    if ($location) {
-                        $field_location->or(...$location);
-                    }
+                    $field_location->or(...$location);
                     continue;
                 }
                 $f->setLocation(...$location);
@@ -123,7 +124,7 @@ class CustomFieldsServiceProvider extends ServiceProvider
     /**
      * Set fields location
      *
-     * @param string $class
+     * @param string|object $class
      */
     private function getFieldsLocation($class): ?array
     {
@@ -167,105 +168,105 @@ class CustomFieldsServiceProvider extends ServiceProvider
         return null;
     }
 
-    /**
-     * Merge fields locations
-     *
-     * @param [type] $fields
-     */
-    private function mergeFieldsLocations(FieldsBuilder $fields, array $condition)
-    {
-        $location = $fields->getLocation();
-        if (!$location) {
-            $fields->setLocation(...$condition);
-            return $fields;
-        }
+    // /**
+    //  * Merge fields locations
+    //  *
+    //  * @param [type] $fields
+    //  */
+    // private function mergeFieldsLocations(FieldsBuilder $fields, array $condition)
+    // {
+    //     $location = $fields->getLocation();
+    //     if (!$location) {
+    //         $fields->setLocation(...$condition);
+    //         return $fields;
+    //     }
 
-        $location->orCondition(...$condition);
-        return $fields;
-    }
+    //     $location->orCondition(...$condition);
+    //     return $fields;
+    // }
 
-    /**
-     * Localize fields
-     */
-    private function localizeFields(FieldsBuilder $fields): FieldsBuilder
-    {
-        // Return fields if Polylang isn't there
-        if (!\function_exists('pll_the_languages')) {
-            return $fields;
-        }
+    // /**
+    //  * Localize fields
+    //  */
+    // private function localizeFields(FieldsBuilder $fields): FieldsBuilder
+    // {
+    //     // Return fields if Polylang isn't there
+    //     if (!\function_exists('pll_the_languages')) {
+    //         return $fields;
+    //     }
 
-        // Avoid expensive queries on front end
-        if (\is_admin()) {
-            $languages = \PLL()->model->get_languages_list();
-        } else {
-            $languages = \pll_languages_list();
-            $languages = \array_map(function ($lang) {
-                $obj = new \stdClass();
-                $obj->slug = $lang;
+    //     // Avoid expensive queries on front end
+    //     if (\is_admin()) {
+    //         $languages = \PLL()->model->get_languages_list();
+    //     } else {
+    //         $languages = \pll_languages_list();
+    //         $languages = \array_map(function ($lang) {
+    //             $obj = new \stdClass();
+    //             $obj->slug = $lang;
 
-                return $obj;
-            }, $languages);
-        }
+    //             return $obj;
+    //         }, $languages);
+    //     }
 
-        // No languages
-        if (empty($languages)) {
-            return $fields;
-        }
+    //     // No languages
+    //     if (empty($languages)) {
+    //         return $fields;
+    //     }
 
-        // Create a new field set & filter i18n fields
-        $fields_i18n = new FieldsBuilder('');
-        foreach ($fields->getFields() as $field) {
-            $acf_field_config = $field->build();
-            if (isset($acf_field_config['i18n']) && $acf_field_config['i18n']) {
-                $fields_i18n->addFields([$field]);
-            }
-        }
+    //     // Create a new field set & filter i18n fields
+    //     $fields_i18n = new FieldsBuilder('');
+    //     foreach ($fields->getFields() as $field) {
+    //         $acf_field_config = $field->build();
+    //         if (isset($acf_field_config['i18n']) && $acf_field_config['i18n']) {
+    //             $fields_i18n->addFields([$field]);
+    //         }
+    //     }
 
-        // No i18n fields
-        if (empty($fields_i18n->getFields())) {
-            return $fields;
-        }
+    //     // No i18n fields
+    //     if (empty($fields_i18n->getFields())) {
+    //         return $fields;
+    //     }
 
-        // Store original fields keys
-        $keys = \array_map(function ($field) {
-            return $field->getName();
-        }, $fields_i18n->getFields());
+    //     // Store original fields keys
+    //     $keys = \array_map(function ($field) {
+    //         return $field->getName();
+    //     }, $fields_i18n->getFields());
 
-        $current_lang = \pll_current_language();
+    //     $current_lang = \pll_current_language();
 
-        // Add fields for each lang
-        foreach ($languages as $lang) {
-            // Only register the field for the current lang field on front end
-            if (!\is_admin() && $current_lang !== $lang->slug) {
-                continue;
-            }
+    //     // Add fields for each lang
+    //     foreach ($languages as $lang) {
+    //         // Only register the field for the current lang field on front end
+    //         if (!\is_admin() && $current_lang !== $lang->slug) {
+    //             continue;
+    //         }
 
-            // Only add tabs when on admin
-            if (\is_admin()) {
-                $fields
-                    ->addTab($lang->slug)
-                    ->setLabel(\sprintf('%s %s', $lang->flag, $lang->name))
-                ;
-            }
+    //         // Only add tabs when on admin
+    //         if (\is_admin()) {
+    //             $fields
+    //                 ->addTab($lang->slug)
+    //                 ->setLabel(\sprintf('%s %s', $lang->flag, $lang->name))
+    //             ;
+    //         }
 
-            foreach ($fields_i18n->getFields() as $field) {
-                // Modify field name
-                $new_field = clone $field;
-                $new_field->setConfig('name', \sprintf('%s_%s', $field->getName(), $lang->slug));
-                $new_field->setKey($new_field->getName());
+    //         foreach ($fields_i18n->getFields() as $field) {
+    //             // Modify field name
+    //             $new_field = clone $field;
+    //             $new_field->setConfig('name', \sprintf('%s_%s', $field->getName(), $lang->slug));
+    //             $new_field->setKey($new_field->getName());
 
-                // Create a new builder
-                $new_builder = new FieldsBuilder('');
-                $new_builder->addFields([$new_field]);
-                $fields->addFields($new_builder);
-            }
-        }
+    //             // Create a new builder
+    //             $new_builder = new FieldsBuilder('');
+    //             $new_builder->addFields([$new_field]);
+    //             $fields->addFields($new_builder);
+    //         }
+    //     }
 
-        // Remove original fields
-        foreach ($keys as $key) {
-            $fields->removeField($key);
-        }
+    //     // Remove original fields
+    //     foreach ($keys as $key) {
+    //         $fields->removeField($key);
+    //     }
 
-        return $fields;
-    }
+    //     return $fields;
+    // }
 }

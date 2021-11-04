@@ -6,5 +6,4 @@ use Timber\MenuItem as TimberMenuItem;
 
 class NavMenuItem extends TimberMenuItem
 {
-    public $PostClass = Post::class;
 }

@@ -19,12 +19,12 @@ class MenusServiceProvider extends ServiceProvider
         \add_filter('timber/menuitem/class', [$this, 'setDefaultNavMenuItemClass'], 10, 2);
     }
 
-    public function setDefaultNavMenuClass(string $class, WP_Term $term)
+    public function setDefaultNavMenuClass(string $class, WP_Term $term): string
     {
         return $class === Menu::class ? NavMenu::class : $class;
     }
 
-    public function setDefaultNavMenuItemClass(string $class, WP_Post $post)
+    public function setDefaultNavMenuItemClass(string $class, WP_Post $post): string
     {
         return $class === MenuItem::class ? NavMenuItem::class : $class;
     }

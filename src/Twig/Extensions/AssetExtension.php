@@ -8,7 +8,7 @@ use Twig\TwigFunction;
 
 class AssetExtension extends AbstractExtension
 {
-    private $packages;
+    private Packages $packages;
 
     public function __construct(Packages $packages)
     {
@@ -24,7 +24,7 @@ class AssetExtension extends AbstractExtension
         ];
     }
 
-    public function getAssetFile($path, $packageName = null)
+    public function getAssetFile($path, $packageName = null): ?string
     {
         return \is_file($this->packages->getUrl($path, $packageName)) ? \file_get_contents($this->packages->getUrl($path, $packageName)) : null;
     }
