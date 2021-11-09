@@ -11,10 +11,11 @@ use Rareloop\Router\Controller;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
+use WP_Query;
 
 abstract class AbstractController extends Controller
 {
-    protected $container;
+    protected ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -29,6 +30,10 @@ abstract class AbstractController extends Controller
                 \getenv('BASIC_AUTH_USER') => \getenv('BASIC_AUTH_PASSWORD'),
             ]));
         }
+    }
+
+    public function handleQuery(WP_Query $query)
+    {
     }
 
     /**

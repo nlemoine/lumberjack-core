@@ -13,10 +13,14 @@ abstract class AbstractFacetMeta extends AbstractFacet
 
     public function setPostsClauses(array $clauses): array
     {
+        $key = \esc_sql($this->key);
         $alias = 'qf_' . $this->type;
-        $clauses['join'] .= ' INNER JOIN ' . $this->wpdb->postmeta . ' AS ' . $alias . ' ON ' . $alias . '.post_id = ' . $this->wpdb->posts . '.ID AND ' . $alias . '.meta_key = "' . \esc_sql($this->key) . '"';
-        $clauses['fields'] = $alias . '.meta_value AS value, COUNT(DISTINCT ' . $this->wpdb->posts . '.ID) AS count';
-        $clauses['groupby'] = $alias . '.meta_value';
+        $clauses['join'] .= " INNER JOIN {$this->wpdb->postmeta} AS {$alias}
+            ON {$alias}.post_id = {$this->wpdb->posts}.ID
+            AND {$alias}.meta_key = \"{$key}\"
+        ";
+        $clauses['fields'] = "{$alias}.meta_value AS value, COUNT(DISTINCT {$this->wpdb->posts}.ID) AS count";
+        $clauses['groupby'] = "{$alias}.meta_value";
         $clauses['limits'] = '';
         $clauses['orderby'] = '';
         return $clauses;
@@ -24,9 +28,7 @@ abstract class AbstractFacetMeta extends AbstractFacet
 
     public function filter(WP_Query $query)
     {
-        $value = $this->getValue();
-
-        if ($value === null) {
+        if ($this->currentValue === null) {
             return;
         }
 
@@ -36,13 +38,13 @@ abstract class AbstractFacetMeta extends AbstractFacet
                 'relation' => 'AND',
             ];
         }
-        if (\is_array($value)) {
-            $meta_query[] = $value;
+        if (\is_array($this->currentValue)) {
+            $meta_query[] = $this->currentValue;
         }
         $meta_query[] = [
             'key'     => $this->key,
             'compare' => '=',
-            'value'   => $value,
+            'value'   => $this->currentValue,
         ];
         $query->set('meta_query', $meta_query);
 

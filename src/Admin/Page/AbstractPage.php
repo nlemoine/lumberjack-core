@@ -6,9 +6,9 @@ use function Symfony\Component\String\u;
 
 abstract class AbstractPage
 {
-    public static function getPageSlug(): ?string
+    public static function getPageSlug(): string
     {
-        return u(static::class)->replace('\\', '-')->lower()->toString();
+        return (string) u(static::class)->replace('\\', '-')->lower();
     }
 
     public static function register(): void
@@ -16,11 +16,12 @@ abstract class AbstractPage
         $config = static::getConfig();
 
         \add_action('admin_menu', function () use ($config) {
-            if (empty($config['parent_slug'])) {
-                $hook = \call_user_func_array('add_menu_page', $config);
-            } else {
-                $hook = \call_user_func_array('add_submenu_page', $config);
+            $add_page_fn = 'add_menu_page';
+            if (!empty($config['parent_slug'])) {
+                $add_page_fn = 'add_submenu_page';
             }
+            /** @var string $hook */
+            $hook = \call_user_func_array($add_page_fn, $config);
             \add_action(\sprintf('load-%s', $hook), [static::class, 'controller']);
         }, 100);
     }

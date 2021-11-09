@@ -8,20 +8,41 @@ use Laminas\Diactoros\ServerRequestFactory;
 use mindplay\middleman\Dispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Rareloop\Lumberjack\Http\AbstractController;
 use Rareloop\Router\Invoker;
 use Rareloop\Router\ProvidesControllerMiddleware;
 use Rareloop\Router\ResponseFactory;
 use function Symfony\Component\String\u;
 use Tightenco\Collect\Support\Collection;
+use WP_Query;
 
 class WordPressControllersServiceProvider extends ServiceProvider
 {
+    protected ?AbstractController $resolvedController = null;
+
     public function boot()
     {
+        if (!\is_admin()) {
+            \add_action('pre_get_posts', [$this, 'handleQuery'], PHP_INT_MAX);
+        }
         \add_filter('template_redirect', [$this, 'handleWordPressController'], PHP_INT_MAX);
         \add_filter('lumberjack_controller_namespace', function ($namespace) {
             return 'App\\Http\\Controllers\\';
         }, 1);
+    }
+
+    public function handleQuery(WP_Query $query)
+    {
+        if (!$query->is_main_query()) {
+            return;
+        }
+
+        $controller = $this->resolveController();
+        if (!$controller) {
+            return;
+        }
+
+        $controller->handleQuery($query);
     }
 
     /**
@@ -29,17 +50,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
      */
     public function handleWordPressController(): void
     {
-
-        // Don't handle those requests (robots.txt, HEAD, etc.)
-        if (!QueryTemplate::mainQueryTemplateAllowed()) {
-            return;
-        }
-
-        $finder = new CallbackTemplateFinder([$this, 'getControllerClass']);
-
-        $queryTemplate = new QueryTemplate($finder);
-
-        $controller = $queryTemplate->findTemplate();
+        $controller = $this->resolveController();
         if (!$controller) {
             return;
         }
@@ -74,12 +85,8 @@ class WordPressControllersServiceProvider extends ServiceProvider
         return \class_exists($controllerFqns) ? $controllerFqns : '';
     }
 
-    public function handleRequest(ServerRequestInterface $request, string $controllerName, string $methodName): ResponseInterface
+    public function handleRequest(ServerRequestInterface $request, AbstractController $controller, string $methodName): ResponseInterface
     {
-        $this->app->requestHasBeenHandled();
-
-        $controller = $this->app->get($controllerName);
-
         $middlewares = [];
 
         if ($controller instanceof ProvidesControllerMiddleware) {
@@ -100,6 +107,34 @@ class WordPressControllersServiceProvider extends ServiceProvider
 
         $dispatcher = $this->createDispatcher($middlewares);
         return $dispatcher->handle($request);
+    }
+
+    protected function resolveController(bool $trigger_filters = true): ?AbstractController
+    {
+        // Don't handle those requests (robots.txt, HEAD, etc.)
+        if (!QueryTemplate::mainQueryTemplateAllowed()) {
+            return null;
+        }
+
+        if ($this->resolvedController !== null) {
+            return $this->resolvedController;
+        }
+
+        $finder = new CallbackTemplateFinder([$this, 'getControllerClass']);
+
+        $query_template = new QueryTemplate($finder);
+
+        $controller_class = $query_template->findTemplate(null, $trigger_filters);
+
+        if (!$controller_class) {
+            return null;
+        }
+
+        $this->resolvedController = $this->app->get($controller_class);
+
+        $this->app->requestHasBeenHandled();
+
+        return $this->resolvedController;
     }
 
     private function createDispatcher(array $middlewares): Dispatcher

@@ -13,11 +13,12 @@ abstract class AbstractFacetTaxonomy extends AbstractFacet
 
     public function setPostsClauses(array $clauses): array
     {
-        $clauses['join'] .= ' INNER JOIN ' . $this->wpdb->term_relationships . ' AS qf_tr ON qf_tr.object_id = ' . $this->wpdb->posts . '.ID';
-        $clauses['join'] .= ' INNER JOIN ' . $this->wpdb->term_taxonomy . ' AS qf_tt ON qf_tt.term_taxonomy_id = qf_tr.term_taxonomy_id';
-        $clauses['join'] .= ' INNER JOIN ' . $this->wpdb->terms . ' AS qf_t ON qf_t.term_id = qf_tt.term_id';
-        $clauses['where'] .= ' AND qf_tt.taxonomy = "' . \esc_sql($this->key) . '"';
-        $clauses['fields'] = 'qf_t.slug AS value, qf_t.name AS name, COUNT(DISTINCT ' . $this->wpdb->posts . '.ID) AS count';
+        $key = \esc_sql($this->key);
+        $clauses['join'] .= " INNER JOIN {$this->wpdb->term_relationships} AS qf_tr ON qf_tr.object_id = {$this->wpdb->posts}.ID";
+        $clauses['join'] .= " INNER JOIN {$this->wpdb->term_taxonomy} AS qf_tt ON qf_tt.term_taxonomy_id = qf_tr.term_taxonomy_id";
+        $clauses['join'] .= " INNER JOIN {$this->wpdb->terms} AS qf_t ON qf_t.term_id = qf_tt.term_id";
+        $clauses['where'] .= " AND qf_tt.taxonomy = \"{$key}\"";
+        $clauses['fields'] = "qf_t.slug AS value, qf_t.name AS name, COUNT(DISTINCT {$this->wpdb->posts}.ID) AS count";
         $clauses['groupby'] = 'qf_t.slug';
         $clauses['limits'] = '';
         $clauses['orderby'] = '';
@@ -26,9 +27,7 @@ abstract class AbstractFacetTaxonomy extends AbstractFacet
 
     public function filter(WP_Query $query)
     {
-        $value = $this->getValue();
-
-        if ($value === null) {
+        if ($this->currentValue === null) {
             return;
         }
 
@@ -39,13 +38,13 @@ abstract class AbstractFacetTaxonomy extends AbstractFacet
             ];
         }
 
-        if (\is_array($value)) {
-            $tax_query[] = $value;
+        if (\is_array($this->currentValue)) {
+            $tax_query[] = $this->currentValue;
         }
         $tax_query[] = [
             'taxonomy' => $this->key,
             'field'    => 'slug',
-            'terms'    => $this->getValue(),
+            'terms'    => $this->currentValue,
         ];
 
         $query->set('tax_query', $tax_query);

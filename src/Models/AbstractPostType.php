@@ -17,7 +17,7 @@ abstract class AbstractPostType extends Post
         Macroable::__callStatic as __macroableCallStatic;
     }
 
-    public function __construct($id = null, $preventTimberInit = false)
+    public function __construct(?int $id = null, bool $preventTimberInit = false)
     {
         /**
          * There are occasions where we do not want the bootstrap the data. At the moment this is
@@ -168,7 +168,7 @@ abstract class AbstractPostType extends Post
      *
      * @param  array $args standard WP_Query array
      */
-    public static function query(array $args = []): array
+    public static function query(array $args = []): Iterable
     {
         // Set the correct post type
         $args = \array_merge($args, [
@@ -250,6 +250,6 @@ abstract class AbstractPostType extends Post
      */
     private static function posts(array $args = [])
     {
-        return Timber::get_posts($args, static::class);
+        return Timber::get_posts($args);
     }
 }

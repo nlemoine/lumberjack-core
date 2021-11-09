@@ -88,8 +88,10 @@ class Facets
     /**
      * Add facet
      */
-    public function addFacet(AbstractFacet $facet)
+    public function addFacet(AbstractFacet $facet): self
     {
         $this->facets[$facet->getKey()] = $facet;
+
+        return $this;
     }
 }

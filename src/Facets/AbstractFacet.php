@@ -28,7 +28,7 @@ abstract class AbstractFacet
 
     protected ?array $items = null;
 
-    protected $value;
+    protected $currentValue = null;
 
     protected $wpdb;
 
@@ -42,6 +42,7 @@ abstract class AbstractFacet
         $this->name = $this->getName() ?? $this->getKey();
         $this->label = $this->getLabel();
         $this->labelAll = $this->getLabelAll();
+        $this->currentValue = $this->getCurrentValue();
         $this->wpdb = $GLOBALS['wpdb'];
     }
 
@@ -79,7 +80,10 @@ abstract class AbstractFacet
     /**
      * Get value
      */
-    abstract public function getValue();
+    public function getCurrentValue()
+    {
+        return \get_query_var($this->getName()) ?: null;
+    }
 
     /**
      * Get items
@@ -103,8 +107,15 @@ abstract class AbstractFacet
      */
     public function setPostsRequest(string $request): string
     {
-        $this->items = $this->wpdb->get_results($request);
+        $items = $this->wpdb->get_results($request);
         // \dump((new SqlFormatter(new NullHighlighter()))->format($request));
+
+        foreach ($items as $item) {
+            $item->current = $item->value === $this->currentValue;
+        }
+
+        $this->items = $items;
+
         return '';
     }
 
