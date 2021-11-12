@@ -93,6 +93,14 @@ abstract class AbstractTerm extends TimberTerm
 
         \register_extended_taxonomy($taxonomy, $taxonomyObjectTypes, $config);
 
+        if ($taxonomy_object && $taxonomy_object->_builtin) {
+            $taxonomy_object = \get_taxonomy($taxonomy);
+            if(!$taxonomy_object->rewrite) {
+                remove_rewrite_tag( "%$taxonomy_object->name%" );
+                remove_permastruct( $taxonomy_object->name );
+            }
+        }
+
         \add_filter('pre_get_posts', function ($wp_query) {
             if (\is_admin()) {
                 return;
