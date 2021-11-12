@@ -8,7 +8,7 @@ use Twig\TwigFunction;
 
 class SvgHelpersExtension extends AbstractExtension
 {
-    private $package;
+    private PathPackage $package;
 
     public function __construct(PathPackage $package)
     {
@@ -25,7 +25,7 @@ class SvgHelpersExtension extends AbstractExtension
         ];
     }
 
-    public function inlineSvg($file, $attributes = [])
+    public function inlineSvg(string $file, array $attributes = []): string
     {
         $svg = $this->getFileContents($file);
         if (!empty($attributes)) {
@@ -35,7 +35,7 @@ class SvgHelpersExtension extends AbstractExtension
         return $svg;
     }
 
-    public function getFileContents($path, $packageName = null)
+    public function getFileContents(string $path, ?string $packageName = null): ?string
     {
         $file = \parse_url($this->package->getUrl($path, $packageName), PHP_URL_PATH);
         if (!\is_file($file)) {
@@ -45,7 +45,7 @@ class SvgHelpersExtension extends AbstractExtension
         return \file_get_contents($file);
     }
 
-    public function placeholderSvg($width, $height, $fill = null, $base64 = false)
+    public function placeholderSvg(int $width, int $height, bool $fill = null, bool $base64 = false): string
     {
         $style = $fill ? \sprintf('style="background:%s"', $fill) : '';
         $svg = <<<SVG
@@ -59,7 +59,7 @@ SVG;
         return \sprintf('data:image/svg+xml,%s', $this->encodeOptimizedSVGDataUri($svg));
     }
 
-    protected function encodeOptimizedSVGDataUri($uri)
+    protected function encodeOptimizedSVGDataUri(string $uri): string
     {
         // First, uri encode everything
         $uri = \rawurlencode($uri);
@@ -84,7 +84,12 @@ SVG;
         return $uri;
     }
 
-    protected function renderAttributes($attributes)
+    /**
+     * Render attributes
+     *
+     * @param array<string> $attributes
+     */
+    protected function renderAttributes(array $attributes): string
     {
         $attrs = \array_map(function ($attribute, $value) {
             return \is_string($value) ? \sprintf('%s="%s"', $attribute, $value) : $attribute;
