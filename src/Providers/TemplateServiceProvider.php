@@ -47,10 +47,10 @@ class TemplateServiceProvider extends ServiceProvider
     {
         $templates = $this->getConfig('templates', []);
         foreach ($templates as $template) {
-            if (\is_page_template($template::getTemplate() . '.php')) {
+            if (!\is_page_template($template::getTemplate() . '.php')) {
                 return;
             }
-            if (!$template::isCacheable() && !\defined('DONOTCACHEPAGE')) {
+            if ($template::isCacheable() && !\defined('DONOTCACHEPAGE')) {
                 \define('DONOTCACHEPAGE', true);
             }
         }
