@@ -11,6 +11,11 @@ class MigrationsServiceProvider extends ServiceProvider
         if (!\class_exists('WP_CLI')) {
             return;
         }
+
+        add_filter('dbi_wp_migrations_path', function() {
+            return $this->app->get('path.theme') . '/app/Migrations';
+        });
+
         Migrator::instance();
     }
 }
