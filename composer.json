@@ -43,7 +43,7 @@
         "symfony/twig-bridge": "^5.3",
         "symfony/validator": "^5.3",
         "tightenco/collect": "^8.0",
-        "timber/timber": "@dev",
+        "timber/timber": "2.x-dev",
         "twig/html-extra": "^3.0",
         "twig/string-extra": "^3.3",
         "league/route": "^5.1",
