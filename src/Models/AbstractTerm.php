@@ -93,6 +93,15 @@ abstract class AbstractTerm extends TimberTerm
 
         \register_extended_taxonomy($taxonomy, $taxonomyObjectTypes, $config);
 
+        \add_filter('timber/term/classmap', function ($term_class) use ($taxonomy) {
+            return \array_merge(
+                [
+                    $taxonomy => static::class,
+                ],
+                (array) $term_class
+            );
+        });
+
         if ($taxonomy_object && $taxonomy_object->_builtin) {
             $taxonomy_object = \get_taxonomy($taxonomy);
             if (!$taxonomy_object->rewrite) {
