@@ -3,7 +3,9 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Brain\Hierarchy\Finder\CallbackTemplateFinder;
+use Brain\Hierarchy\Hierarchy;
 use Brain\Hierarchy\QueryTemplate;
+use Inpsyde\Assets\AssetManager;
 use Laminas\Diactoros\ServerRequestFactory;
 use mindplay\middleman\Dispatcher;
 use Psr\Http\Message\ResponseInterface;
@@ -20,15 +22,21 @@ class WordPressControllersServiceProvider extends ServiceProvider
 {
     protected ?AbstractController $resolvedController = null;
 
+    protected Hierarchy $hierarchy;
+
+    protected ?array $resolvedHierarchy = null;
+
+    protected int $resolutionCount = 0;
+
     public function boot()
     {
-        if (!\is_admin()) {
-            \add_action('pre_get_posts', [$this, 'handleQuery'], PHP_INT_MAX);
+        if (\is_admin()) {
+            return;
         }
+
+        $this->hierarchy = new Hierarchy();
+        \add_action('pre_get_posts', [$this, 'handleQuery'], PHP_INT_MAX);
         \add_filter('template_redirect', [$this, 'handleWordPressController'], PHP_INT_MAX);
-        \add_filter('lumberjack_controller_namespace', function ($namespace) {
-            return 'App\\Http\\Controllers\\';
-        }, 1);
     }
 
     public function handleQuery(WP_Query $query)
@@ -37,7 +45,12 @@ class WordPressControllersServiceProvider extends ServiceProvider
             return;
         }
 
-        $controller = $this->resolveController();
+        $controller = null;
+        try {
+            $controller = $this->resolveController();
+        } catch (\Throwable $e) {
+        }
+
         if (!$controller) {
             return;
         }
@@ -54,6 +67,9 @@ class WordPressControllersServiceProvider extends ServiceProvider
         if (!$controller) {
             return;
         }
+
+        $asset_manager = $this->app->get(AssetManager::class);
+        $controller->enqueueAssets($asset_manager);
 
         $request = ServerRequestFactory::fromGlobals(
             $_SERVER,
@@ -76,11 +92,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
         $template = $template . '-controller';
 
         $controllerClass = u($template)->camel()->title();
-
-        $controllerName = \apply_filters('lumberjack_controller_name', $controllerClass);
-        $controllerNamespace = \apply_filters('lumberjack_controller_namespace', 'App\\');
-
-        $controllerFqns = $controllerNamespace . $controllerName;
+        $controllerFqns = 'App\\Http\\Controllers\\' . $controllerClass;
 
         return \class_exists($controllerFqns) ? $controllerFqns : '';
     }
@@ -116,7 +128,10 @@ class WordPressControllersServiceProvider extends ServiceProvider
             return null;
         }
 
-        if ($this->resolvedController !== null) {
+        $this->resolutionCount = $this->resolutionCount + 1;
+
+        // Check if hierarchy has changed, resolve it again
+        if ($this->resolutionCount > 1 && $this->hierarchy->getHierarchy() === $this->resolvedHierarchy) {
             return $this->resolvedController;
         }
 
@@ -130,6 +145,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
             return null;
         }
 
+        $this->resolvedHierarchy = $this->hierarchy->getHierarchy();
         $this->resolvedController = $this->app->get($controller_class);
 
         $this->app->requestHasBeenHandled();

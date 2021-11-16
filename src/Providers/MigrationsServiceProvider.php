@@ -12,7 +12,7 @@ class MigrationsServiceProvider extends ServiceProvider
             return;
         }
 
-        add_filter('dbi_wp_migrations_path', function() {
+        \add_filter('dbi_wp_migrations_path', function () {
             return $this->app->get('path.theme') . '/app/Migrations';
         });
 

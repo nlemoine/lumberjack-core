@@ -20,6 +20,7 @@ use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\RuntimeLoader\FactoryRuntimeLoader;
@@ -29,8 +30,23 @@ class FormServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->singleton('translator', function () {
-            return new Translator($this->app->get('locale.short'));
+        $this->app->singleton(TranslatorInterface::class, function () {
+            $translator = new Translator($this->app->get('locale.short'));
+            $translator->addLoader('xlf', new \Symfony\Component\Translation\Loader\XliffFileLoader());
+
+            $form_reflection = new \ReflectionClass(Forms::class);
+            $filename = $form_reflection->getFileName();
+            if ($filename) {
+                $translations = \dirname($filename) . '/Resources/translations/validators.fr.xlf';
+                $translator->addResource('xlf', $translations, $this->app->get('locale.short'));
+            }
+            $validator_reflection = new \ReflectionClass(Validation::class);
+            $filename = $validator_reflection->getFileName();
+            if ($filename) {
+                $translations = \dirname($filename) . '/Resources/translations/validators.fr.xlf';
+                $translator->addResource('xlf', $translations, $this->app->get('locale.short'));
+            }
+            return $translator;
         });
 
         $this->app->singleton('form.wp_error_handler', function (FormInterface $form, WP_Error $errors) {
@@ -43,7 +59,7 @@ class FormServiceProvider extends ServiceProvider
 
         $this->app->singleton('validator', function () {
             return Validation::createValidatorBuilder()
-                ->setTranslator($this->app->get('translator'))
+                ->setTranslator($this->app->get(TranslatorInterface::class))
                 ->addMethodMapping('loadValidatorMetadata')
                 ->getValidator()
             ;
@@ -128,7 +144,9 @@ class FormServiceProvider extends ServiceProvider
             },
         ]));
         $twig->addExtension(new FormExtension());
-        $twig->addExtension(new TranslationExtension());
+        if ($this->app->has(TranslatorInterface::class)) {
+            $twig->addExtension(new TranslationExtension($this->app->get(TranslatorInterface::class)));
+        }
 
         return $twig;
     }

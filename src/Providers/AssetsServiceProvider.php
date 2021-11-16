@@ -2,10 +2,10 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Inpsyde\Assets\AssetFactory;
+use function DI\get;
 use Inpsyde\Assets\AssetManager;
-use Inpsyde\Assets\Loader\ArrayLoader;
-use Rareloop\Lumberjack\Config;
+use Rareloop\Lumberjack\Assets\CustomLoader;
+use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\PathPackage;
 use Symfony\Component\Asset\UrlPackage;
@@ -17,7 +17,7 @@ class AssetsServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->bind('assets.packages', function ($app) {
+        $this->app->singleton(Packages::class, function ($app) {
             $packages = [];
             foreach ($app->get('assets.named_packages') as $name => $package) {
                 $version = $app->make('assets.strategy_factory', [
@@ -37,8 +37,9 @@ class AssetsServiceProvider extends ServiceProvider
 
             return new Packages($app->get('assets.default_package'), $packages);
         });
+        $this->app->singleton('assets.packages', get(Packages::class));
 
-        $this->app->bind('assets.default_package', function ($app) {
+        $this->app->singleton(PackageInterface::class, function ($app) {
             $version = $app->make('assets.strategy_factory', [
                 'version'          => $app->get('assets.version'),
                 'format'           => $app->get('assets.version_format'),
@@ -53,13 +54,24 @@ class AssetsServiceProvider extends ServiceProvider
                 'name'     => 'default',
             ]);
         });
+        $this->app->bind('assets.default_package', get(PackageInterface::class));
 
         $this->app->bind('assets.base_path', '');
-        $this->app->bind('assets.base_urls', []);
         $this->app->bind('assets.version', null);
         $this->app->bind('assets.version_format', null);
-        $this->app->bind('assets.json_manifest_path', null);
-        $this->app->bind('assets.named_packages', []);
+        $this->app->singleton('assets.json_manifest_path', function () {
+            if (WP_DEBUG || !\in_array(WP_ENV, ['staging', 'production'], true)) {
+                return null;
+            }
+            $manifest_path = $this->app->get('path.assets') . '/manifest.json';
+            if (!\is_file($manifest_path)) {
+                return null;
+            }
+            return $manifest_path;
+        });
+
+        // $this->app->bind('assets.json_manifest_path', null);
+        // $this->app->bind('assets.named_packages', []);
 
         // prototypes
         $this->app->bind('assets.strategy_factory', function ($version, $format, $jsonManifestPath, $name) {
@@ -87,42 +99,17 @@ class AssetsServiceProvider extends ServiceProvider
             return new UrlPackage($baseUrls, $version);
         });
 
-        $this->app->bind('assets.loader', function () {
-            $loader = new ArrayLoader();
+        $this->app->singleton(AssetManager::class, AssetManager::class);
+        $this->app->singleton(CustomLoader::class, CustomLoader::class);
+
+        $this->app->singleton('assets', function () {
+            $loader = $this->app->get(CustomLoader::class);
+
             $loader->disableAutodiscoverVersion();
-            $config = $this->app->get(Config::class)->get('assets');
-            /** @var Asset[] $assets */
-            return $loader->load(\array_map(function ($asset) {
-                $asset['url'] = $this->app->get('assets.packages')->getUrl($asset['url']);
-
-                return $asset;
-            }, $config));
+            $assets = $loader->load($this->app->get('path.config') . '/assets.php');
+            return $assets;
         });
 
-        $this->app->singleton('assets.store', function ($app) {
-            $packages = $app->get('assets.packages');
-
-            return new class($packages) extends \ArrayObject {
-                private $packages;
-
-                public function __construct(Packages $packages)
-                {
-                    $this->packages = $packages;
-                }
-
-                public function append($asset)
-                {
-                    if (isset($asset['url'])) {
-                        $asset['url'] = $this->packages->getUrl($asset['url']);
-                    }
-                    parent::append(AssetFactory::create($asset));
-                }
-            };
-        });
-    }
-
-    public function boot(Config $config)
-    {
         $this->app->singleton('assets.base_urls', $this->app->get('url.assets'));
         $this->app->bind('assets.named_packages', [
             'path' => [
@@ -133,29 +120,21 @@ class AssetsServiceProvider extends ServiceProvider
             ],
         ]);
 
-        if (!WP_DEBUG && \in_array(WP_ENV, ['staging', 'production'], true)) {
-            $manifest_path = $this->app->get('path.assets') . '/manifest.json';
-            if (\is_file($manifest_path)) {
-                $this->app->singleton('assets.json_manifest_path', $manifest_path);
-            }
-            $this->app->singleton('assets.named_packages', \array_merge_recursive($this->app->get('assets.named_packages'), [
-                'path',
-            ]));
-        }
+        // $this->app->bind('assets.loader', function () {
+        //     $loader = new ArrayLoader();
+        //     $loader->disableAutodiscoverVersion();
+        //     $config = $this->app->get(Config::class)->get('assets');
+        //     /** @var Asset[] $assets */
+        //     return $loader->load(\array_map(function ($asset) {
+        //         $asset['url'] = $this->app->get('assets.packages')->getUrl($asset['url']);
 
-        foreach ($config->get('assets', []) as $asset) {
-            $this->app->get('assets.store')->append($asset);
-        }
+        //         return $asset;
+        //     }, $config));
+        // });
+    }
 
-        // Enqueue scripts & styles
-        \add_action(
-            AssetManager::ACTION_SETUP,
-            function (AssetManager $assetManager) {
-                $assets = $this->app->get('assets.store');
-                foreach ($assets as $asset) {
-                    $assetManager->register($asset);
-                }
-            }
-        );
+    public function boot()
+    {
+        $this->app->get(AssetManager::class)->setup();
     }
 }

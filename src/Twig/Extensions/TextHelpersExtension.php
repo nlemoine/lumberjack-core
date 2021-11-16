@@ -2,9 +2,9 @@
 
 namespace Rareloop\Lumberjack\Twig\Extensions;
 
+use Rareloop\Lumberjack\Helpers\TextHelpers;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
-use Rareloop\Lumberjack\Helpers\TextHelpers;
 
 final class TextHelpersExtension extends AbstractExtension
 {
@@ -19,5 +19,4 @@ final class TextHelpersExtension extends AbstractExtension
             ]),
         ];
     }
-
 }

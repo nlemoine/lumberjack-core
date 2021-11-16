@@ -95,11 +95,9 @@ class Context extends \ArrayObject
     }
 
     /**
-     * Get post type by different ways
-     *
-     * @return string|false
+     * Get post type by all means available
      */
-    public function getPostType()
+    public function getPostType(): ?string
     {
         $post_type = \get_post_type();
         if (!$post_type) {
@@ -109,6 +107,12 @@ class Context extends \ArrayObject
                 $post_type = \get_query_var('post_type');
             }
         }
+
+        if (\is_tax()) {
+            $taxonomy = \get_taxonomy(\get_queried_object()->taxonomy);
+            $post_type = $taxonomy->object_type[0] ?? null;
+        }
+
         return $post_type;
     }
 

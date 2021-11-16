@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Bootstrappers;
 
+use function DI\get;
 use Rareloop\Lumberjack\Application;
 use Rareloop\Lumberjack\Config;
 
@@ -11,7 +12,7 @@ class LoadConfiguration
     {
         $config = new Config($app->configPath());
 
-        $app->bind('config', $config);
         $app->bind(Config::class, $config);
+        $app->bind('config', get(Config::class));
     }
 }

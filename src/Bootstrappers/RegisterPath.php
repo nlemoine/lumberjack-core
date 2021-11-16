@@ -1,13 +1,15 @@
 <?php
 
-namespace Rareloop\Lumberjack\Providers;
+namespace Rareloop\Lumberjack\Bootstrappers;
 
-class PathServiceProvider extends ServiceProvider
+use Rareloop\Lumberjack\Application;
+
+class RegisterPath
 {
-    public function register()
+    public function bootstrap(Application $app)
     {
         // project
-        $this->app->singleton('path.project', function () {
+        $app->singleton('path.project', function () {
             $abspath = \untrailingslashit(ABSPATH);
             if (\is_file($abspath . '/../index.php')) {
                 return \realpath($abspath . '/../..');
@@ -20,7 +22,7 @@ class PathServiceProvider extends ServiceProvider
         });
 
         // root
-        $this->app->singleton('path.root', function () {
+        $app->singleton('path.root', function () {
             $abspath = \untrailingslashit(ABSPATH);
             if (\is_file($abspath . '/../index.php')) {
                 return \realpath($abspath . '/..');
@@ -33,36 +35,36 @@ class PathServiceProvider extends ServiceProvider
         });
 
         // log
-        $this->app->singleton('path.log', function ($app) {
+        $app->singleton('path.log', function () use ($app) {
             $logPath = $app->get('path.project') . '/var/log';
 
             return \is_dir($logPath) ? $logPath : null;
         });
 
         // uploads
-        $this->app->singleton('path.uploads', function () {
+        $app->singleton('path.uploads', function () {
             $upload = \wp_get_upload_dir();
 
             return empty($upload['error']) ? \untrailingslashit($upload['basedir']) : null;
         });
 
         // theme
-        $this->app->singleton('path.theme', function () {
+        $app->singleton('path.theme', function () {
             return \untrailingslashit(\get_template_directory());
         });
 
         // assets
-        $this->app->singleton('path.assets', function ($app) {
+        $app->singleton('path.assets', function () use ($app) {
             return $app->get('path.theme') . '/assets';
         });
-        $this->app->singleton('path.languages', function ($app) {
+        $app->singleton('path.languages', function () use ($app) {
             return $app->get('path.theme') . '/languages';
         });
 
         // URLS
 
         // home
-        $this->app->singleton('url.home', function () {
+        $app->singleton('url.home', function () {
             $homeUrl = \home_url('/');
             $path = \parse_url($homeUrl, PHP_URL_PATH);
             if ($path !== '/' && \is_string($path)) {
@@ -73,19 +75,19 @@ class PathServiceProvider extends ServiceProvider
         });
 
         // uploads
-        $this->app->singleton('url.uploads', function () {
+        $app->singleton('url.uploads', function () {
             $upload = \wp_get_upload_dir();
 
             return empty($upload['error']) ? \untrailingslashit($upload['baseurl']) : null;
         });
 
         // theme
-        $this->app->singleton('url.theme', function () {
+        $app->singleton('url.theme', function () {
             return \untrailingslashit(\get_template_directory_uri());
         });
 
         // assets
-        $this->app->singleton('url.assets', function ($app) {
+        $app->singleton('url.assets', function () use ($app) {
             return $app->get('url.theme') . '/assets';
         });
     }

@@ -8,7 +8,7 @@
         "brain/hierarchy": "^2.5",
         "deliciousbrains/wp-migrations": "^2.0",
         "http-interop/response-sender": "^1.0",
-        "inpsyde/assets": "^2.6",
+        "inpsyde/assets": "^2.8",
         "inpsyde/wp-context": "^1.2",
         "johnbillion/extended-cpts": "^4.5",
         "laminas/laminas-diactoros": "^2.4",
@@ -17,6 +17,7 @@
         "mindplay/middleman": "^3.0",
         "monolog/monolog": "^2.0",
         "php-di/php-di": "^6.3.5",
+        "piedweb/render-html-attributes": "^2.0",
         "psr/container": "^1.0",
         "psr/http-message": "^1.0",
         "psr/http-server-middleware": "^1.0",
@@ -28,6 +29,7 @@
         "spatie/schema-org": "^3.3",
         "stoutlogic/acf-builder": "dev-master",
         "symfony/asset": "^5.3",
+        "symfony/config": "^5.3",
         "symfony/console": "^5.2",
         "symfony/error-handler": "^5.1",
         "symfony/form": "^5.3",
@@ -36,14 +38,16 @@
         "symfony/intl": "^5.3",
         "symfony/routing": "^5.2",
         "symfony/security-csrf": "^5.3",
+        "symfony/string": "^5.3",
         "symfony/translation": "^5.3",
         "symfony/twig-bridge": "^5.3",
-        "symfony/string": "^5.3",
         "symfony/validator": "^5.3",
         "tightenco/collect": "^8.0",
-        "timber/timber": "2.x-dev",
+        "timber/timber": "@dev",
         "twig/html-extra": "^3.0",
-        "twig/string-extra": "^3.3"
+        "twig/string-extra": "^3.3",
+        "league/route": "^5.1",
+        "laminas/laminas-httphandlerrunner": "^2.1"
     },
     "require-dev": {
         "antecedent/patchwork": "^2.1.8",
@@ -53,8 +57,10 @@
         "mockery/mockery": "^1.4.4",
         "php-coveralls/php-coveralls": "^2.0",
         "php-mock/php-mock": "^2.0",
+        "phpstan/extension-installer": "^1.1",
         "phpunit/phpunit": "^9.0",
-        "symplify/easy-coding-standard": "^9.3"
+        "symplify/easy-coding-standard": "^9.3",
+        "szepeviktor/phpstan-wordpress": "^1.0"
     },
     "autoload": {
         "psr-4": {

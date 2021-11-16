@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use PiedWeb\RenderAttributes\TwigExtension as RenderAttributesExtension;
 use Rareloop\Lumberjack\Config;
 use Rareloop\Lumberjack\Timber;
 use Rareloop\Lumberjack\Twig\Extensions\AssetExtension;
@@ -119,6 +120,7 @@ class TimberServiceProvider extends ServiceProvider
     public function addTwigExtensions(Environment $twig): Environment
     {
         $twig->addExtension(new HtmlExtension());
+        $twig->addExtension(new RenderAttributesExtension());
         $twig->addExtension(new TextHelpersExtension());
         if ($this->app->has('slugger')) {
             $twig->addExtension(new StringExtension($this->get('slugger')));
@@ -139,8 +141,6 @@ class TimberServiceProvider extends ServiceProvider
         // $twig->addExtension(
         //     new ImageFactoryExtension($this->app->get('image.factory'))
         // );
-
-        // $twig->addExtension(new TranslationExtension());
 
         // $fixer = new Fixer(['Ellipsis', 'Dimension', 'Unit', 'Dash', 'SmartQuotes', 'FrenchNoBreakSpace', 'NoSpaceBeforeComma', 'CurlyQuote', 'Trademark']);
         // $fixer->setLocale($this->app->get('locale'));

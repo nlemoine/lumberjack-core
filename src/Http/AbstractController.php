@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Http;
 
+use Inpsyde\Assets\AssetManager;
 use Laminas\Diactoros\Response\JsonResponse;
 use Middlewares\Minifier;
 use Psr\Container\ContainerInterface;
@@ -33,6 +34,10 @@ abstract class AbstractController extends Controller
     }
 
     public function handleQuery(WP_Query $query)
+    {
+    }
+
+    public function enqueueAssets(AssetManager $assets)
     {
     }
 

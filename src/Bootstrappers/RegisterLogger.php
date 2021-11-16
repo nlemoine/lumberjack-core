@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Bootstrappers;
 
+use function DI\get;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -31,8 +32,8 @@ class RegisterLogger
 
         $logger->pushHandler($handler);
 
-        $this->app->bind('logger', $logger);
-        $this->app->bind(LoggerInterface::class, $logger);
+        $this->app->singleton(LoggerInterface::class, $logger);
+        $this->app->singleton('logger', get(LoggerInterface::class));
     }
 
     private function shouldUseErrorLogHandler()

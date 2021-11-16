@@ -38,6 +38,7 @@ class ContextServiceProvider extends ServiceProvider
     {
         $post_type = $this->app->get('context')->getPostType();
         $post_type = \str_replace('-', '_', $post_type);
+
         if (\is_singular() && isset($context['post']) && $post_type !== 'post') {
             $context[$post_type] = $context['post'];
             unset($context['post']);
@@ -48,6 +49,12 @@ class ContextServiceProvider extends ServiceProvider
         ) {
             $context[$post_type . 's'] = $context['posts'];
             unset($context['posts']);
+        }
+
+        if ((\is_tax() || \is_category() || \is_tag()) && isset($context['term'])) {
+            $taxonomy = \str_replace('-', '_', \get_queried_object()->taxonomy);
+            $context[$taxonomy] = $context['term'];
+            unset($context['term']);
         }
 
         if (\is_home() && isset($context['post'])) {

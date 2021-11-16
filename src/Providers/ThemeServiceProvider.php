@@ -12,8 +12,22 @@ class ThemeServiceProvider extends ServiceProvider
 
     public function addThemeSupport(): void
     {
+        $default_support = [
+            'title-tag',
+            'html5' => [
+                'comment-list',
+                'comment-form',
+                'search-form',
+                'gallery',
+                'caption',
+                'style',
+                'script',
+            ],
+        ];
+
         // Theme support
         $support = $this->getConfig('theme.support', []);
+        $support = \array_merge($default_support, $support);
         foreach ($support as $key => $value) {
             if (\is_numeric($key)) {
                 \add_theme_support($value);
