@@ -9,6 +9,7 @@ use Rareloop\Lumberjack\Twig\Extensions\AssetExtension;
 use Rareloop\Lumberjack\Twig\Extensions\RoutingExtension;
 use Rareloop\Lumberjack\Twig\Extensions\SvgHelpersExtension;
 use Rareloop\Lumberjack\Twig\Extensions\TextHelpersExtension;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Timber\Loader;
 use Timber\Timber as TimberCore;
@@ -43,9 +44,10 @@ class TimberServiceProvider extends ServiceProvider
         }
 
         // Extensions, functions & filters
-        // \add_filter('timber/twig/filters', [$this, 'filterTimberFilters']);
-        // \add_filter('timber/twig/functions', [$this, 'filterTimberFunctions']);
+        \add_filter('timber/twig/filters', [$this, 'filterTimberFilters']);
+        \add_filter('timber/twig/functions', [$this, 'filterTimberFunctions']);
         \add_filter('timber/twig', [$this, 'addTwigExtensions']);
+        \add_filter('timber/cache/enable_extension', '__return_false');
 
         // Configure Twig
         \add_filter('timber/twig/environment/options', [$this, 'configureTwigOptions']);
@@ -89,6 +91,7 @@ class TimberServiceProvider extends ServiceProvider
     public function filterTimberFunctions(array $functions): array
     {
         $whitelist = [
+            '__',
             'action',
             'get_post',
             'get_image',
@@ -122,33 +125,22 @@ class TimberServiceProvider extends ServiceProvider
         $twig->addExtension(new HtmlExtension());
         $twig->addExtension(new RenderAttributesExtension());
         $twig->addExtension(new TextHelpersExtension());
-        if ($this->app->has('slugger')) {
+        if ($this->has('slugger')) {
             $twig->addExtension(new StringExtension($this->get('slugger')));
         }
 
-        if ($this->app->has('router.generator')) {
+        if ($this->has('router.generator')) {
             $twig->addExtension(new RoutingExtension($this->get('router.generator')));
         }
 
-        if ($this->app->has('assets.packages')) {
-            $packages = $this->get('assets.packages');
+        if ($this->has(Packages::class)) {
+            $packages = $this->get(Packages::class);
             $twig->addExtension(new AssetExtension($packages));
-            if ($packages->getPackage('path')) {
+            $path_package = $packages->getPackage('path');
+            if ($path_package) {
                 $twig->addExtension(new SvgHelpersExtension($packages->getPackage('path')));
             }
         }
-
-        // $twig->addExtension(
-        //     new ImageFactoryExtension($this->app->get('image.factory'))
-        // );
-
-        // $fixer = new Fixer(['Ellipsis', 'Dimension', 'Unit', 'Dash', 'SmartQuotes', 'FrenchNoBreakSpace', 'NoSpaceBeforeComma', 'CurlyQuote', 'Trademark']);
-        // $fixer->setLocale($this->app->get('locale'));
-
-        // $presets = [
-        //     'default' => $fixer,
-        // ];
-        // $twig->addExtension(new JoliTypoExtension($presets));
 
         return $twig;
     }

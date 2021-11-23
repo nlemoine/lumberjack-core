@@ -32,6 +32,11 @@ abstract class ServiceProvider
         return $this->app->get($key);
     }
 
+    protected function has(string $key)
+    {
+        return $this->app->has($key);
+    }
+
     protected function getConfig(string $key, $default = null)
     {
         return $this->get(Config::class)->get($key, $default);
