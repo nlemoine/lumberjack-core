@@ -33,6 +33,8 @@ class SvgHelpersExtension extends AbstractExtension
             $svg = \str_replace('<svg', \sprintf('<svg%s', $this->renderAttributes($attributes)), $svg);
         }
 
+        $svg = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $svg);
+
         return $svg;
     }
 
