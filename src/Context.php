@@ -108,7 +108,7 @@ class Context extends \ArrayObject
             }
         }
 
-        if (\is_tax()) {
+        if (!$post_type && \is_tax()) {
             $taxonomy = \get_taxonomy(\get_queried_object()->taxonomy);
             $post_type = $taxonomy->object_type[0] ?? null;
         }
