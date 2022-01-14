@@ -98,6 +98,20 @@ abstract class AbstractFacet
             \remove_filter('posts_request', [$this, 'setPostsRequest']);
         }
 
+        $int_types = [
+            'term_id',
+            'count',
+            'parent',
+        ];
+        $this->items = array_map(function ($item) use($int_types) {
+            foreach($int_types as $int_type) {
+                if(isset($item->{$int_type})) {
+                    $item->{$int_type} = (int) $item->{$int_type};
+                }
+            }
+            return $item;
+        }, $this->items);
+
         return $this->itemsCallback($this->items);
     }
 
