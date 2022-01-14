@@ -4,10 +4,7 @@ namespace Rareloop\Lumberjack\Facets;
 
 use WP_Query;
 
-/**
- * @see examples.php for some examples
- */
-class Facets
+class FacetsManager
 {
     /**
      * the wp_query on wich we want to get the facets

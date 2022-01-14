@@ -53,6 +53,11 @@ class RegisterPath
             return \untrailingslashit(\get_template_directory());
         });
 
+        // views
+        $app->singleton('path.views', function () use($app) {
+            return $app->get('path.theme') . '/views';
+        });
+
         // assets
         $app->singleton('path.assets', function () use ($app) {
             return $app->get('path.theme') . '/assets';
