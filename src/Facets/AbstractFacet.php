@@ -111,7 +111,11 @@ abstract class AbstractFacet
         // \dump((new SqlFormatter(new NullHighlighter()))->format($request));
 
         foreach ($items as $item) {
-            $item->current = $item->value === $this->currentValue;
+            if(is_array($this->currentValue)) {
+                $item->current = in_array($item->value, $this->currentValue, true);
+            } else {
+                $item->current = $item->value === $this->currentValue;
+            }
         }
 
         $this->items = $items;
