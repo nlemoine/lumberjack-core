@@ -18,7 +18,7 @@ abstract class AbstractFacetTaxonomy extends AbstractFacet
         $clauses['join'] .= " INNER JOIN {$this->wpdb->term_taxonomy} AS qf_tt ON qf_tt.term_taxonomy_id = qf_tr.term_taxonomy_id";
         $clauses['join'] .= " INNER JOIN {$this->wpdb->terms} AS qf_t ON qf_t.term_id = qf_tt.term_id";
         $clauses['where'] .= " AND qf_tt.taxonomy = \"{$key}\"";
-        $clauses['fields'] = "qf_t.slug AS value, qf_t.name AS name, COUNT(DISTINCT {$this->wpdb->posts}.ID) AS count";
+        $clauses['fields'] = "qf_t.slug AS value, qf_t.name AS name, qf_t.term_id as term_id, qf_tt.parent as parent, COUNT(DISTINCT {$this->wpdb->posts}.ID) AS count";
         $clauses['groupby'] = 'qf_t.slug';
         $clauses['limits'] = '';
         $clauses['orderby'] = '';
