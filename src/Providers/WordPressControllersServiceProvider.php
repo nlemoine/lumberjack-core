@@ -2,7 +2,7 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Brain\Hierarchy\Finder\CallbackTemplateFinder;
+use Brain\Hierarchy\Finder\ByCallback;
 use Brain\Hierarchy\Hierarchy;
 use Brain\Hierarchy\QueryTemplate;
 use Laminas\Diactoros\ServerRequestFactory;
@@ -127,11 +127,11 @@ class WordPressControllersServiceProvider extends ServiceProvider
         $this->resolutionCount = $this->resolutionCount + 1;
 
         // Check if hierarchy has changed, resolve it again
-        if ($this->resolutionCount > 1 && $this->hierarchy->getHierarchy() === $this->resolvedHierarchy) {
+        if ($this->resolutionCount > 1 && $this->hierarchy->hierarchy() === $this->resolvedHierarchy) {
             return $this->resolvedController;
         }
 
-        $finder = new CallbackTemplateFinder([$this, 'getControllerClass']);
+        $finder = new ByCallback([$this, 'getControllerClass']);
 
         $query_template = new QueryTemplate($finder);
 
@@ -141,7 +141,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
             return null;
         }
 
-        $this->resolvedHierarchy = $this->hierarchy->getHierarchy();
+        $this->resolvedHierarchy = $this->hierarchy->hierarchy();
         $this->resolvedController = $this->app->get($controller_class);
 
         $this->app->requestHasBeenHandled();

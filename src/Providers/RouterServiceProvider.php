@@ -8,13 +8,14 @@ use League\Route\Router;
 use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\ServerRequest;
 use Rareloop\Lumberjack\Router\MiddlewareControllerAwareStrategy;
+use League\Route\Strategy\ApplicationStrategy;
 
 class RouterServiceProvider extends ServiceProvider
 {
     public function register()
     {
         $this->app->singleton('router', function () {
-            $strategy = new MiddlewareControllerAwareStrategy();
+            $strategy = new ApplicationStrategy();
             $strategy->setContainer($this->app);
             $router = new Router();
             $router->setStrategy($strategy);
