@@ -5,17 +5,14 @@ namespace Rareloop\Lumberjack\Providers;
 use Brain\Hierarchy\Finder\CallbackTemplateFinder;
 use Brain\Hierarchy\Hierarchy;
 use Brain\Hierarchy\QueryTemplate;
-use Inpsyde\Assets\AssetManager;
 use Laminas\Diactoros\ServerRequestFactory;
-use mindplay\middleman\Dispatcher;
+use League\Route\Middleware\{MiddlewareAwareInterface, MiddlewareAwareTrait};
+use Middleland\Dispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\AbstractController;
-use Rareloop\Router\Invoker;
-use Rareloop\Router\ProvidesControllerMiddleware;
 use Rareloop\Router\ResponseFactory;
 use function Symfony\Component\String\u;
-use Tightenco\Collect\Support\Collection;
 use WP_Query;
 
 class WordPressControllersServiceProvider extends ServiceProvider
@@ -68,9 +65,6 @@ class WordPressControllersServiceProvider extends ServiceProvider
             return;
         }
 
-        $asset_manager = $this->app->get(AssetManager::class);
-        $controller->enqueueAssets($asset_manager);
-
         $request = ServerRequestFactory::fromGlobals(
             $_SERVER,
             $_GET,
@@ -101,24 +95,26 @@ class WordPressControllersServiceProvider extends ServiceProvider
     {
         $middlewares = [];
 
-        if ($controller instanceof ProvidesControllerMiddleware) {
-            $controllerMiddleware = new Collection($controller->getControllerMiddleware());
-
-            $middlewares = $controllerMiddleware->reject(function ($cm) use ($methodName) {
-                return $cm->excludedForMethod($methodName);
-            })->map(function ($cm) {
-                return $cm->middleware();
-            })->all();
+        if ($controller instanceof MiddlewareAwareInterface) {
+            $middlewares = $controller->getMiddlewareStack();
         }
 
+        // $middlewares[] = function ($request) use ($controller, $methodName) {
+        //     $invoker = new Invoker($this->app);
+        //     $output = $invoker->setRequest($request)->call([$controller, $methodName]);
+        //     return ResponseFactory::create($request, $output);
+        // };
+
+        // Middleware to handle request
         $middlewares[] = function ($request) use ($controller, $methodName) {
-            $invoker = new Invoker($this->app);
-            $output = $invoker->setRequest($request)->call([$controller, $methodName]);
-            return ResponseFactory::create($request, $output);
+            return $controller->{$methodName}($request);
         };
 
-        $dispatcher = $this->createDispatcher($middlewares);
-        return $dispatcher->handle($request);
+        $dispatcher = new Dispatcher($middlewares, $this->app);
+
+        $response = $dispatcher->handle($request);
+
+        return $response;
     }
 
     protected function resolveController(bool $trigger_filters = true): ?AbstractController
@@ -151,18 +147,5 @@ class WordPressControllersServiceProvider extends ServiceProvider
         $this->app->requestHasBeenHandled();
 
         return $this->resolvedController;
-    }
-
-    private function createDispatcher(array $middlewares): Dispatcher
-    {
-        $resolver = null;
-
-        if ($this->app->has('middleware-resolver')) {
-            $resolver = function ($name) {
-                return $this->app->get('middleware-resolver')->resolve($name);
-            };
-        }
-
-        return new Dispatcher($middlewares, $resolver);
     }
 }

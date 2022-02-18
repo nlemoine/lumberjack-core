@@ -136,9 +136,13 @@ class TimberServiceProvider extends ServiceProvider
         if ($this->has(Packages::class)) {
             $packages = $this->get(Packages::class);
             $twig->addExtension(new AssetExtension($packages));
-            $path_package = $packages->getPackage('path');
-            if ($path_package) {
-                $twig->addExtension(new SvgHelpersExtension($packages->getPackage('path')));
+            try {
+                $pathPackage = $packages->getPackage('images_path');
+                $twig->addExtension(new SvgHelpersExtension($pathPackage));
+            } catch (\Exception $e) {
+                if (WP_DEBUG) {
+                    throw $e;
+                }
             }
         }
 

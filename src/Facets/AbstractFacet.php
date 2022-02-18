@@ -103,9 +103,9 @@ abstract class AbstractFacet
             'count',
             'parent',
         ];
-        $this->items = array_map(function ($item) use($int_types) {
-            foreach($int_types as $int_type) {
-                if(isset($item->{$int_type})) {
+        $this->items = \array_map(function ($item) use ($int_types) {
+            foreach ($int_types as $int_type) {
+                if (isset($item->{$int_type})) {
                     $item->{$int_type} = (int) $item->{$int_type};
                 }
             }
@@ -125,8 +125,8 @@ abstract class AbstractFacet
         // \dump((new SqlFormatter(new NullHighlighter()))->format($request));
 
         foreach ($items as $item) {
-            if(is_array($this->currentValue)) {
-                $item->current = in_array($item->value, $this->currentValue, true);
+            if (\is_array($this->currentValue)) {
+                $item->current = \in_array($item->value, $this->currentValue, true);
             } else {
                 $item->current = $item->value === $this->currentValue;
             }

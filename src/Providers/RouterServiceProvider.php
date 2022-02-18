@@ -3,49 +3,40 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Laminas\Diactoros\ServerRequestFactory;
-use Psr\Http\Message\RequestInterface;
-use Rareloop\Lumberjack\Contracts\MiddlewareAliases;
-use Rareloop\Lumberjack\Http\MiddlewareAliasStore;
-use Rareloop\Lumberjack\Http\MiddlewareResolver;
-use Rareloop\Lumberjack\Http\Router;
+use League\Route\Middleware\{MiddlewareAwareInterface, MiddlewareAwareTrait};
+use League\Route\Router;
+use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\ServerRequest;
-use Rareloop\Router\MiddlewareResolver as MiddlewareResolverInterface;
+use Rareloop\Lumberjack\Router\MiddlewareControllerAwareStrategy;
 
 class RouterServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $store = new MiddlewareAliasStore();
-        $resolver = new MiddlewareResolver($this->app, $store);
-
-        $router = new Router($this->app, $resolver);
-        $router->setBasePath($this->getBasePathFromWPConfig());
-
-        $this->app->bind('router', $router);
-        $this->app->bind(Router::class, $router);
-
-        $this->app->bind('middleware-alias-store', $store);
-        $this->app->bind(MiddlewareAliases::class, $store);
-
-        $this->app->bind('middleware-resolver', $resolver);
-        $this->app->bind(MiddlewareResolverInterface::class, $resolver);
-
-        $this->app->bind('router.generator', function () use ($router) {
-            $locale = $this->app->get('locale.short');
-            $base_url = $this->app->get('url.home');
-            $router::macro('generateUrl', function ($name, $arguments = [], $relative = false) use ($locale, $base_url) {
-                $route_name = $name . '_' . $locale;
-                if (!$this->has($route_name)) {
-                    $route_name = $name;
-                }
-
-                $path = $this->url($route_name, $arguments = []);
-
-                return ($relative ? '' : \rtrim($base_url, '/')) . $path;
-            });
-
+        $this->app->singleton('router', function () {
+            $strategy = new MiddlewareControllerAwareStrategy();
+            $strategy->setContainer($this->app);
+            $router = new Router();
+            $router->setStrategy($strategy);
             return $router;
         });
+
+        // $this->app->bind('router.generator', function () use ($router) {
+        //     $locale = $this->app->get('locale.short');
+        //     $base_url = $this->app->get('url.home');
+        //     $router::macro('generateUrl', function ($name, $arguments = [], $relative = false) use ($locale, $base_url) {
+        //         $route_name = $name . '_' . $locale;
+        //         if (!$this->has($route_name)) {
+        //             $route_name = $name;
+        //         }
+
+        //         $path = $this->url($route_name, $arguments = []);
+
+        //         return ($relative ? '' : \rtrim($base_url, '/')) . $path;
+        //     });
+
+        //     return $router;
+        // });
     }
 
     public function boot()
@@ -60,14 +51,17 @@ class RouterServiceProvider extends ServiceProvider
             ));
 
             $this->processRequest($request);
-        }, 100); // Load after inpsyde/assets
+        }, 1000); // Load after inpsyde/assets
     }
 
-    public function processRequest(RequestInterface $request)
+    public function processRequest(ServerRequestInterface $request)
     {
         $this->app->bind('request', $request);
-
-        $response = $this->app->get('router')->match($request);
+        try {
+            $response = $this->app->get('router')->dispatch($request);
+        } catch (\Exception $e) {
+            return;
+        }
 
         $response = \apply_filters('lumberjack_router_response', $response, $request);
 

@@ -4,8 +4,8 @@ namespace Rareloop\Lumberjack\Bootstrappers;
 
 use DI\NotFoundException;
 use Exception;
-use function Http\Response\send;
 use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Rareloop\Lumberjack\Application;
@@ -59,7 +59,7 @@ class RegisterExceptionHandler
 
     public function send(ResponseInterface $response)
     {
-        @send($response);
+        @(new SapiEmitter())->emit($response);
     }
 
     /**

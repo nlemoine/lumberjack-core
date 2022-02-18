@@ -10,7 +10,6 @@ use Rareloop\Psr7ServerRequestExtension\InteractsWithUri;
 class ServerRequest extends DiactorosServerRequest
 {
     use InteractsWithInput;
-
     use InteractsWithUri;
 
     public static function fromRequest(ServerRequestInterface $request)

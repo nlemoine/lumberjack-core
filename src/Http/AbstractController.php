@@ -2,20 +2,23 @@
 
 namespace Rareloop\Lumberjack\Http;
 
-use Inpsyde\Assets\AssetManager;
 use Laminas\Diactoros\Response\JsonResponse;
+use League\Route\Middleware\{MiddlewareAwareInterface, MiddlewareAwareTrait};
 use Middlewares\Minifier;
 use Psr\Container\ContainerInterface;
+use Psr\Link\LinkInterface;
 use Rareloop\Lumberjack\Http\Responses\RedirectResponse;
 use Rareloop\Lumberjack\Http\Responses\TimberResponse;
-use Rareloop\Router\Controller;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\WebLink\GenericLinkProvider;
 use WP_Query;
 
-abstract class AbstractController extends Controller
+abstract class AbstractController implements MiddlewareAwareInterface
 {
+    use MiddlewareAwareTrait;
+
     protected ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
@@ -37,7 +40,7 @@ abstract class AbstractController extends Controller
     {
     }
 
-    public function enqueueAssets(AssetManager $assets)
+    public function enqueueAssets()
     {
     }
 
@@ -122,5 +125,21 @@ abstract class AbstractController extends Controller
     protected function generateUrl(string $route, array $parameters = [], $relative = false): string
     {
         return $this->container->get('router.generator')->generateUrl($route, $parameters, $relative);
+    }
+
+    /**
+     * Adds a Link HTTP header to the current response.
+     *
+     * @see https://tools.ietf.org/html/rfc5988
+     */
+    protected function addLink(LinkInterface $link): void
+    {
+        if (null === $linkProvider = $request->attributes->get('_links')) {
+            $request->attributes->set('_links', new GenericLinkProvider([$link]));
+
+            return;
+        }
+
+        $request->attributes->set('_links', $linkProvider->withLink($link));
     }
 }

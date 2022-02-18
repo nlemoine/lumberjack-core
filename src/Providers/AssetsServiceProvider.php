@@ -3,7 +3,12 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use function DI\get;
+
+use Inpsyde\Assets\AssetFactory;
 use Inpsyde\Assets\AssetManager;
+use Inpsyde\Assets\Loader\ArrayLoader;
+use Inpsyde\Assets\Script;
+use Inpsyde\Assets\Style;
 use Rareloop\Lumberjack\Assets\CustomLoader;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\Asset\Packages;
@@ -12,129 +17,132 @@ use Symfony\Component\Asset\UrlPackage;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
+use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 class AssetsServiceProvider extends ServiceProvider
 {
     public function register()
     {
         $this->app->singleton(Packages::class, function ($app) {
-            $packages = [];
-            foreach ($app->get('assets.named_packages') as $name => $package) {
-                $version = $app->make('assets.strategy_factory', [
-                    'version'          => isset($package['version']) ? $package['version'] : null,
-                    'format'           => isset($package['version_format']) ? $package['version_format'] : null,
-                    'jsonManifestPath' => isset($package['json_manifest_path']) ? $package['json_manifest_path'] : null,
-                    'name'             => $name,
-                ]);
+            $packages = $this->getConfig('assets.config.packages', []);
+            $defaultVersion = $this->get('assets.version_strategy');
 
-                $packages[$name] = $app->make('assets.package_factory', [
-                    'basePath' => isset($package['base_path']) ? $package['base_path'] : '',
-                    'baseUrls' => isset($package['base_urls']) ? $package['base_urls'] : [],
-                    'version'  => $version,
-                    'name'     => $name,
-                ]);
+            foreach ($packages as $name => $package) {
+                // $package['version_strategy'] = $package['version_strategy'] ?? null;
+                // $package['json_manifest_path'] = $package['json_manifest_path'] ?? null;
+                // // $package['strict_mode'] = $package['strict_mode'] ?? null;
+
+                // if (null !== $package['version_strategy']) {
+                //     $version = $this->createVersion(($package['version_strategy']);
+                // } elseif (!\array_key_exists('version', $package) && null === $package['json_manifest_path']) {
+                //     // if neither version nor json_manifest_path are specified, use the default
+                //     $version = $defaultVersion;
+                // } else {
+                //     // let format fallback to main version_format
+                //     $format = $package['version_format'] ?: $this->get('assets.version_fomat');
+                //     $version = $package['version'] ?? null;
+                //     $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name, $package['strict_mode']);
+                // }
+
+                $packages[$name] = $this->createPackage(
+                    $this->getParameter($package['base_path'] ?? ''),
+                    $this->getParameter($package['base_urls'] ?? []),
+                    $defaultVersion
+                );
             }
 
-            return new Packages($app->get('assets.default_package'), $packages);
+            return new Packages($this->get(PackageInterface::class), $packages);
         });
         $this->app->singleton('assets.packages', get(Packages::class));
 
         $this->app->singleton(PackageInterface::class, function ($app) {
-            $version = $app->make('assets.strategy_factory', [
-                'version'          => $app->get('assets.version'),
-                'format'           => $app->get('assets.version_format'),
-                'jsonManifestPath' => $app->get('assets.json_manifest_path'),
-                'name'             => 'default',
-            ]);
-
-            return $app->make('assets.package_factory', [
-                'basePath' => $app->get('assets.base_path'),
-                'baseUrls' => $app->get('assets.base_urls'),
-                'version'  => $version,
-                'name'     => 'default',
-            ]);
+            return $this->createPackage(
+                $this->get('assets.base_path'),
+                $this->get('assets.base_urls'),
+                $this->get('assets.version_strategy')
+            );
         });
-        $this->app->bind('assets.default_package', get(PackageInterface::class));
+        $this->app->singleton('assets.default_package', get(PackageInterface::class));
 
-        $this->app->bind('assets.base_path', '');
-        $this->app->bind('assets.version', null);
-        $this->app->bind('assets.version_format', null);
-        $this->app->singleton('assets.json_manifest_path', function () {
-            if (WP_DEBUG || !\in_array(WP_ENV, ['staging', 'production'], true)) {
-                return null;
-            }
-            $manifest_path = $this->app->get('path.assets') . '/manifest.json';
-            if (!\is_file($manifest_path)) {
-                return null;
-            }
-            return $manifest_path;
+        $this->app->singleton('assets.version_strategy', function () {
+            return $this->createVersion(
+                $this->get('assets.version'),
+                $this->get('assets.version_format'),
+                $this->get('assets.json_manifest_path'),
+                'default',
+                $this->get('assets.strict_mode')
+            );
         });
 
-        // $this->app->bind('assets.json_manifest_path', null);
-        // $this->app->bind('assets.named_packages', []);
-
-        // prototypes
-        $this->app->bind('assets.strategy_factory', function ($version, $format, $jsonManifestPath, $name) {
-            if ($version && $jsonManifestPath) {
-                throw new \LogicException(\sprintf('Asset package "%s" cannot have version and manifest.', $name));
-            }
-            if ($version) {
-                return new StaticVersionStrategy($version, $format);
-            }
-            if ($jsonManifestPath) {
-                return new JsonManifestVersionStrategy($jsonManifestPath);
-            }
-
-            return new EmptyVersionStrategy();
+        $this->app->singleton('assets.strict_mode', $this->getConfig('assets.config.strict_mode', false));
+        $this->app->singleton('assets.base_path', function () {
+            return $this->getParameter($this->getConfig('assets.config.base_path', ''));
         });
-
-        $this->app->bind('assets.package_factory', function ($basePath, $baseUrls, $version, $name) {
-            if ($basePath && $baseUrls) {
-                throw new \LogicException(\sprintf('Asset package "%s" cannot have base URLs and base paths.', $name));
-            }
-            if (!$baseUrls) {
-                return new PathPackage($basePath, $version);
-            }
-
-            return new UrlPackage($baseUrls, $version);
+        $this->app->singleton('assets.base_urls', function () {
+            return $this->getParameter($this->getConfig('assets.config.base_urls', []));
         });
+        $this->app->singleton('assets.version', $this->getConfig('assets.config.version', null));
+        $this->app->singleton('assets.version_format', $this->getConfig('assets.config.version_format', '%%s?%%s'));
+        $this->app->singleton('assets.json_manifest_path', $this->getParameter($this->getConfig('assets.config.json_manifest_path', null)));
 
         $this->app->singleton(AssetManager::class, AssetManager::class);
+        $this->app->singleton(ArrayLoader::class, ArrayLoader::class);
+        $this->app->singleton(AssetFactory::class, AssetFactory::class);
         $this->app->singleton(CustomLoader::class, CustomLoader::class);
 
-        $this->app->singleton('assets', function () {
-            $loader = $this->app->get(CustomLoader::class);
-
-            $loader->disableAutodiscoverVersion();
-            $assets = $loader->load($this->app->get('path.config') . '/assets.php');
-            return $assets;
-        });
-
-        $this->app->singleton('assets.base_urls', $this->app->get('url.assets'));
-        $this->app->bind('assets.named_packages', [
-            'path' => [
-                'base_path' => $this->app->get('path.assets'),
-            ],
-            'editor' => [
-                'base_path' => 'assets',
-            ],
-        ]);
-
-        // $this->app->bind('assets.loader', function () {
-        //     $loader = new ArrayLoader();
-        //     $loader->disableAutodiscoverVersion();
-        //     $config = $this->app->get(Config::class)->get('assets');
-        //     /** @var Asset[] $assets */
-        //     return $loader->load(\array_map(function ($asset) {
-        //         $asset['url'] = $this->app->get('assets.packages')->getUrl($asset['url']);
-
-        //         return $asset;
-        //     }, $config));
-        // });
+        foreach ($this->getConfig('assets.assets', []) as $asset) {
+            $typeMap = [
+                Style::class  => 'css',
+                Script::class => 'js',
+            ];
+            if (!isset($typeMap[$asset['type']])) {
+                continue;
+            }
+            $asset['url'] = $this->get(PackageInterface::class)->getUrl($asset['url']);
+            $id = \sprintf('assets.%s.%s', $typeMap[$asset['type']], $asset['handle']);
+            $this->app->singleton($id, function () use ($asset) {
+                return $this->get(AssetFactory::class)->create($asset)->disableAutodiscoverVersion();
+            });
+        }
     }
 
     public function boot()
     {
         $this->app->get(AssetManager::class)->setup();
+    }
+
+    /**
+     * Create a package
+     */
+    private function createPackage(?string $basePath, array $baseUrls, VersionStrategyInterface $versionStrategy): PackageInterface
+    {
+        if ($basePath && $baseUrls) {
+            throw new \LogicException('An asset package cannot have base URLs and base paths.');
+        }
+        if (!$baseUrls) {
+            return new PathPackage($basePath, $versionStrategy);
+        }
+
+        return new UrlPackage($baseUrls, $versionStrategy);
+    }
+
+    /**
+     * Create a version strategy
+     *
+     * @param boolean $strictMode
+     */
+    private function createVersion(?string $version, ?string $format, ?string $jsonManifestPath, string $name, bool $strictMode): VersionStrategyInterface
+    {
+        if ($version && $jsonManifestPath) {
+            throw new \LogicException(\sprintf('Asset package "%s" cannot have version and manifest.', $name));
+        }
+        if ($version) {
+            return new StaticVersionStrategy($version, $format);
+        }
+        if ($jsonManifestPath) {
+            return new JsonManifestVersionStrategy($jsonManifestPath, null, $strictMode);
+        }
+
+        return new EmptyVersionStrategy();
     }
 }

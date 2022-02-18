@@ -54,7 +54,7 @@ class RegisterPath
         });
 
         // views
-        $app->singleton('path.views', function () use($app) {
+        $app->singleton('path.views', function () use ($app) {
             return $app->get('path.theme') . '/views';
         });
 
