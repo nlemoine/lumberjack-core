@@ -128,6 +128,17 @@ abstract class AbstractController implements MiddlewareAwareInterface
     }
 
     /**
+     * Forwards the request to another controller.
+     *
+     * @param string $controller The controller name (a string like Bundle\BlogBundle\Controller\PostController::indexAction)
+     */
+    protected function forward(string $controller): TimberResponse
+    {
+        $controller = $this->container->get($controller);
+        return $controller->handle();
+    }
+
+    /**
      * Adds a Link HTTP header to the current response.
      *
      * @see https://tools.ietf.org/html/rfc5988
