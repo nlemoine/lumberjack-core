@@ -18,7 +18,7 @@ abstract class AbstractTemplate
         return [Page::getPostType()];
     }
 
-    protected static function isCacheable(): bool
+    public static function isCacheable(): bool
     {
         return true;
     }
