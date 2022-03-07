@@ -26,6 +26,12 @@ class BreadcrumbServiceProvider extends ServiceProvider
     public function boot()
     {
         \add_filter('timber/context', [$this, 'addBreadcrumbsToContext']);
+        \add_action('after_setup_theme', [$this, 'addThemeSupport']);
+    }
+
+    public function addThemeSupport()
+    {
+        \add_theme_support('yoast-seo-breadcrumbs');
     }
 
     public function addBreadcrumbsToContext(array $context): array

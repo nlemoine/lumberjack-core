@@ -54,7 +54,7 @@ class Context extends \ArrayObject
 
             public function __get(string $location)
             {
-                $location = str_replace('_', '-', $location);
+                $location = \str_replace('_', '-', $location);
                 return \once(function () use ($location) {
                     return Timber::get_menu($location);
                 });

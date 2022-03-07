@@ -5,10 +5,9 @@ namespace Rareloop\Lumberjack\Providers;
 use Laminas\Diactoros\ServerRequestFactory;
 use League\Route\Middleware\{MiddlewareAwareInterface, MiddlewareAwareTrait};
 use League\Route\Router;
+use League\Route\Strategy\ApplicationStrategy;
 use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\ServerRequest;
-use Rareloop\Lumberjack\Router\MiddlewareControllerAwareStrategy;
-use League\Route\Strategy\ApplicationStrategy;
 
 class RouterServiceProvider extends ServiceProvider
 {

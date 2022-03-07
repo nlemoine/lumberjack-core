@@ -8,9 +8,10 @@ use Brain\Hierarchy\QueryTemplate;
 use Laminas\Diactoros\ServerRequestFactory;
 use League\Route\Middleware\{MiddlewareAwareInterface, MiddlewareAwareTrait};
 use Middleland\Dispatcher;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\AbstractController;
+use Rareloop\Lumberjack\Http\ServerRequest;
 use Rareloop\Router\ResponseFactory;
 use function Symfony\Component\String\u;
 use WP_Query;
@@ -91,7 +92,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
         return \class_exists($controllerFqns) ? $controllerFqns : '';
     }
 
-    public function handleRequest(ServerRequestInterface $request, AbstractController $controller, string $methodName): ResponseInterface
+    public function handleRequest(RequestInterface $request, AbstractController $controller, string $methodName): ResponseInterface
     {
         $middlewares = [];
 
@@ -107,7 +108,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
 
         // Middleware to handle request
         $middlewares[] = function ($request) use ($controller, $methodName) {
-            return $controller->{$methodName}($request);
+            return $controller->{$methodName}(ServerRequest::fromRequest($request));
         };
 
         $dispatcher = new Dispatcher($middlewares, $this->app);

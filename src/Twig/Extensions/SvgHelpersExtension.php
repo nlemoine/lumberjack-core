@@ -30,7 +30,7 @@ class SvgHelpersExtension extends AbstractExtension
 
     public function inlineSvg(string $file, array $attributes = [], array $args = []): string
     {
-        $args = array_merge([
+        $args = \array_merge([
             'renderOnce' => false,
         ], $args);
 
@@ -57,9 +57,9 @@ class SvgHelpersExtension extends AbstractExtension
             $attrs = [];
 
             \preg_match('@viewBox="([^"]+)"@', $svg, $matches);
-            if (isset($matches[1])) {
+            if (isset($matches[1]) && empty($attributes['viewBox'])) {
                 $attrs['viewBox'] = $matches[1];
-                $attributes = array_merge($attributes, $attrs);
+                $attributes = \array_merge($attributes, $attrs);
             }
             $this->rendered[$svg_path]['attributes'] = $attrs;
             $this->rendered[$svg_path]['once'] = $args['renderOnce'];
@@ -67,12 +67,12 @@ class SvgHelpersExtension extends AbstractExtension
             $symbol = '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">';
             $symbol .= '<symbol';
             $symbol .= ' id="' . $svg_id . '"';
-            if(isset($attrs['viewBox'])) {
-                $symbol .= ' viewBox="'.$attrs['viewBox'].'"';
+            if (isset($attrs['viewBox'])) {
+                $symbol .= ' viewBox="' . $attrs['viewBox'] . '"';
             }
             $symbol .= '>';
-            $symbol = preg_replace("/<svg[^>]*?(\/?)>/si", $symbol, $svg);
-            $symbol = str_replace('</svg>', '</symbol></svg>', $symbol);
+            $symbol = \preg_replace("/<svg[^>]*?(\/?)>/si", $symbol, $svg);
+            $symbol = \str_replace('</svg>', '</symbol></svg>', $symbol);
         }
 
         $svg = <<<SVG
