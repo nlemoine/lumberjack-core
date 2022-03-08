@@ -50,7 +50,7 @@ class TemplateServiceProvider extends ServiceProvider
             if (!\is_page_template($template::getTemplate() . '.php')) {
                 return;
             }
-            if ($template::isCacheable() && !\defined('DONOTCACHEPAGE')) {
+            if (!$template::isCacheable() && !\defined('DONOTCACHEPAGE')) {
                 \define('DONOTCACHEPAGE', true);
             }
         }
