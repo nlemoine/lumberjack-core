@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Form\Extension\Recaptcha;
+namespace Rareloop\Lumberjack\Form\Extension\Recaptcha;
 
-use App\Form\Extension\Recaptcha\Type\FormTypeRecaptchaExtension;
+use Rareloop\Lumberjack\Form\Extension\Recaptcha\Type\FormTypeRecaptchaExtension;
 use Symfony\Component\Form\AbstractExtension;
 
 class RecaptchaExtension extends AbstractExtension

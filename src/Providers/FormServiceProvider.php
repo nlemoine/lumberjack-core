@@ -94,8 +94,21 @@ class FormServiceProvider extends ServiceProvider
             $extensions[] = new MagicQuotesExtension();
             $extensions[] = new SanitizerExtension();
 
-            $honeypot_config = $this->app->get('config')->get('form.honeypot', []);
+            $honeypot_config = $this->app->get('config')->get('forms.honeypot', []);
             $extensions[] = new HoneyPotExtension($honeypot_config);
+
+            $recaptcha_config = $this->app->get('config')->get('forms.recaptcha', []);
+            if(!empty($recaptcha_config['site_key']) && !empty($recaptcha_config['secret_key'])) {
+                $extensions[] = new RecaptchaExtension(
+                    $recaptcha_config['site_key'],
+                    $recaptcha_config['secret_key'],
+                    $recaptcha_config['global'],
+                    $recaptcha_config['score_threshold'] ?? null,
+                    $recaptcha_config['field'] ?? null,
+                    \__('Une erreur a eu lieu lors de la validation du captcha, veuillez soumettre à nouveau le formulaire.', 'regilait')
+                );
+            }
+
             $extensions[] = new CsrfExtension($this->app->get('form.csrf_manager'));
 
             return $extensions;

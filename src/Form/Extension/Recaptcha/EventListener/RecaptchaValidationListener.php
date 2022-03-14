@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form\Extension\Recaptcha\EventListener;
+namespace Rareloop\Lumberjack\Form\Extension\Recaptcha\EventListener;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

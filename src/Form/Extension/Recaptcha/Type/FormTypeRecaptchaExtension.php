@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Form\Extension\Recaptcha\Type;
+namespace Rareloop\Lumberjack\Form\Extension\Recaptcha\Type;
 
-use App\Form\Extension\Recaptcha\EventListener\RecaptchaValidationListener;
-use App\Form\Extension\Recaptcha\Form\Type\Recaptcha3Type;
+use Rareloop\Lumberjack\Form\Extension\Recaptcha\EventListener\RecaptchaValidationListener;
+use Rareloop\Lumberjack\Form\Extension\Recaptcha\Form\Type\Recaptcha3Type;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
