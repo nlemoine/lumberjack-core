@@ -51,7 +51,8 @@
         "timber/timber": "2.x-dev",
         "twig/cache-extra": "^3.3",
         "twig/html-extra": "^3.0",
-        "twig/string-extra": "^3.3"
+        "twig/string-extra": "^3.3",
+        "google/recaptcha": "^1.2"
     },
     "require-dev": {
         "antecedent/patchwork": "^2.1.8",

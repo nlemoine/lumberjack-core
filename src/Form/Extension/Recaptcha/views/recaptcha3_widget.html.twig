@@ -1,0 +1,87 @@
+{% block recaptcha3_widget %}
+    {%- set type = type|default('hidden') -%}
+    {{ block('form_widget_simple') }}
+    {% if form.vars.site_key %}
+        {%- set validJsId = id|replace({'-':'_'}) -%}
+        {%- set callbackName = 'recaptchaCallback_%s'|format(validJsId) -%}
+        <style>.grecaptcha-badge{visibility: hidden;pointer-events:none;}</style>
+        <script type="text/javascript">
+            (function(){
+                var input = document.getElementById('{{ id }}');
+                if(!input) {
+                    return;
+                }
+
+                var form = input.form;
+                var executeRecaptcha = function() {
+                    grecaptcha
+                        .execute('{{ form.vars.site_key }}', {
+                            action: '{{ form.vars.action_name }}'
+                        })
+                        .then(function(token) {
+                            document.getElementById('{{ id }}').value = token;
+                        });
+                }
+
+                window.{{ callbackName }} = executeRecaptcha;
+
+                var loadRecaptcha = function() {
+                    if(window.grecaptcha) {
+                        executeRecaptcha();
+                        return;
+                    }
+                    var script = document.createElement('script');
+                    script.type = 'text/javascript';
+                    script.async = true;
+                    script.src = 'https://www.google.com/recaptcha/api.js?render={{ form.vars.site_key }}&onload={{ callbackName }}';
+                    var firstScript = document.getElementsByTagName('script')[0];
+                    firstScript.parentNode.insertBefore(script, firstScript);
+                };
+
+                {%- if is_ajax -%}
+                    var reloaded = false;
+                    var onFieldError = function() {
+                        form.addEventListener('invalid', function() {
+                            if(reloaded) {
+                                return;
+                            }
+                            reloaded = true;
+                            executeRecaptcha();
+                        }, true);
+                    };
+
+                    var onFormSubmit = function() {
+                        form.addEventListener('submit', function() {
+                            reloaded = false;
+                        });
+                    };
+                {%- endif -%}
+
+                var init = function() {
+                    loadRecaptcha();
+                    {%- if is_ajax -%}
+                        onFormSubmit();
+                        onFieldError();
+                    {%- endif -%}
+                };
+
+                if ('IntersectionObserver' in window &&
+                    'IntersectionObserverEntry' in window &&
+                    'intersectionRatio' in window.IntersectionObserverEntry.prototype) {
+                    var observerCallback = function(entries, observer) {
+                        entries.map(function(entry) {
+                            if (entry.isIntersecting) {
+                                init();
+                                observer.unobserve(form);
+                            }
+                        });
+                    }
+                    var observer = new IntersectionObserver(observerCallback);
+                    observer.observe(form);
+                } else {
+                    init();
+                }
+            })();
+        </script>
+    {% endif %}
+{% endblock %}
