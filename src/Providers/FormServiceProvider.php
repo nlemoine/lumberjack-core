@@ -6,6 +6,7 @@ use Rareloop\Lumberjack\Form\Extension\HoneyPot\HoneyPotExtension;
 use Rareloop\Lumberjack\Form\Extension\InvalidFeedback\InvalidFeedbackExtension;
 use Rareloop\Lumberjack\Form\Extension\MagicQuotes\MagicQuotesExtension;
 use Rareloop\Lumberjack\Form\Extension\Sanitizer\SanitizerExtension;
+use Rareloop\Lumberjack\Form\Extension\Recaptcha\RecaptchaExtension;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
