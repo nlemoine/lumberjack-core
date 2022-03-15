@@ -8,6 +8,7 @@
         "brain/hierarchy": "^3.0",
         "deliciousbrains/wp-migrations": "^2.0",
         "gajus/dindent": "dev-master",
+        "google/recaptcha": "^1.2",
         "inpsyde/assets": "^2.8",
         "inpsyde/wp-context": "^1.2",
         "johnbillion/extended-cpts": "^5.0",
@@ -40,6 +41,7 @@
         "symfony/http-foundation": "^5.2",
         "symfony/http-kernel": "^5.3",
         "symfony/intl": "^5.3",
+        "symfony/mailer": "^5.4",
         "symfony/routing": "^5.3",
         "symfony/security-csrf": "^5.3",
         "symfony/string": "^5.3",
@@ -51,8 +53,7 @@
         "timber/timber": "2.x-dev",
         "twig/cache-extra": "^3.3",
         "twig/html-extra": "^3.0",
-        "twig/string-extra": "^3.3",
-        "google/recaptcha": "^1.2"
+        "twig/string-extra": "^3.3"
     },
     "require-dev": {
         "antecedent/patchwork": "^2.1.8",
