@@ -9,6 +9,7 @@ class Context extends \ArrayObject
     private $app;
 
     private $option;
+    private $menu;
 
     private $acfOption;
 
@@ -62,7 +63,7 @@ class Context extends \ArrayObject
         };
     }
 
-    public function getArrayCopy()
+    public function getArrayCopy(): array
     {
         return [
             'option' => $this->option,
@@ -120,6 +121,40 @@ class Context extends \ArrayObject
     public function getQuery()
     {
         return $GLOBALS['wp_query'];
+    }
+
+    /**
+     * Returns some or all the existing flash messages:
+     *  * getFlashes() returns all the flash messages
+     *  * getFlashes('notice') returns a simple array with flash messages of that type
+     *  * getFlashes(['notice', 'error']) returns a nested array of type => messages.
+     *
+     * @return array
+     */
+    public function getFlashes($types = null)
+    {
+        try {
+            if (null === $session = $this->app->get('session')) {
+                return [];
+            }
+        } catch (\RuntimeException $e) {
+            return [];
+        }
+
+        if (null === $types || '' === $types || [] === $types) {
+            return $session->getFlashBag()->all();
+        }
+
+        if (\is_string($types)) {
+            return $session->getFlashBag()->get($types);
+        }
+
+        $result = [];
+        foreach ($types as $type) {
+            $result[$type] = $session->getFlashBag()->get($type);
+        }
+
+        return $result;
     }
 
     /**

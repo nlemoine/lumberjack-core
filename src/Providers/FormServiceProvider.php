@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
@@ -76,12 +77,12 @@ class FormServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('form.csrf_manager', function () {
-            if (!$this->app->has('session')) {
+            if (!$this->app->has(SessionInterface::class)) {
                 throw new \RuntimeException('You must register a session service provider to use the CSRF extension.');
             }
 
             $csrfGenerator = new UriSafeTokenGenerator();
-            $csrfStorage = new SessionTokenStorage($this->app->get('session'));
+            $csrfStorage = new SessionTokenStorage($this->app->get(SessionInterface::class));
 
             return new CsrfTokenManager($csrfGenerator, $csrfStorage);
         });
@@ -195,7 +196,7 @@ class FormServiceProvider extends ServiceProvider
      */
     public function addTwigExtension(Environment $twig): Environment
     {
-        $form_themes = array_merge($this->app->get('form.form_themes'), ['bootstrap_5_layout.html.twig']);
+        $form_themes = array_merge(['bootstrap_5_layout.html.twig'], $this->app->get('form.form_themes'));
 
         $formEngine = new TwigRendererEngine($form_themes, $twig);
         $twig->addRuntimeLoader(new FactoryRuntimeLoader([
