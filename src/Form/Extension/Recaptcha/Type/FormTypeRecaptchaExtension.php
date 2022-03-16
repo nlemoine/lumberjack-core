@@ -14,10 +14,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class FormTypeRecaptchaExtension extends AbstractTypeExtension
 {
     private string $siteKey;
+
     private string $secretKey;
+
     private bool $defaultEnabled;
+
     private float $scoreThreshold;
+
     private string $defaultFieldName;
+
     private string $errorMessage;
 
     public function __construct(
@@ -27,8 +32,7 @@ final class FormTypeRecaptchaExtension extends AbstractTypeExtension
         float $scoreThreshold,
         string $defaultFieldName,
         string $errorMessage
-    )
-    {
+    ) {
         $this->siteKey = $siteKey;
         $this->secretKey = $secretKey;
         $this->defaultEnabled = $defaultEnabled;
@@ -63,7 +67,7 @@ final class FormTypeRecaptchaExtension extends AbstractTypeExtension
             $recaptcha_form = $factory->createNamed($options['recaptcha_field_name'], Recaptcha3Type::class, null, [
                 'action_name' => $action_name,
                 'mapped'      => false,
-                'is_ajax' => $options['recaptcha_is_ajax'],
+                'is_ajax'     => $options['recaptcha_is_ajax'],
             ]);
 
             $view->children[$options['recaptcha_field_name']] = $recaptcha_form->createView($view);
@@ -92,5 +96,4 @@ final class FormTypeRecaptchaExtension extends AbstractTypeExtension
             FormType::class,
         ];
     }
-
 }

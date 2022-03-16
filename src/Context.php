@@ -9,6 +9,7 @@ class Context extends \ArrayObject
     private $app;
 
     private $option;
+
     private $menu;
 
     private $acfOption;
@@ -141,7 +142,7 @@ class Context extends \ArrayObject
             return [];
         }
 
-        if (null === $types || '' === $types || [] === $types) {
+        if ($types === null || $types === '' || $types === []) {
             return $session->getFlashBag()->all();
         }
 

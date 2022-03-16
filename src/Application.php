@@ -66,6 +66,11 @@ class Application implements ContainerInterface, InteropContainerInterface
         $this->addToContainer($key, $value);
     }
 
+    public function set($key, $value)
+    {
+        $this->container->set($key, $value);
+    }
+
     /**
      * Bind a singleton into the container
      *

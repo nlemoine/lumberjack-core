@@ -2,27 +2,23 @@
 
 namespace Rareloop\Lumberjack\Form\Extension\Recaptcha\EventListener;
 
-use Symfony\Component\HttpFoundation\Request;
+use ReCaptcha\ReCaptcha;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Util\ServerParams;
-use ReCaptcha\ReCaptcha;
+use Symfony\Component\HttpFoundation\Request;
 
 class RecaptchaValidationListener implements EventSubscriberInterface
 {
     private string $secretKey;
-    private string $fieldName;
-    private float $scoreThreshold;
-    private string $errorMessage;
 
-    public static function getSubscribedEvents()
-    {
-        return [
-            FormEvents::PRE_SUBMIT => 'preSubmit',
-        ];
-    }
+    private string $fieldName;
+
+    private float $scoreThreshold;
+
+    private string $errorMessage;
 
     public function __construct(string $secretKey, float $scoreThreshold, string $fieldName, string $errorMessage)
     {
@@ -32,11 +28,18 @@ class RecaptchaValidationListener implements EventSubscriberInterface
         $this->errorMessage = $errorMessage;
     }
 
+    public static function getSubscribedEvents()
+    {
+        return [
+            FormEvents::PRE_SUBMIT => 'preSubmit',
+        ];
+    }
+
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
         $serverParams = new ServerParams();
-        $postRequestSizeExceeded = 'POST' === $form->getConfig()->getMethod() && $serverParams->hasPostMaxSizeBeenExceeded();
+        $postRequestSizeExceeded = $form->getConfig()->getMethod() === 'POST' && $serverParams->hasPostMaxSizeBeenExceeded();
 
         if ($form->isRoot() && $form->getConfig()->getOption('compound') && !$postRequestSizeExceeded) {
             $data = $event->getData();

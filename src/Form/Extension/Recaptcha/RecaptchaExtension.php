@@ -8,10 +8,15 @@ use Symfony\Component\Form\AbstractExtension;
 class RecaptchaExtension extends AbstractExtension
 {
     private string $siteKey;
+
     private string $secretKey;
+
     private bool $defaultEnabled;
+
     private float $scoreThreshold;
+
     private string $defaultFieldName;
+
     private string $errorMessage;
 
     public function __construct(
@@ -21,8 +26,7 @@ class RecaptchaExtension extends AbstractExtension
         ?float $scoreThreshold = null,
         ?string $defaultFieldName = null,
         ?string $errorMessage = null
-    )
-    {
+    ) {
         $this->siteKey = $siteKey;
         $this->secretKey = $secretKey;
         $this->defaultEnabled = $defaultEnabled;

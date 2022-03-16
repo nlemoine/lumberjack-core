@@ -5,8 +5,8 @@ namespace Rareloop\Lumberjack\Providers;
 use Rareloop\Lumberjack\Form\Extension\HoneyPot\HoneyPotExtension;
 use Rareloop\Lumberjack\Form\Extension\InvalidFeedback\InvalidFeedbackExtension;
 use Rareloop\Lumberjack\Form\Extension\MagicQuotes\MagicQuotesExtension;
-use Rareloop\Lumberjack\Form\Extension\Sanitizer\SanitizerExtension;
 use Rareloop\Lumberjack\Form\Extension\Recaptcha\RecaptchaExtension;
+use Rareloop\Lumberjack\Form\Extension\Sanitizer\SanitizerExtension;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
@@ -99,7 +99,7 @@ class FormServiceProvider extends ServiceProvider
             $honeypot_config = $this->getConfig('form.honeypot', []);
             $extensions[] = new HoneyPotExtension($honeypot_config);
 
-            if($this->app->get('form.recaptcha.site_key') && $this->app->get('form.recaptcha.secret_key')) {
+            if ($this->app->get('form.recaptcha.site_key') && $this->app->get('form.recaptcha.secret_key')) {
                 $recaptcha_config = $this->getConfig('form.recaptcha', []);
                 $extensions[] = new RecaptchaExtension(
                     $this->app->get('form.recaptcha.site_key'),
@@ -111,7 +111,7 @@ class FormServiceProvider extends ServiceProvider
                 );
 
                 $form_themes = $this->app->get('form.form_themes');
-                array_unshift($form_themes, 'recaptcha3_widget.html.twig');
+                \array_unshift($form_themes, 'recaptcha3_widget.html.twig');
                 $this->app->bind('form.form_themes', $form_themes);
             }
 
@@ -122,15 +122,15 @@ class FormServiceProvider extends ServiceProvider
 
         $this->app->bind('form.form_themes', $this->getConfig('form.themes', []));
 
-        $this->app->singleton('form.recaptcha.site_key', function() {
+        $this->app->singleton('form.recaptcha.site_key', function () {
             return $this->getConfig('form.recaptcha.site_key', []);
         });
-        $this->app->singleton('form.recaptcha.secret_key', function() {
+        $this->app->singleton('form.recaptcha.secret_key', function () {
             return $this->getConfig('form.recaptcha.secret_key', []);
         });
 
-        $this->app->singleton('form.paths', function() {
-            return array_filter([
+        $this->app->singleton('form.paths', function () {
+            return \array_filter([
                 $this->getTwigBridgeFormPath(),
                 $this->app->get('form.recaptcha.site_key') && $this->app->get('form.recaptcha.secret_key') ? $this->getRecaptchaExtensionPath() : null,
             ]);
@@ -139,36 +139,6 @@ class FormServiceProvider extends ServiceProvider
 
     /**
      * Undocumented function
-     *
-     * @return string|null
-     */
-    protected function getRecaptchaExtensionPath(): ?string {
-        $recaptcha_reflection = new \ReflectionClass(RecaptchaExtension::class);
-        $filename = $recaptcha_reflection->getFileName();
-        if (!$filename) {
-            return null;
-        }
-        return dirname($filename) . '/views';
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return string|null
-     */
-    protected function getTwigBridgeFormPath(): ?string {
-        $app_variable_reflection = new \ReflectionClass('\Symfony\Bridge\Twig\AppVariable');
-        $filename = $app_variable_reflection->getFileName();
-        if (!$filename) {
-            return null;
-        }
-        return \dirname($filename) . '/Resources/views/Form';
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return void
      */
     public function boot()
     {
@@ -185,7 +155,7 @@ class FormServiceProvider extends ServiceProvider
      */
     public function addSymfonyFormThemePath(FilesystemLoader $loader): FilesystemLoader
     {
-        foreach($this->app->get('form.paths') as $path) {
+        foreach ($this->app->get('form.paths') as $path) {
             $loader->addPath($path);
         }
         return $loader;
@@ -196,7 +166,7 @@ class FormServiceProvider extends ServiceProvider
      */
     public function addTwigExtension(Environment $twig): Environment
     {
-        $form_themes = array_merge(['bootstrap_5_layout.html.twig'], $this->app->get('form.form_themes'));
+        $form_themes = \array_merge(['bootstrap_5_layout.html.twig'], $this->app->get('form.form_themes'));
 
         $formEngine = new TwigRendererEngine($form_themes, $twig);
         $twig->addRuntimeLoader(new FactoryRuntimeLoader([
@@ -210,5 +180,31 @@ class FormServiceProvider extends ServiceProvider
         }
 
         return $twig;
+    }
+
+    /**
+     * Undocumented function
+     */
+    protected function getRecaptchaExtensionPath(): ?string
+    {
+        $recaptcha_reflection = new \ReflectionClass(RecaptchaExtension::class);
+        $filename = $recaptcha_reflection->getFileName();
+        if (!$filename) {
+            return null;
+        }
+        return \dirname($filename) . '/views';
+    }
+
+    /**
+     * Undocumented function
+     */
+    protected function getTwigBridgeFormPath(): ?string
+    {
+        $app_variable_reflection = new \ReflectionClass('\Symfony\Bridge\Twig\AppVariable');
+        $filename = $app_variable_reflection->getFileName();
+        if (!$filename) {
+            return null;
+        }
+        return \dirname($filename) . '/Resources/views/Form';
     }
 }
