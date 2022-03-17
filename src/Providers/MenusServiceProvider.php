@@ -14,9 +14,8 @@ class MenusServiceProvider extends ServiceProvider
     public function boot()
     {
         \add_action('after_setup_theme', [$this, 'registerNavMenus']);
-        // \add_filter('timber/context', [$this, 'addMenusToContext']);
         \add_filter('timber/menu/class', [$this, 'setDefaultNavMenuClass'], 10, 2);
-        \add_filter('timber/menuitem/class', [$this, 'setDefaultNavMenuItemClass'], 10, 2);
+        \add_filter('timber/menuitem/class', [$this, 'setDefaultNavMenuItemClass'], 10, 3);
     }
 
     public function setDefaultNavMenuClass(string $class, WP_Term $term): string
@@ -24,8 +23,18 @@ class MenusServiceProvider extends ServiceProvider
         return $class === Menu::class ? NavMenu::class : $class;
     }
 
-    public function setDefaultNavMenuItemClass(string $class, WP_Post $post): string
+    public function setDefaultNavMenuItemClass(string $class, WP_Post $post, $menu): string
     {
+        /**
+         * Map in the shape of 'location' => 'class'
+         */
+        $menu_item_class_map = $this->getConfig('menus.menu_item_classes', []);
+        foreach($menu_item_class_map as $location => $item_class) {
+            if ($menu->theme_location === $location) {
+                return $item_class;
+            }
+        }
+
         return $class === MenuItem::class ? NavMenuItem::class : $class;
     }
 
@@ -40,27 +49,4 @@ class MenusServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Add menus to context
-     */
-    public function addMenusToContext(array $context): array
-    {
-        $menus = $this->app->get('config')->get('menus.menus');
-        $context['menus'] = !isset($context['menus']) ? [] : $context['menus'];
-
-        foreach (\array_keys($menus) as $location) {
-            if (!\has_nav_menu($location)) {
-                continue;
-            }
-            // $cache_key = 'menu_' . $location . '_' . $current_language;
-
-            if (isset($context['menus'][\str_replace('-', '_', $location)])) {
-                continue;
-            }
-
-            $context['menus'][\str_replace('-', '_', $location)] = new NavMenu($location);
-        }
-
-        return $context;
-    }
 }
