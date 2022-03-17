@@ -14,11 +14,13 @@
         "johnbillion/extended-cpts": "^5.0",
         "laminas/laminas-diactoros": "^2.4",
         "laminas/laminas-httphandlerrunner": "^2.1",
+        "league/html-to-markdown": "^5.1",
         "league/route": "^5.1",
         "middlewares/http-authentication": "^2.1",
         "middlewares/minifier": "^2.0",
         "middlewares/utils": "^3.3",
         "monolog/monolog": "^2.0",
+        "ocramius/proxy-manager": "^2.13",
         "oscarotero/middleland": "^1.0",
         "php-di/php-di": "^6.3.5",
         "piedweb/render-html-attributes": "^2.0",
@@ -53,8 +55,7 @@
         "timber/timber": "2.x-dev",
         "twig/cache-extra": "^3.3",
         "twig/html-extra": "^3.0",
-        "twig/string-extra": "^3.3",
-        "ocramius/proxy-manager": "^2.13"
+        "twig/string-extra": "^3.3"
     },
     "require-dev": {
         "antecedent/patchwork": "^2.1.8",

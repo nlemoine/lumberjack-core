@@ -4,21 +4,20 @@ namespace Rareloop\Lumberjack\Mailer\Transport;
 
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\RuntimeException;
-use Symfony\Component\Mailer\Header\MetadataHeader;
-use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MessageConverter;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use WP_Error;
 
 class WordPressTransport extends AbstractTransport
 {
     public function __toString(): string
     {
-        return '';
+        return 'wordpress://wp_mail';
     }
 
     /**
@@ -45,7 +44,24 @@ class WordPressTransport extends AbstractTransport
         $email_headers->remove('subject');
         $email_headers->addHeader('content-type', 'text/html');
 
+        $setTextPart = function ($phpmailer) use ($email) {
+            $phpmailer->AltBody = $email->getTextBody();
+        };
+        \add_action('phpmailer_init', $setTextPart);
+
+        $error = null;
+        $getErrors = function(WP_Error $send_error) use(&$error) {
+            $error = $send_error;
+        };
+        add_action('wp_mail_failed', $getErrors);
+
         $result = \wp_mail($email_to, $email_subject, $email_html, $email_headers->toArray());
+        if(!$result) {
+            $e = new TransportException(is_wp_error($error) ? $error->get_error_message() : 'Unknown error');
+            throw $e;
+        }
+
+        \remove_action('phpmailer_init', $setTextPart);
 
         $this->getLogger()->debug(\sprintf('Email transport "%s" stopped', __CLASS__));
     }
