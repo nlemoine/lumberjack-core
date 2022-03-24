@@ -6,6 +6,7 @@ use Laminas\Diactoros\ServerRequestFactory;
 use League\Route\Middleware\{MiddlewareAwareInterface, MiddlewareAwareTrait};
 use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
+use League\Route\Http\Exception\NotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\ServerRequest;
 
@@ -59,7 +60,7 @@ class RouterServiceProvider extends ServiceProvider
         $this->app->bind('request', $request);
         try {
             $response = $this->app->get('router')->dispatch($request);
-        } catch (\Exception $e) {
+        } catch (NotFoundException $e) {
             return;
         }
 
