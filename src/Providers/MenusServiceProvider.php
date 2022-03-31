@@ -29,7 +29,7 @@ class MenusServiceProvider extends ServiceProvider
          * Map in the shape of 'location' => 'class'
          */
         $menu_item_class_map = $this->getConfig('menus.menu_item_classes', []);
-        foreach($menu_item_class_map as $location => $item_class) {
+        foreach ($menu_item_class_map as $location => $item_class) {
             if ($menu->theme_location === $location) {
                 return $item_class;
             }
@@ -48,5 +48,4 @@ class MenusServiceProvider extends ServiceProvider
             \register_nav_menus($menus);
         }
     }
-
 }

@@ -3,10 +3,10 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Laminas\Diactoros\ServerRequestFactory;
+use League\Route\Http\Exception\NotFoundException;
 use League\Route\Middleware\{MiddlewareAwareInterface, MiddlewareAwareTrait};
 use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
-use League\Route\Http\Exception\NotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\ServerRequest;
 

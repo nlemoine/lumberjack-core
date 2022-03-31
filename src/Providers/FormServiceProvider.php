@@ -7,10 +7,12 @@ use Rareloop\Lumberjack\Form\Extension\InvalidFeedback\InvalidFeedbackExtension;
 use Rareloop\Lumberjack\Form\Extension\MagicQuotes\MagicQuotesExtension;
 use Rareloop\Lumberjack\Form\Extension\Recaptcha\RecaptchaExtension;
 use Rareloop\Lumberjack\Form\Extension\Sanitizer\SanitizerExtension;
+use Rareloop\Lumberjack\Form\FileUploader;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
+use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -89,6 +91,8 @@ class FormServiceProvider extends ServiceProvider
 
         $this->app->singleton('form.extensions', function () {
             $extensions = [];
+
+            $extensions[] = new HttpFoundationExtension();
             if ($this->app->has('validator')) {
                 $extensions[] = new ValidatorExtension($this->app->get('validator'));
             }
@@ -135,6 +139,15 @@ class FormServiceProvider extends ServiceProvider
                 $this->app->get('form.recaptcha.site_key') && $this->app->get('form.recaptcha.secret_key') ? $this->getRecaptchaExtensionPath() : null,
             ]);
         });
+
+        $this->app->singleton('form.uploader.target_directory', function () {
+            return $this->app->get('path.uploads');
+        });
+
+        $this->app->singleton(FileUploader::class, function () {
+            return new FileUploader($this->app->get('form.uploader.target_directory'));
+        });
+        $this->app->singleton('form.uploader', $this->app->get(FileUploader::class));
     }
 
     /**

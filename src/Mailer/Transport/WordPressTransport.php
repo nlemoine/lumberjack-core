@@ -4,13 +4,13 @@ namespace Rareloop\Lumberjack\Mailer\Transport;
 
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\RuntimeException;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\MessageConverter;
-use Symfony\Component\Mailer\Exception\TransportException;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use WP_Error;
 
 class WordPressTransport extends AbstractTransport
@@ -50,14 +50,14 @@ class WordPressTransport extends AbstractTransport
         \add_action('phpmailer_init', $setTextPart);
 
         $error = null;
-        $getErrors = function(WP_Error $send_error) use(&$error) {
+        $getErrors = function (WP_Error $send_error) use (&$error) {
             $error = $send_error;
         };
-        add_action('wp_mail_failed', $getErrors);
+        \add_action('wp_mail_failed', $getErrors);
 
         $result = \wp_mail($email_to, $email_subject, $email_html, $email_headers->toArray());
-        if(!$result) {
-            $e = new TransportException(is_wp_error($error) ? $error->get_error_message() : 'Unknown error');
+        if (!$result) {
+            $e = new TransportException(\is_wp_error($error) ? $error->get_error_message() : 'Unknown error');
             throw $e;
         }
 
@@ -90,5 +90,4 @@ class WordPressTransport extends AbstractTransport
 
         return $attachments;
     }
-
 }
