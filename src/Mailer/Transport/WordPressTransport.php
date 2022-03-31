@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Mailer\Transport;
 
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -28,6 +29,7 @@ class WordPressTransport extends AbstractTransport
         $this->getLogger()->debug(\sprintf('Email transport "%s" starting', __CLASS__));
 
         try {
+            /** @var Email $email */
             $email = MessageConverter::toEmail($message->getOriginalMessage());
         } catch (\Exception $e) {
             throw new RuntimeException(\sprintf('Unable to send message with the "%s" transport: ', __CLASS__) . $e->getMessage(), 0, $e);
@@ -44,6 +46,19 @@ class WordPressTransport extends AbstractTransport
         $email_headers->remove('subject');
         $email_headers->addHeader('content-type', 'text/html');
 
+        $email_array = $email->__serialize();
+        $email_class = \get_class($email);
+        $attachments = [];
+        if ($email_class === TemplatedEmail::class && isset($email_array[3][4])) {
+            $attachments = \array_map(function ($a) {
+                return $a['path'] ?? null;
+            }, $email_array[3][4]);
+        } elseif ($email_class === Email::class && isset($email_array[4])) {
+            $attachments = \array_map(function ($a) {
+                return $a['path'] ?? null;
+            }, $email_array[4][4]);
+        }
+
         $setTextPart = function ($phpmailer) use ($email) {
             $phpmailer->AltBody = $email->getTextBody();
         };
@@ -55,7 +70,7 @@ class WordPressTransport extends AbstractTransport
         };
         \add_action('wp_mail_failed', $getErrors);
 
-        $result = \wp_mail($email_to, $email_subject, $email_html, $email_headers->toArray());
+        $result = \wp_mail($email_to, $email_subject, $email_html, $email_headers->toArray(), $attachments);
         if (!$result) {
             $e = new TransportException(\is_wp_error($error) ? $error->get_error_message() : 'Unknown error');
             throw $e;

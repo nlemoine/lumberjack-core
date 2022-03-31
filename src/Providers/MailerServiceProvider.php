@@ -41,7 +41,7 @@ class MailerServiceProvider extends ServiceProvider
         // });
 
         // $this->app->singleton('app.mailer.subject_prefix', function () {
-        //     return '[Régilait] ';
+        //     return '[] ';
         // });
 
         // $this->app->singleton('app.mailer.renderer', function () {
