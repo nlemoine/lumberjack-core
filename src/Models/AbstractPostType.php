@@ -252,4 +252,8 @@ abstract class AbstractPostType extends Post
     {
         return Timber::get_posts($args);
     }
+
+    public function getTemplate(): ?string {
+        return $this->_wp_page_template ? $this->_wp_page_template : null;
+    }
 }
