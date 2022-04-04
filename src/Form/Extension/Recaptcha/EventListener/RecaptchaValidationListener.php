@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\HttpFoundation\Request;
+use ReCaptcha\RequestMethod\CurlPost;
 
 class RecaptchaValidationListener implements EventSubscriberInterface
 {
@@ -45,7 +46,7 @@ class RecaptchaValidationListener implements EventSubscriberInterface
             $data = $event->getData();
 
             $recaptchaToken = \is_string($data[$this->fieldName] ?? null) ? $data[$this->fieldName] : null;
-            $recaptcha = new ReCaptcha($this->secretKey);
+            $recaptcha = new ReCaptcha($this->secretKey, ini_get('allow_url_fopen') ? null : new CurlPost());
             $action_name = $form->getName() ?: \get_class($form->getConfig()->getType()->getInnerType());
 
             $request = Request::createFromGlobals();
