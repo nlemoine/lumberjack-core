@@ -6,13 +6,13 @@ use Rareloop\Lumberjack\Form\Extension\HoneyPot\HoneyPotExtension;
 use Rareloop\Lumberjack\Form\Extension\InvalidFeedback\InvalidFeedbackExtension;
 use Rareloop\Lumberjack\Form\Extension\MagicQuotes\MagicQuotesExtension;
 use Rareloop\Lumberjack\Form\Extension\Recaptcha\RecaptchaExtension;
+use Rareloop\Lumberjack\Form\Extension\RequestHandler\HttpExtension;
 use Rareloop\Lumberjack\Form\Extension\Sanitizer\SanitizerExtension;
 use Rareloop\Lumberjack\Form\FileUploader;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -92,7 +92,7 @@ class FormServiceProvider extends ServiceProvider
         $this->app->singleton('form.extensions', function () {
             $extensions = [];
 
-            $extensions[] = new HttpFoundationExtension();
+            $extensions[] = new HttpExtension();
             if ($this->app->has('validator')) {
                 $extensions[] = new ValidatorExtension($this->app->get('validator'));
             }

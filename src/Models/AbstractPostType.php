@@ -214,6 +214,11 @@ abstract class AbstractPostType extends Post
         return $posts[0];
     }
 
+    public function getTemplate(): ?string
+    {
+        return $this->_wp_page_template ? $this->_wp_page_template : null;
+    }
+
     /**
      * Return the config to use to register the post type with WordPress
      * Second parameter of the `register_post_type` function:
@@ -251,9 +256,5 @@ abstract class AbstractPostType extends Post
     private static function posts(array $args = [])
     {
         return Timber::get_posts($args);
-    }
-
-    public function getTemplate(): ?string {
-        return $this->_wp_page_template ? $this->_wp_page_template : null;
     }
 }

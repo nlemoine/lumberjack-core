@@ -3,13 +3,13 @@
 namespace Rareloop\Lumberjack\Form\Extension\Recaptcha\EventListener;
 
 use ReCaptcha\ReCaptcha;
+use ReCaptcha\RequestMethod\CurlPost;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\HttpFoundation\Request;
-use ReCaptcha\RequestMethod\CurlPost;
 
 class RecaptchaValidationListener implements EventSubscriberInterface
 {
@@ -46,7 +46,7 @@ class RecaptchaValidationListener implements EventSubscriberInterface
             $data = $event->getData();
 
             $recaptchaToken = \is_string($data[$this->fieldName] ?? null) ? $data[$this->fieldName] : null;
-            $recaptcha = new ReCaptcha($this->secretKey, ini_get('allow_url_fopen') ? null : new CurlPost());
+            $recaptcha = new ReCaptcha($this->secretKey, \ini_get('allow_url_fopen') ? null : new CurlPost());
             $action_name = $form->getName() ?: \get_class($form->getConfig()->getType()->getInnerType());
 
             $request = Request::createFromGlobals();
