@@ -122,9 +122,9 @@ abstract class AbstractController implements MiddlewareAwareInterface
      *
      * @param bool $relative
      */
-    protected function generateUrl(string $route, array $parameters = [], $relative = false): string
+    protected function generateUrl(string $route, array $parameters = [], bool $relative = true): string
     {
-        return $this->container->get('router.generator')->generateUrl($route, $parameters, $relative);
+        return $this->container->get('router')->generate($route, $parameters, $relative);
     }
 
     /**

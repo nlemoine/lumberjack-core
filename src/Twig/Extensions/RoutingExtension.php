@@ -2,7 +2,7 @@
 
 namespace Rareloop\Lumberjack\Twig\Extensions;
 
-use Rareloop\Router\Router;
+use Rareloop\Lumberjack\Router\Router;
 use Twig\Extension\AbstractExtension;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
@@ -18,26 +18,25 @@ final class RoutingExtension extends AbstractExtension
         $this->generator = $generator;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('url', [$this, 'getUrl'], [
-                'is_safe_callback' => [$this, 'isUrlGenerationSafe'],
-            ]),
-            new TwigFunction('path', [$this, 'getPath'], [
-                'is_safe_callback' => [$this, 'isUrlGenerationSafe'],
-            ]),
+            new TwigFunction('url', [$this, 'getUrl'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
+            new TwigFunction('path', [$this, 'getPath'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
         ];
     }
 
     public function getPath(string $name, array $parameters = []): string
     {
-        return $this->generator->generateUrl($name, $parameters);
+        return $this->generator->generate($name, $parameters);
     }
 
     public function getUrl(string $name, array $parameters = []): string
     {
-        return $this->generator->generateUrl($name, $parameters, false);
+        return $this->generator->generate($name, $parameters, false);
     }
 
     /**
@@ -69,8 +68,8 @@ final class RoutingExtension extends AbstractExtension
             $argsNode->hasNode(1) ? $argsNode->getNode(1) : null
         );
 
-        if ($paramsNode === null || $paramsNode instanceof ArrayExpression && \count($paramsNode) <= 2
-            && (!$paramsNode->hasNode(1) || $paramsNode->getNode(1) instanceof ConstantExpression)
+        if (null === $paramsNode || $paramsNode instanceof ArrayExpression && \count($paramsNode) <= 2 &&
+            (!$paramsNode->hasNode(1) || $paramsNode->getNode(1) instanceof ConstantExpression)
         ) {
             return ['html'];
         }

@@ -7,7 +7,6 @@ use Rareloop\Lumberjack\Config;
 use Rareloop\Lumberjack\Loader;
 use Rareloop\Lumberjack\Timber;
 use Rareloop\Lumberjack\Twig\Extensions\AssetExtension;
-use Rareloop\Lumberjack\Twig\Extensions\RoutingExtension;
 use Rareloop\Lumberjack\Twig\Extensions\SvgHelpersExtension;
 use Rareloop\Lumberjack\Twig\Extensions\TextHelpersExtension;
 use Symfony\Component\Asset\Packages;
@@ -130,10 +129,6 @@ class TimberServiceProvider extends ServiceProvider
         $twig->addExtension(new TextHelpersExtension());
         if ($this->has('slugger')) {
             $twig->addExtension(new StringExtension($this->get('slugger')));
-        }
-
-        if ($this->has('router.generator')) {
-            $twig->addExtension(new RoutingExtension($this->get('router.generator')));
         }
 
         if ($this->has(Packages::class)) {

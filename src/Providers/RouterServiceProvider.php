@@ -5,39 +5,27 @@ namespace Rareloop\Lumberjack\Providers;
 use Laminas\Diactoros\ServerRequestFactory;
 use League\Route\Http\Exception\NotFoundException;
 use League\Route\Middleware\{MiddlewareAwareInterface, MiddlewareAwareTrait};
-use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
 use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\ServerRequest;
+use Rareloop\Lumberjack\Router\Router;
+use Twig\Environment;
+use Rareloop\Lumberjack\Twig\Extensions\RoutingExtension;
 
 class RouterServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->singleton('router', function () {
+        $this->app->singleton(Router::class, function () {
             $strategy = new ApplicationStrategy();
             $strategy->setContainer($this->app);
             $router = new Router();
             $router->setStrategy($strategy);
             return $router;
         });
-
-        // $this->app->bind('router.generator', function () use ($router) {
-        //     $locale = $this->app->get('locale.short');
-        //     $base_url = $this->app->get('url.home');
-        //     $router::macro('generateUrl', function ($name, $arguments = [], $relative = false) use ($locale, $base_url) {
-        //         $route_name = $name . '_' . $locale;
-        //         if (!$this->has($route_name)) {
-        //             $route_name = $name;
-        //         }
-
-        //         $path = $this->url($route_name, $arguments = []);
-
-        //         return ($relative ? '' : \rtrim($base_url, '/')) . $path;
-        //     });
-
-        //     return $router;
-        // });
+        $this->app->singleton('router', function() {
+            return $this->app->get(Router::class);
+        });
     }
 
     public function boot()
@@ -53,6 +41,16 @@ class RouterServiceProvider extends ServiceProvider
 
             $this->processRequest($request);
         }, 1000); // Load after inpsyde/assets
+        \add_filter('timber/twig', [$this, 'addTwigExtension']);
+    }
+
+    /**
+     * Add the form extension to the Twig environment
+     */
+    public function addTwigExtension(Environment $twig): Environment
+    {
+        $twig->addExtension(new RoutingExtension($this->get('router')));
+        return $twig;
     }
 
     public function processRequest(ServerRequestInterface $request)
