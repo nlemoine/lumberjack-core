@@ -80,6 +80,7 @@ class SvgHelpersExtension extends AbstractExtension
         SVG;
 
         $svg = \str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $svg);
+        $symbol = \str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $symbol);
         if (!empty($attributes)) {
             $svg = \str_replace('<svg', \sprintf('<svg%s', $this->renderAttributes($attributes)), $svg);
         }
