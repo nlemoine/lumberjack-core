@@ -12,7 +12,6 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Rareloop\Lumberjack\Http\AbstractController;
 use Rareloop\Lumberjack\Http\ServerRequest;
-use Rareloop\Router\ResponseFactory;
 use function Symfony\Component\String\u;
 use WP_Query;
 

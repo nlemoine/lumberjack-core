@@ -4,7 +4,7 @@ namespace Rareloop\Lumberjack\Bootstrappers;
 
 use function DI\get;
 use Monolog\Handler\ErrorLogHandler;
-use Monolog\Handler\StreamHandler;
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Rareloop\Lumberjack\Application;
@@ -27,7 +27,7 @@ class RegisterLogger
         if ($this->shouldUseErrorLogHandler()) {
             $handler = new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, $this->getLogLevel());
         } else {
-            $handler = new StreamHandler($this->getLogsPath(), $this->getLogLevel());
+            $handler = new RotatingFileHandler($this->getLogsPath(), 0, $this->getLogLevel());
         }
 
         $logger->pushHandler($handler);

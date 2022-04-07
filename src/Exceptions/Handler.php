@@ -10,7 +10,6 @@ use Rareloop\Lumberjack\Application;
 use Rareloop\Lumberjack\Config;
 use Rareloop\Lumberjack\Contracts\ExceptionHandler;
 use Rareloop\Lumberjack\Http\Responses\TimberResponse;
-use Rareloop\Router\Responsable;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -27,10 +26,6 @@ class Handler implements ExceptionHandler
 
     public function render(ServerRequestInterface $request, Throwable $exception): ResponseInterface
     {
-        if ($exception instanceof Responsable) {
-            return $exception->toResponse($request);
-        }
-
         return $this->prepareResponse($request, $exception);
     }
 
