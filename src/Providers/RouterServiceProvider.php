@@ -9,8 +9,8 @@ use League\Route\Strategy\ApplicationStrategy;
 use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\ServerRequest;
 use Rareloop\Lumberjack\Router\Router;
-use Twig\Environment;
 use Rareloop\Lumberjack\Twig\Extensions\RoutingExtension;
+use Twig\Environment;
 
 class RouterServiceProvider extends ServiceProvider
 {
@@ -23,7 +23,7 @@ class RouterServiceProvider extends ServiceProvider
             $router->setStrategy($strategy);
             return $router;
         });
-        $this->app->singleton('router', function() {
+        $this->app->singleton('router', function () {
             return $this->app->get(Router::class);
         });
     }

@@ -18,14 +18,16 @@ final class RoutingExtension extends AbstractExtension
         $this->generator = $generator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('url', [$this, 'getUrl'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
-            new TwigFunction('path', [$this, 'getPath'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
+            new TwigFunction('url', [$this, 'getUrl'], [
+                'is_safe_callback' => [$this, 'isUrlGenerationSafe'],
+            ]),
+            new TwigFunction('path', [$this, 'getPath'], [
+                'is_safe_callback' => [$this, 'isUrlGenerationSafe'],
+            ]),
         ];
     }
 
@@ -68,7 +70,7 @@ final class RoutingExtension extends AbstractExtension
             $argsNode->hasNode(1) ? $argsNode->getNode(1) : null
         );
 
-        if (null === $paramsNode || $paramsNode instanceof ArrayExpression && \count($paramsNode) <= 2 &&
+        if ($paramsNode === null || $paramsNode instanceof ArrayExpression && \count($paramsNode) <= 2 &&
             (!$paramsNode->hasNode(1) || $paramsNode->getNode(1) instanceof ConstantExpression)
         ) {
             return ['html'];

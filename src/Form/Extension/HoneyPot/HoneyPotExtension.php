@@ -14,7 +14,7 @@ class HoneyPotExtension extends AbstractExtension
         $this->defaults = $defaults;
     }
 
-    protected function loadTypeExtensions()
+    protected function loadTypeExtensions(): array
     {
         return [
             new FormTypeHoneyPotExtension($this->defaults),

@@ -7,7 +7,7 @@ use Symfony\Component\Form\AbstractExtension;
 
 class SanitizerExtension extends AbstractExtension
 {
-    protected function loadTypeExtensions()
+    protected function loadTypeExtensions(): array
     {
         return [
             new FormTypeSanitizerExtension(),

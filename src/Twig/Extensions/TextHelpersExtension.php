@@ -8,7 +8,7 @@ use Twig\TwigFilter;
 
 final class TextHelpersExtension extends AbstractExtension
 {
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('bisect', [TextHelpers::class, 'bisect'], [

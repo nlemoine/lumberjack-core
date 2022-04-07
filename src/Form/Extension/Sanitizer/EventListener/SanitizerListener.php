@@ -2,7 +2,6 @@
 
 namespace Rareloop\Lumberjack\Form\Extension\Sanitizer\EventListener;
 
-use Rareloop\Lumberjack\Form\FileUploadType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -14,10 +13,8 @@ class SanitizerListener implements EventSubscriberInterface
 {
     /**
      * Setup the list of events for the form.
-     *
-     * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SUBMIT => 'onSubmission',
@@ -75,7 +72,6 @@ class SanitizerListener implements EventSubscriberInterface
 
                         break;
 
-                    case FileUploadType::class:
                     case FileType::class:
                         $sanitized[$field->getName()] = $data[$field->getName()];
 

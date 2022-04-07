@@ -18,7 +18,7 @@ class SvgHelpersExtension extends AbstractExtension
         $this->package = $package;
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('inline_svg', [$this, 'inlineSvg'], [

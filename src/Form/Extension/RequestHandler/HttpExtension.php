@@ -7,7 +7,7 @@ use Symfony\Component\Form\Extension\HttpFoundation\Type;
 
 class HttpExtension extends AbstractExtension
 {
-    protected function loadTypeExtensions()
+    protected function loadTypeExtensions(): array
     {
         return [
             new Type\FormTypeHttpFoundationExtension(new HttpRequestHandler()),

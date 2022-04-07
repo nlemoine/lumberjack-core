@@ -119,8 +119,6 @@ abstract class AbstractController implements MiddlewareAwareInterface
 
     /**
      * Generate URL.
-     *
-     * @param bool $relative
      */
     protected function generateUrl(string $route, array $parameters = [], bool $relative = true): string
     {

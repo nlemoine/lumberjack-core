@@ -35,7 +35,7 @@ class RecaptchaExtension extends AbstractExtension
         $this->errorMessage = $errorMessage ?? 'Error validating recaptcha';
     }
 
-    protected function loadTypeExtensions()
+    protected function loadTypeExtensions(): array
     {
         return [
             new FormTypeRecaptchaExtension(
