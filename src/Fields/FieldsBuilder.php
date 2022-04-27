@@ -10,7 +10,7 @@ class FieldsBuilder extends AcfBuilderFieldsBuilder
     {
         $config = $this->build();
         unset($config['location']);
-        return \json_encode($config);
+        return \json_encode($config, JSON_THROW_ON_ERROR);
     }
 
     public function insertFields($fields, int $index)
