@@ -208,6 +208,6 @@ abstract class AbstractTerm extends TimberTerm
      */
     private static function terms($args = [])
     {
-        return Timber::get_terms($args, [], static::class);
+        return Timber::get_terms($args);
     }
 }

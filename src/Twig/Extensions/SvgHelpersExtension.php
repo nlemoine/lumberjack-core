@@ -56,11 +56,22 @@ class SvgHelpersExtension extends AbstractExtension
             }
             $attrs = [];
 
-            \preg_match('@viewBox="([^"]+)"@', $svg, $matches);
-            if (isset($matches[1]) && empty($attributes['viewBox'])) {
-                $attrs['viewBox'] = $matches[1];
-                $attributes = \array_merge($attributes, $attrs);
+            if (false !== strpos($svg, 'preserveAspectRatio=')) {
+                \preg_match('@preserveAspectRatio="([^"]+)"@', $svg, $matches);
+                if (isset($matches[1]) && empty($attributes['preserveAspectRatio'])) {
+                    $attrs['preserveAspectRatio'] = $matches[1];
+                    $attributes = \array_merge($attributes, $attrs);
+                }
             }
+
+            if (false !== strpos($svg, 'viewBox=')) {
+                \preg_match('@viewBox="([^"]+)"@', $svg, $matches);
+                if (isset($matches[1]) && empty($attributes['viewBox'])) {
+                    $attrs['viewBox'] = $matches[1];
+                    $attributes = \array_merge($attributes, $attrs);
+                }
+            }
+
             $this->rendered[$svg_path]['attributes'] = $attrs;
             $this->rendered[$svg_path]['once'] = $args['renderOnce'];
 
@@ -69,6 +80,9 @@ class SvgHelpersExtension extends AbstractExtension
             $symbol .= ' id="' . $svg_id . '"';
             if (isset($attrs['viewBox'])) {
                 $symbol .= ' viewBox="' . $attrs['viewBox'] . '"';
+            }
+            if (isset($attrs['preserveAspectRatio'])) {
+                $symbol .= ' preserveAspectRatio="' . $attrs['preserveAspectRatio'] . '"';
             }
             $symbol .= '>';
             $symbol = \preg_replace("/<svg[^>]*?(\/?)>/si", $symbol, $svg);
