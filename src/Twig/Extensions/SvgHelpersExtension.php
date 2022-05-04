@@ -56,7 +56,7 @@ class SvgHelpersExtension extends AbstractExtension
             }
             $attrs = [];
 
-            if (false !== strpos($svg, 'preserveAspectRatio=')) {
+            if (\strpos($svg, 'preserveAspectRatio=') !== false) {
                 \preg_match('@preserveAspectRatio="([^"]+)"@', $svg, $matches);
                 if (isset($matches[1]) && empty($attributes['preserveAspectRatio'])) {
                     $attrs['preserveAspectRatio'] = $matches[1];
@@ -64,7 +64,7 @@ class SvgHelpersExtension extends AbstractExtension
                 }
             }
 
-            if (false !== strpos($svg, 'viewBox=')) {
+            if (\strpos($svg, 'viewBox=') !== false) {
                 \preg_match('@viewBox="([^"]+)"@', $svg, $matches);
                 if (isset($matches[1]) && empty($attributes['viewBox'])) {
                     $attrs['viewBox'] = $matches[1];

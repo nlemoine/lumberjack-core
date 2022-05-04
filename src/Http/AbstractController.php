@@ -118,6 +118,16 @@ abstract class AbstractController implements MiddlewareAwareInterface
     }
 
     /**
+     * Gets a container service by its id.
+     *
+     * @return object The service
+     */
+    protected function has(string $id)
+    {
+        return $this->container->has($id);
+    }
+
+    /**
      * Generate URL.
      */
     protected function generateUrl(string $route, array $parameters = [], bool $relative = true): string

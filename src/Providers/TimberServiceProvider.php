@@ -5,11 +5,11 @@ namespace Rareloop\Lumberjack\Providers;
 use PiedWeb\RenderAttributes\TwigExtension as RenderAttributesExtension;
 use Rareloop\Lumberjack\Config;
 use Rareloop\Lumberjack\Loader;
+use Rareloop\Lumberjack\Models;
 use Rareloop\Lumberjack\Timber;
 use Rareloop\Lumberjack\Twig\Extensions\AssetExtension;
 use Rareloop\Lumberjack\Twig\Extensions\SvgHelpersExtension;
 use Rareloop\Lumberjack\Twig\Extensions\TextHelpersExtension;
-use Rareloop\Lumberjack\Models;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Timber\Timber as TimberCore;
@@ -61,11 +61,9 @@ class TimberServiceProvider extends ServiceProvider
 
     /**
      * Set default classmap for post
-     *
-     * @param array $classmap
-     * @return array
      */
-    public function setDefaultPostClassmap(array $classmap): array {
+    public function setDefaultPostClassmap(array $classmap): array
+    {
         return \array_merge($classmap, [
             'post' => Models\Post::class,
             'page' => Models\Page::class,

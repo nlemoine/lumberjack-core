@@ -106,7 +106,7 @@ abstract class AbstractPostType extends Post
                     return false;
                 }
                 // Remove comments rules
-                if (!in_array('comments', $config['supports'] ?? [], true) && \strpos($regex, $wp_rewrite->comments_pagination_base) !== false) {
+                if (!\in_array('comments', $config['supports'] ?? [], true) && \strpos($regex, $wp_rewrite->comments_pagination_base) !== false) {
                     return false;
                 }
                 return true;
