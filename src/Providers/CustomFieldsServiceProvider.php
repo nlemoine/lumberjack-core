@@ -12,6 +12,8 @@ use Rareloop\Lumberjack\Models\AbstractTerm;
 use Rareloop\Lumberjack\Models\NavMenuItem;
 use Rareloop\Lumberjack\Template\AbstractTemplate;
 use Rareloop\Lumberjack\Template\FrontPage;
+use StoutLogic\AcfBuilder\FieldBuilder;
+use StoutLogic\AcfBuilder\TabBuilder;
 
 class CustomFieldsServiceProvider extends ServiceProvider
 {
@@ -44,6 +46,8 @@ class CustomFieldsServiceProvider extends ServiceProvider
     {
         $classes = $this->getClasses();
 
+        $isMultiLanguage = \function_exists('PLL');
+
         $groups = [];
         foreach ($classes as $class) {
             $fields = $class::getCustomFields();
@@ -63,8 +67,10 @@ class CustomFieldsServiceProvider extends ServiceProvider
                 $order[$group_position] = isset($order[$group_position]) ? $order[$group_position] + 10 : 0;
                 $f->setGroupConfig('menu_order', $order[$group_position]);
 
+                // TODO: merge location
                 $location = $this->getFieldsLocation($class);
-                if (!$location) {
+                $locationConfig = $location;
+                if (!$location && !$f->getLocation()) {
                     continue;
                 }
 
@@ -75,7 +81,17 @@ class CustomFieldsServiceProvider extends ServiceProvider
                     $field_location->or(...$location);
                     continue;
                 }
-                $f->setLocation(...$location);
+
+                // Field has a location
+                if (!$f->getLocation()) {
+                    $f->setLocation(...$location);
+                }
+
+                // Localize options fields if they are translatable and Polylang is active
+                if ($isMultiLanguage && isset($locationConfig[0]) && $locationConfig[0] === 'options_page') {
+                    $f = $this->localizeFields($f);
+                }
+
                 $this->configureFields($f);
                 $groups[$field_hash] = $f;
             }
@@ -185,88 +201,122 @@ class CustomFieldsServiceProvider extends ServiceProvider
     //     return $fields;
     // }
 
-    // /**
-    //  * Localize fields
-    //  */
-    // private function localizeFields(FieldsBuilder $fields): FieldsBuilder
-    // {
-    //     // Return fields if Polylang isn't there
-    //     if (!\function_exists('pll_the_languages')) {
-    //         return $fields;
-    //     }
+    /**
+     * Localize fields
+     */
+    private function localizeFields(FieldsBuilder $builder): FieldsBuilder
+    {
+        // Return fields if Polylang isn't there
+        if (!\function_exists('pll_the_languages')) {
+            return $builder;
+        }
 
-    //     // Avoid expensive queries on front end
-    //     if (\is_admin()) {
-    //         $languages = \PLL()->model->get_languages_list();
-    //     } else {
-    //         $languages = \pll_languages_list();
-    //         $languages = \array_map(function ($lang) {
-    //             $obj = new \stdClass();
-    //             $obj->slug = $lang;
+        // return $builder;
+        // Avoid expensive queries on front end
+        if (\is_admin()) {
+            $languages = \PLL()->model->get_languages_list();
+        } else {
+            $languages = \pll_languages_list();
+            $languages = \array_map(function ($lang) {
+                $obj = new \stdClass();
+                $obj->slug = $lang;
 
-    //             return $obj;
-    //         }, $languages);
-    //     }
+                return $obj;
+            }, $languages);
+        }
 
-    //     // No languages
-    //     if (empty($languages)) {
-    //         return $fields;
-    //     }
+        // No languages
+        if (empty($languages)) {
+            return $builder;
+        }
 
-    //     // Create a new field set & filter i18n fields
-    //     $fields_i18n = new FieldsBuilder('');
-    //     foreach ($fields->getFields() as $field) {
-    //         $acf_field_config = $field->build();
-    //         if (isset($acf_field_config['i18n']) && $acf_field_config['i18n']) {
-    //             $fields_i18n->addFields([$field]);
-    //         }
-    //     }
+        // Get fields
+        $fields = $builder->getFields();
 
-    //     // No i18n fields
-    //     if (empty($fields_i18n->getFields())) {
-    //         return $fields;
-    //     }
+        // Get fields needing translation
+        $fields_needing_translations = array_filter($fields, function ($field) {
+            return $field->getConfig()['translate'] ?? false;
+        });
 
-    //     // Store original fields keys
-    //     $keys = \array_map(function ($field) {
-    //         return $field->getName();
-    //     }, $fields_i18n->getFields());
+        // No fields to translate
+        if(empty($fields_needing_translations)) {
+            return $builder;
+        }
 
-    //     $current_lang = \pll_current_language();
+        // Get current & default language
+        $current_lang = \pll_current_language();
+        $default_language = pll_default_language();
 
-    //     // Add fields for each lang
-    //     foreach ($languages as $lang) {
-    //         // Only register the field for the current lang field on front end
-    //         if (!\is_admin() && $current_lang !== $lang->slug) {
-    //             continue;
-    //         }
+        $remove = [];
 
-    //         // Only add tabs when on admin
-    //         if (\is_admin()) {
-    //             $fields
-    //                 ->addTab($lang->slug)
-    //                 ->setLabel(\sprintf('%s %s', $lang->flag, $lang->name))
-    //             ;
-    //         }
+        foreach ($fields as $k => $field) {
 
-    //         foreach ($fields_i18n->getFields() as $field) {
-    //             // Modify field name
-    //             $new_field = clone $field;
-    //             $new_field->setConfig('name', \sprintf('%s_%s', $field->getName(), $lang->slug));
-    //             $new_field->setKey($new_field->getName());
+            $needs_translation = $field->getConfig()['translate'] ?? false;
+            if(!$needs_translation) {
+                continue;
+            }
 
-    //             // Create a new builder
-    //             $new_builder = new FieldsBuilder('');
-    //             $new_builder->addFields([$new_field]);
-    //             $fields->addFields($new_builder);
-    //         }
-    //     }
+            // $next_field_is_translatable = isset($fields[$k + 1]) ? $fields[$k + 1]->getConfig()['translate'] ?? false : false;
+            // $previous_field_is_translatable = isset($fields[$k - 1]) ? $fields[$k - 1]->getConfig()['translate'] ?? false : false;
 
-    //     // Remove original fields
-    //     foreach ($keys as $key) {
-    //         $fields->removeField($key);
-    //     }
+            $field_name = $field->getName();
+            $field_index = $builder->getFieldIndex($field_name);
+            $field_label = $field->getConfig()['label'] ?? null;
 
-    //     return $fields;
-    // }
+            foreach ($languages as $lang) {
+
+                if (is_admin()) {
+                    $label = sprintf('<img src="%s" /> %s', $lang->flag_url, $field_label);
+                    if ($default_language === $lang->slug) {
+                        // !$previous_field_is_translatable && $builder->insertField($tab, $field_index);
+                        $field->setLabel($label);
+                    }
+
+                //     $tab_key = sprintf('tab_%s_%s', $lang->slug, $k);
+                //     $tab = new TabBuilder($tab_key, 'tab', [
+                //         'label' => $lang->name,
+                //     ]);
+
+                //     $tab_break = new TabBuilder(sprintf('tab_break_%s', $k), 'tab', [
+                //         'label' => '',
+                //         'endpoint' => true,
+                //     ]);
+                }
+
+                // // Clone & create new field for each language
+                if (
+                    (is_admin() && $default_language !== $lang->slug)
+                    || (!is_admin() && $current_lang === $lang->slug && $current_lang !== $default_language)
+                ) {
+                    $translated_key = $default_language === $lang->slug ? $field_name : \sprintf('%s_%s', $field_name, $lang->slug);
+                    $translated_field = clone $field;
+                    $translated_field->setConfig('name', $translated_key);
+                    $translated_field->setKey($translated_field->getName());
+                    $translated_field->setParentContext($builder);
+                    if (is_admin()) {
+                        $translated_field->setLabel($label);
+                    }
+                    $field_index = $builder->getFieldIndex($field_name);
+                    $builder->insertField($translated_field, $field_index + 1);
+                    // if (is_admin()) {
+                    //     $translated_index = $builder->getFieldIndex($translated_key);
+                    //     $tab->endpoint();
+                    //     !$previous_field_is_translatable && $builder->insertField($tab, $translated_index);
+                    //     $tab->removeEndpoint();
+                    // }
+                }
+
+                // if(is_admin() && !$next_field_is_translatable && $default_language !== $lang->slug) {
+                //     // $builder->insertField($tab_break, $translated_index + 2);
+                // }
+
+                // Only register the field for the current lang field on front end
+                if (!\is_admin() && $current_lang !== $default_language && $current_lang !== $lang->slug) {
+                    $remove[] = $field_name;
+                }
+            }
+        }
+
+        return $builder;
+    }
 }
