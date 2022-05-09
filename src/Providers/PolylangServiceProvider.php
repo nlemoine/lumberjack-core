@@ -25,10 +25,6 @@ class PolylangServiceProvider extends ServiceProvider
             return $value;
         }
 
-        if (!\function_exists('PLL')) {
-            return $value;
-        }
-
         if ($post_id !== 'options') {
             return $value;
         }
@@ -47,6 +43,7 @@ class PolylangServiceProvider extends ServiceProvider
             return $value;
         }
 
+        // Translate field
         $field['key'] = $field['key'] . '_' . $current_language;
         $field['name'] = $field['name'] . '_' . $current_language;
         $field['_name'] = $field['_name'] . '_' . $current_language;
