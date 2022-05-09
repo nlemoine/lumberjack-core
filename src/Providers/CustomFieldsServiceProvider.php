@@ -12,7 +12,6 @@ use Rareloop\Lumberjack\Models\AbstractTerm;
 use Rareloop\Lumberjack\Models\NavMenuItem;
 use Rareloop\Lumberjack\Template\AbstractTemplate;
 use Rareloop\Lumberjack\Template\FrontPage;
-use StoutLogic\AcfBuilder\FieldBuilder;
 use StoutLogic\AcfBuilder\TabBuilder;
 
 class CustomFieldsServiceProvider extends ServiceProvider
@@ -187,7 +186,7 @@ class CustomFieldsServiceProvider extends ServiceProvider
     // /**
     //  * Merge fields locations
     //  *
-    //  * @param [type] $fields
+    //  * @param [type] $builder
     //  */
     // private function mergeFieldsLocations(FieldsBuilder $fields, array $condition)
     // {
@@ -234,25 +233,24 @@ class CustomFieldsServiceProvider extends ServiceProvider
         $fields = $builder->getFields();
 
         // Get fields needing translation
-        $fields_needing_translations = array_filter($fields, function ($field) {
+        $fields_needing_translations = \array_filter($fields, function ($field) {
             return $field->getConfig()['translate'] ?? false;
         });
 
         // No fields to translate
-        if(empty($fields_needing_translations)) {
+        if (empty($fields_needing_translations)) {
             return $builder;
         }
 
         // Get current & default language
         $current_lang = \pll_current_language();
-        $default_language = pll_default_language();
+        $default_language = \pll_default_language();
 
         $remove = [];
 
         foreach ($fields as $k => $field) {
-
             $needs_translation = $field->getConfig()['translate'] ?? false;
-            if(!$needs_translation) {
+            if (!$needs_translation) {
                 continue;
             }
 
@@ -264,15 +262,14 @@ class CustomFieldsServiceProvider extends ServiceProvider
             $field_label = $field->getConfig()['label'] ?? null;
 
             foreach ($languages as $lang) {
-
-                if (is_admin()) {
-                    $label = sprintf('<img src="%s" /> %s', $lang->flag_url, $field_label);
+                if (\is_admin()) {
+                    $label = \sprintf('<img src="%s" /> %s', $lang->flag_url, $field_label);
                     if ($default_language === $lang->slug) {
                         // !$previous_field_is_translatable && $builder->insertField($tab, $field_index);
                         $field->setLabel($label);
                     }
 
-                //     $tab_key = sprintf('tab_%s_%s', $lang->slug, $k);
+                    //     $tab_key = sprintf('tab_%s_%s', $lang->slug, $k);
                 //     $tab = new TabBuilder($tab_key, 'tab', [
                 //         'label' => $lang->name,
                 //     ]);
@@ -285,15 +282,15 @@ class CustomFieldsServiceProvider extends ServiceProvider
 
                 // // Clone & create new field for each language
                 if (
-                    (is_admin() && $default_language !== $lang->slug)
-                    || (!is_admin() && $current_lang === $lang->slug && $current_lang !== $default_language)
+                    (\is_admin() && $default_language !== $lang->slug)
+                    || (!\is_admin() && $current_lang === $lang->slug && $current_lang !== $default_language)
                 ) {
                     $translated_key = $default_language === $lang->slug ? $field_name : \sprintf('%s_%s', $field_name, $lang->slug);
                     $translated_field = clone $field;
                     $translated_field->setConfig('name', $translated_key);
                     $translated_field->setKey($translated_field->getName());
                     $translated_field->setParentContext($builder);
-                    if (is_admin()) {
+                    if (\is_admin()) {
                         $translated_field->setLabel($label);
                     }
                     $field_index = $builder->getFieldIndex($field_name);

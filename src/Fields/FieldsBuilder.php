@@ -2,8 +2,8 @@
 
 namespace Rareloop\Lumberjack\Fields;
 
-use StoutLogic\AcfBuilder\FieldsBuilder as AcfBuilderFieldsBuilder;
 use StoutLogic\AcfBuilder\FieldBuilder;
+use StoutLogic\AcfBuilder\FieldsBuilder as AcfBuilderFieldsBuilder;
 
 class FieldsBuilder extends AcfBuilderFieldsBuilder
 {

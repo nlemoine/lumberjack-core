@@ -16,6 +16,47 @@ class PolylangServiceProvider extends ServiceProvider
 
         \add_filter('pll_get_post_types', [$this, 'registerPostTypes'], 10, 2);
         \add_filter('pll_get_taxonomies', [$this, 'registerTaxonomies'], 10, 2);
+        \add_filter('acf/load_value', [$this, 'loadTranslatedOption'], 10, 3);
+    }
+
+    public function loadTranslatedOption($value, $post_id, $field)
+    {
+        if (\is_admin()) {
+            return $value;
+        }
+
+        if (!\function_exists('PLL')) {
+            return $value;
+        }
+
+        if ($post_id !== 'options') {
+            return $value;
+        }
+
+        if (!isset($field['translate'])) {
+            return $value;
+        }
+
+        if (!$field['translate']) {
+            return $value;
+        }
+
+        $default_language = \pll_default_language();
+        $current_language = \pll_current_language();
+        if ($current_language === $default_language) {
+            return $value;
+        }
+
+        $field['key'] = $field['key'] . '_' . $current_language;
+        $field['name'] = $field['name'] . '_' . $current_language;
+        $field['_name'] = $field['_name'] . '_' . $current_language;
+
+        // Avoid infinite loop
+        \remove_filter('acf/load_value', [$this, 'loadTranslatedOption'], 10);
+        $value = \acf_get_value($post_id, $field);
+        \add_filter('acf/load_value', [$this, 'loadTranslatedOption'], 10, 3);
+
+        return $value;
     }
 
     /**
