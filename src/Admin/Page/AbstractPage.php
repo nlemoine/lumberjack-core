@@ -2,6 +2,9 @@
 
 namespace Rareloop\Lumberjack\Admin\Page;
 
+use Laminas\Diactoros\ServerRequestFactory;
+use Rareloop\Lumberjack\Http\ServerRequest;
+
 use function Symfony\Component\String\u;
 
 abstract class AbstractPage
@@ -22,7 +25,9 @@ abstract class AbstractPage
             }
             /** @var string $hook */
             $hook = \call_user_func_array($add_page_fn, $config);
-            \add_action(\sprintf('load-%s', $hook), [static::class, 'controller']);
+            \add_action(\sprintf('load-%s', $hook), function() {
+                return call_user_func_array([static::class, 'controller'], [ServerRequest::fromRequest(ServerRequestFactory::fromGlobals())]);
+            });
         }, 100);
     }
 
@@ -95,8 +100,14 @@ abstract class AbstractPage
         ];
     }
 
-    protected static function getUrl(): string
+    public static function getUrl($query = null, array $escOptions = []): string
     {
-        return \menu_page_url(static::getPageSlug(), false);
+        $url = menu_page_url(static::getPageSlug(), false);
+
+        if ($query) {
+            $url .= '&' . (is_array($query) ? http_build_query($query) : (string) $query);
+        }
+
+        return esc_url($url, ...$escOptions);
     }
 }
