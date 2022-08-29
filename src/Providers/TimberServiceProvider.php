@@ -144,9 +144,7 @@ class TimberServiceProvider extends ServiceProvider
         $twig->addExtension(new HtmlExtension());
         $twig->addExtension(new RenderAttributesExtension());
         $twig->addExtension(new TextHelpersExtension());
-        if ($this->has('slugger')) {
-            $twig->addExtension(new StringExtension($this->get('slugger')));
-        }
+        $twig->addExtension(new StringExtension($this->has('slugger') ? $this->get('slugger') : null));
 
         if ($this->has(Packages::class)) {
             $packages = $this->get(Packages::class);
