@@ -76,4 +76,9 @@ class FieldsBuilder extends AcfBuilderFieldsBuilder
     {
         return $this->initializeField(new FlexibleContentBuilder($name, 'flexible_content', $args));
     }
+
+    public function addGroup($name, array $args = [])
+    {
+        return $this->initializeField(new GroupBuilder($name, 'group', $args));
+    }
 }
