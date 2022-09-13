@@ -16,13 +16,14 @@ class FieldsBuilder extends AcfBuilderFieldsBuilder
 
     public function addFields($fields)
     {
-        if ($fields instanceof self) {
-            $builder = clone $fields;
-            $fields = $builder->getFields();
+        if ($fields instanceof FieldBuilder) {
+            $fields->setParentContext($this);
+            $fields = [$fields];
         }
 
-        if ($fields instanceof FieldBuilder) {
-            $fields = [$fields];
+        if ($fields instanceof FieldsBuilder) {
+            $builder = clone $fields;
+            $fields = $builder->getFields();
         }
 
         foreach ($fields as $field) {
