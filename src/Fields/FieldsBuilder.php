@@ -81,4 +81,9 @@ class FieldsBuilder extends AcfBuilderFieldsBuilder
     {
         return $this->initializeField(new GroupBuilder($name, 'group', $args));
     }
+
+    public function addRepeater($name, array $args = [])
+    {
+        return $this->initializeField(new RepeaterBuilder($name, 'repeater', $args));
+    }
 }
