@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Fields;
 
+use StoutLogic\AcfBuilder\ConditionalBuilder;
 use StoutLogic\AcfBuilder\FieldBuilder;
 use StoutLogic\AcfBuilder\FieldsBuilder as AcfBuilderFieldsBuilder;
 
@@ -16,6 +17,10 @@ class FieldsBuilder extends AcfBuilderFieldsBuilder
 
     public function addFields($fields)
     {
+        if ($fields instanceof ConditionalBuilder) {
+            $fields = $fields->getParentContext($this);
+        }
+
         if ($fields instanceof FieldBuilder) {
             $fields->setParentContext($this);
             $fields = [$fields];
@@ -65,5 +70,10 @@ class FieldsBuilder extends AcfBuilderFieldsBuilder
     public function getFieldIndex(string $name): int
     {
         return $this->getFieldManager()->getFieldIndex($name);
+    }
+
+    public function addFlexibleContent($name, array $args = [])
+    {
+        return $this->initializeField(new FlexibleContentBuilder($name, 'flexible_content', $args));
     }
 }
