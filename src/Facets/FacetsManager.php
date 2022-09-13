@@ -57,9 +57,6 @@ class FacetsManager
         }
     }
 
-    /**
-     * Get facets
-     */
     public function getFacets(): array
     {
         if (empty($this->facets)) {

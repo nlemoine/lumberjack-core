@@ -6,7 +6,7 @@ use Brain\Hierarchy\Finder\ByCallback;
 use Brain\Hierarchy\Hierarchy;
 use Brain\Hierarchy\QueryTemplate;
 use Laminas\Diactoros\ServerRequestFactory;
-use League\Route\Middleware\{MiddlewareAwareInterface, MiddlewareAwareTrait};
+use League\Route\Middleware\MiddlewareAwareInterface;
 use Middleland\Dispatcher;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;

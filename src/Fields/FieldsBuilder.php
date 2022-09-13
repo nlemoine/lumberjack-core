@@ -14,6 +14,24 @@ class FieldsBuilder extends AcfBuilderFieldsBuilder
         return \json_encode($config, JSON_THROW_ON_ERROR);
     }
 
+    public function addFields($fields)
+    {
+        if ($fields instanceof self) {
+            $builder = clone $fields;
+            $fields = $builder->getFields();
+        }
+
+        if ($fields instanceof FieldBuilder) {
+            $fields = [$fields];
+        }
+
+        foreach ($fields as $field) {
+            $this->getFieldManager()->pushField($field);
+        }
+
+        return $this;
+    }
+
     public function unshiftFields($fields)
     {
         return $this->insertFields($fields, 0);

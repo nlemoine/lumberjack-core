@@ -46,48 +46,27 @@ abstract class AbstractFacet
         $this->wpdb = $GLOBALS['wpdb'];
     }
 
-    /**
-     * Get key
-     */
     abstract public function getKey(): string;
 
-    /**
-     * Get name
-     */
     abstract public function getName(): ?string;
 
-    /**
-     * Get type
-     */
     abstract public function getType(): string;
 
-    /**
-     * Get label
-     */
     public function getLabel(): ?string
     {
         return $this->label;
     }
 
-    /**
-     * Get label all
-     */
     public function getLabelAll(): ?string
     {
         return $this->labelAll;
     }
 
-    /**
-     * Get value
-     */
     public function getCurrentValue()
     {
         return \get_query_var($this->getName()) ?: null;
     }
 
-    /**
-     * Get items
-     */
     public function getItems(): array
     {
         if ($this->items === null) {
@@ -137,9 +116,6 @@ abstract class AbstractFacet
         return '';
     }
 
-    /**
-     * Set query
-     */
     public function setQuery(WP_Query $query): void
     {
         $this->query = $query;

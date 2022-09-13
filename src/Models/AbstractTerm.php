@@ -66,7 +66,7 @@ abstract class AbstractTerm extends TimberTerm
         }
 
         if (empty($config) && !\in_array($taxonomy, \get_taxonomies([
-            'public' => true,
+            'public'   => true,
             '_builtin' => true,
         ]), true)) {
             throw new TaxonomyRegistrationException('Config not set');

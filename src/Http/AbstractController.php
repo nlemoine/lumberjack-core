@@ -3,7 +3,8 @@
 namespace Rareloop\Lumberjack\Http;
 
 use Laminas\Diactoros\Response\JsonResponse;
-use League\Route\Middleware\{MiddlewareAwareInterface, MiddlewareAwareTrait};
+use League\Route\Middleware\MiddlewareAwareInterface;
+use League\Route\Middleware\MiddlewareAwareTrait;
 use Middlewares\Minifier;
 use Psr\Container\ContainerInterface;
 use Psr\Link\LinkInterface;

@@ -149,32 +149,32 @@ class CustomFieldsServiceProvider extends ServiceProvider
                 return ['post_type', '==', $class::getPostType()];
                 break;
 
-            // template
+                // template
             case \is_subclass_of($class, AbstractTemplate::class):
                 return ['page_template', '==', \sprintf('%s.php', $class::getTemplate())];
                 break;
 
-            // static template
+                // static template
             case \is_subclass_of($class, FrontPage::class):
                 return ['page_type', '==', 'front_page'];
                 break;
 
-            // taxonomy
+                // taxonomy
             case \is_subclass_of($class, AbstractTerm::class):
                 return ['taxonomy', '==', $class::getTaxonomy()];
                 break;
 
-            // nav menu item
+                // nav menu item
             case \is_subclass_of($class, NavMenuItem::class) && \method_exists($class, 'getCustomFieldsLocation'):
                 return ['nav_menu_item', '==', $class::getCustomFieldsLocation()];
                 break;
 
-            // option
+                // option
             case \is_subclass_of($class, AbstractAcfOptionPage::class):
                 return ['options_page', '==', $class::getPageSlug()];
                 break;
 
-            // block
+                // block
             case \is_subclass_of($class, AbstractAcfBlock::class):
                 return ['block', '==', 'acf/' . $class::getName()];
                 break;
@@ -229,7 +229,6 @@ class CustomFieldsServiceProvider extends ServiceProvider
             return $builder;
         }
 
-        // Get fields
         $fields = $builder->getFields();
 
         // Get fields needing translation
@@ -270,14 +269,14 @@ class CustomFieldsServiceProvider extends ServiceProvider
                     }
 
                     //     $tab_key = sprintf('tab_%s_%s', $lang->slug, $k);
-                //     $tab = new TabBuilder($tab_key, 'tab', [
-                //         'label' => $lang->name,
-                //     ]);
+                    //     $tab = new TabBuilder($tab_key, 'tab', [
+                    //         'label' => $lang->name,
+                    //     ]);
 
-                //     $tab_break = new TabBuilder(sprintf('tab_break_%s', $k), 'tab', [
-                //         'label' => '',
-                //         'endpoint' => true,
-                //     ]);
+                    //     $tab_break = new TabBuilder(sprintf('tab_break_%s', $k), 'tab', [
+                    //         'label' => '',
+                    //         'endpoint' => true,
+                    //     ]);
                 }
 
                 // // Clone & create new field for each language

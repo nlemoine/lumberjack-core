@@ -67,7 +67,7 @@ abstract class AbstractPostType extends Post
 
         if (empty($config) && !\in_array($postType, \get_post_types([
             '_builtin' => true,
-            'public' => true,
+            'public'   => true,
         ]), true)) {
             throw new PostTypeRegistrationException('Config not set');
         }

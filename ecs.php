@@ -1,40 +1,38 @@
 <?php
 
-declare(strict_types=1);
-
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symplify\EasyCodingStandard\ValueObject\Option;
+use PhpCsFixer\Fixer\ArrayNotation\ArraySyntaxFixer;
+use Symplify\EasyCodingStandard\Config\ECSConfig;
 use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use PhpCsFixer\Fixer\Strict\DeclareStrictTypesFixer;
+use PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer;
+use PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer;
+use Symplify\CodingStandard\Fixer\Commenting\RemoveUselessDefaultCommentFixer;
+use PhpCsFixer\Fixer\FunctionNotation\NativeFunctionInvocationFixer;
 
-return static function (ContainerConfigurator $containerConfigurator): void {
+return static function (ECSConfig $ecsConfig): void {
+    $ecsConfig->parallel();
 
-    $parameters = $containerConfigurator->parameters();
-    $parameters->set(Option::PATHS, [__DIR__ . '/src', __DIR__ . '/tests']);
+    $ecsConfig->paths([__DIR__ . '/src', __DIR__ . '/tests']);
 
-    $containerConfigurator->import(SetList::COMMON);
-    $containerConfigurator->import(SetList::PSR_12);
-    $containerConfigurator->import(SetList::CLEAN_CODE);
+    $ecsConfig->sets([SetList::COMMON, SetList::PSR_12, SetList::CLEAN_CODE]);
 
-    $services = $containerConfigurator->services();
-    $services->set(\PhpCsFixer\Fixer\ArrayNotation\ArraySyntaxFixer::class)
-        ->call('configure', [[
-            'syntax' => 'short',
-        ]]);
+    $ecsConfig->ruleWithConfiguration(ArraySyntaxFixer::class, [
+        'syntax' => 'short',
+    ]);
+    $ecsConfig->ruleWithConfiguration(NativeFunctionInvocationFixer::class, [
+        'include' => [
+            '@all',
+        ],
+        'scope' => 'namespaced'
+    ]);
+    $ecsConfig->ruleWithConfiguration(BinaryOperatorSpacesFixer::class, [
+        'operators' => ['=>' => 'align_single_space'],
+    ]);
 
-    $services->set(\PhpCsFixer\Fixer\FunctionNotation\NativeFunctionInvocationFixer::class)
-        ->call('configure', [[
-            'include' => [
-                '@all',
-            ],
-            'scope' => 'namespaced'
-        ]]);
-
-    $services->set(\PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class)
-        ->call('configure', [[
-            'operators' => ['=>' => 'align_single_space'],
-        ]]);
-
-    $services->remove(\PhpCsFixer\Fixer\Strict\DeclareStrictTypesFixer::class);
-    $services->remove(\PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer::class);
-    $services->remove(\Symplify\CodingStandard\Fixer\Commenting\RemoveUselessDefaultCommentFixer::class);
+    $ecsConfig->skip([
+        DeclareStrictTypesFixer::class => null,
+        NotOperatorWithSuccessorSpaceFixer::class => null,
+        RemoveUselessDefaultCommentFixer::class => null,
+    ]);
 };

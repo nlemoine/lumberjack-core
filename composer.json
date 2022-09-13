@@ -55,7 +55,7 @@
         "timber/timber": "2.x-dev",
         "twig/cache-extra": "^3.3",
         "twig/html-extra": "^3.0",
-        "twig/string-extra": "^3.3"
+        "twig/string-extra": "^3.4"
     },
     "require-dev": {
         "antecedent/patchwork": "^2.1.8",
@@ -67,7 +67,7 @@
         "php-mock/php-mock": "^2.0",
         "phpstan/extension-installer": "^1.1",
         "phpunit/phpunit": "^9.0",
-        "symplify/easy-coding-standard": "^10.0",
+        "symplify/easy-coding-standard": "^11.0",
         "szepeviktor/phpstan-wordpress": "^1.0"
     },
     "autoload": {
