@@ -2,6 +2,8 @@
 
 namespace Rareloop\Lumberjack\Fields;
 
-class RepeaterBuilder extends GroupBuilder
+use StoutLogic\AcfBuilder\RepeaterBuilder as AcfRepeaterBuilder;
+
+class RepeaterBuilder extends AcfRepeaterBuilder
 {
 }
