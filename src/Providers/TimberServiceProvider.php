@@ -16,6 +16,7 @@ use Timber\Timber as TimberCore;
 use Twig\Environment;
 use Twig\Extra\Html\HtmlExtension;
 use Twig\Extra\String\StringExtension;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class TimberServiceProvider extends ServiceProvider
 {
@@ -33,9 +34,10 @@ class TimberServiceProvider extends ServiceProvider
             return $this->app->get('twig');
         });
 
-        $this->app->singleton('slugger', function () {
+        $this->app->singleton(SluggerInterface::class, function () {
             return new AsciiSlugger($this->app->get('locale'));
         });
+        $this->app->singleton('slugger', $this->app->get(SluggerInterface::class));
     }
 
     public function boot(Config $config)
@@ -144,7 +146,7 @@ class TimberServiceProvider extends ServiceProvider
         $twig->addExtension(new HtmlExtension());
         $twig->addExtension(new RenderAttributesExtension());
         $twig->addExtension(new TextHelpersExtension());
-        $twig->addExtension(new StringExtension($this->has('slugger') ? $this->get('slugger') : null));
+        $twig->addExtension(new StringExtension($this->has(SluggerInterface::class) ? $this->get(SluggerInterface::class) : null));
 
         if ($this->has(Packages::class)) {
             $packages = $this->get(Packages::class);
