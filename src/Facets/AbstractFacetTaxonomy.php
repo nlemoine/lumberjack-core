@@ -38,13 +38,11 @@ abstract class AbstractFacetTaxonomy extends AbstractFacet
             ];
         }
 
-        if (\is_array($this->currentValue)) {
-            $tax_query[] = $this->currentValue;
-        }
         $tax_query[] = [
             'taxonomy' => $this->key,
             'field'    => 'slug',
-            'terms'    => $this->currentValue,
+            'terms'    => (array) $this->currentValue,
+            'operator' => $this->getMode() === self::MODE_EXCLUDE ? 'NOT IN' : 'IN',
         ];
 
         $query->set('tax_query', $tax_query);

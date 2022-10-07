@@ -2,8 +2,6 @@
 
 namespace Rareloop\Lumberjack\Facets;
 
-use Doctrine\SqlFormatter\NullHighlighter;
-use Doctrine\SqlFormatter\SqlFormatter;
 use WP_Query;
 
 abstract class AbstractFacet
@@ -13,6 +11,9 @@ abstract class AbstractFacet
     public const TYPE_META = 'meta';
 
     public const TYPE_COLUMN = 'column';
+
+    public const MODE_EXCLUDE = 'exclude';
+    public const MODE_INCLUDE = 'include';
 
     public ?WP_Query $query = null;
 
@@ -27,6 +28,8 @@ abstract class AbstractFacet
     protected string $type;
 
     protected ?array $items = null;
+
+    protected string $mode = self::MODE_INCLUDE;
 
     protected $currentValue = null;
 
@@ -43,6 +46,7 @@ abstract class AbstractFacet
         $this->label = $this->getLabel();
         $this->labelAll = $this->getLabelAll();
         $this->currentValue = $this->getCurrentValue();
+        $this->mode = $this->getMode();
         $this->wpdb = $GLOBALS['wpdb'];
     }
 
@@ -51,6 +55,10 @@ abstract class AbstractFacet
     abstract public function getName(): ?string;
 
     abstract public function getType(): string;
+
+    public function getMode(): string {
+        return $this->mode;
+    }
 
     public function getLabel(): ?string
     {
@@ -101,8 +109,6 @@ abstract class AbstractFacet
     public function setPostsRequest(string $request): string
     {
         $items = $this->wpdb->get_results($request);
-        // \dump((new SqlFormatter(new NullHighlighter()))->format($request));
-
         foreach ($items as $item) {
             if (\is_array($this->currentValue)) {
                 $item->current = \in_array($item->value, $this->currentValue, true);
