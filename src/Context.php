@@ -35,19 +35,21 @@ class Context extends \ArrayObject
                 });
             }
         };
-        $this->acfOption = new class() {
-            public function __call($name, $args)
-            {
-                return $this->__get($name);
-            }
+        if (\function_exists('get_field')) {
+            $this->acfOption = new class() {
+                public function __call($name, $args)
+                {
+                    return $this->__get($name);
+                }
 
-            public function __get(string $name)
-            {
-                return \once(function () use ($name) {
-                    return \get_field($name, 'option');
-                });
-            }
-        };
+                public function __get(string $name)
+                {
+                    return \once(function () use ($name) {
+                        return \get_field($name, 'option');
+                    });
+                }
+            };
+        }
         $this->menu = new class() {
             public function __call($location, $args)
             {
