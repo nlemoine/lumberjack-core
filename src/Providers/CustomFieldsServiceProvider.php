@@ -11,6 +11,7 @@ use Rareloop\Lumberjack\Models\AbstractPostType;
 use Rareloop\Lumberjack\Models\AbstractTerm;
 use Rareloop\Lumberjack\Models\NavMenuItem;
 use Rareloop\Lumberjack\Models\Attachment;
+use Rareloop\Lumberjack\Models\User;
 use Rareloop\Lumberjack\Template\AbstractTemplate;
 use Rareloop\Lumberjack\Template\FrontPage;
 use StoutLogic\AcfBuilder\TabBuilder;
@@ -183,6 +184,11 @@ class CustomFieldsServiceProvider extends ServiceProvider
                 // block
             case \is_subclass_of($class, AbstractAcfBlock::class):
                 return ['block', '==', 'acf/' . $class::getName()];
+                break;
+
+            // user
+            case \is_subclass_of($class, User::class):
+                return ['user_form', '==', 'all'];
                 break;
         }
 
