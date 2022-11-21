@@ -10,6 +10,7 @@ use Rareloop\Lumberjack\Fields\FieldsBuilder;
 use Rareloop\Lumberjack\Models\AbstractPostType;
 use Rareloop\Lumberjack\Models\AbstractTerm;
 use Rareloop\Lumberjack\Models\NavMenuItem;
+use Rareloop\Lumberjack\Models\Attachment;
 use Rareloop\Lumberjack\Template\AbstractTemplate;
 use Rareloop\Lumberjack\Template\FrontPage;
 use StoutLogic\AcfBuilder\TabBuilder;
@@ -144,6 +145,11 @@ class CustomFieldsServiceProvider extends ServiceProvider
     private function getFieldsLocation($class): ?array
     {
         switch (true) {
+            // attachment
+            case \is_subclass_of($class, Attachment::class):
+                return ['attachment', '==', 'all'];
+                break;
+
             // post type
             case \is_subclass_of($class, AbstractPostType::class):
                 return ['post_type', '==', $class::getPostType()];
