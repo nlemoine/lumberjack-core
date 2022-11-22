@@ -117,10 +117,10 @@ abstract class AbstractPostType extends Post
 
         \add_filter('timber/post/classmap', function ($post_class) use ($postType) {
             return \array_merge(
+                (array) $post_class,
                 [
                     $postType => static::class,
                 ],
-                (array) $post_class
             );
         });
 
