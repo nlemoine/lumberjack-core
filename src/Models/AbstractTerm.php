@@ -95,10 +95,10 @@ abstract class AbstractTerm extends TimberTerm
 
         \add_filter('timber/term/classmap', function ($term_class) use ($taxonomy) {
             return \array_merge(
+                (array) $term_class,
                 [
                     $taxonomy => static::class,
                 ],
-                (array) $term_class
             );
         });
 
