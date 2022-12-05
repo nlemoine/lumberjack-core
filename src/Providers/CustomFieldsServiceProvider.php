@@ -114,6 +114,7 @@ class CustomFieldsServiceProvider extends ServiceProvider
             (array) $config->get('templates', []),
             (array) $config->get('fields', []),
             (array) $config->get('blocks', []),
+            (array) $config->get('menus.menu_item_classes', []),
         );
 
         return \array_values(\array_filter($classes, [$this, 'filterFieldsAwareClasses']));
@@ -172,8 +173,11 @@ class CustomFieldsServiceProvider extends ServiceProvider
                 break;
 
                 // nav menu item
-            case \is_subclass_of($class, NavMenuItem::class) && \method_exists($class, 'getCustomFieldsLocation'):
-                return ['nav_menu_item', '==', $class::getCustomFieldsLocation()];
+            case \is_subclass_of($class, NavMenuItem::class):
+                if(\method_exists($class, 'getCustomFieldsLocation')) {
+                    return ['nav_menu_item', '==', $class::getCustomFieldsLocation()];
+                }
+                return ['nav_menu_item', '==', 'all'];
                 break;
 
                 // option
