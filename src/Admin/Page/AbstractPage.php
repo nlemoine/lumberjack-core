@@ -25,14 +25,25 @@ abstract class AbstractPage
             }
             /** @var string $hook */
             $hook = \call_user_func_array($add_page_fn, $config);
-            \add_action(\sprintf('load-%s', $hook), function() {
-                return call_user_func_array([static::class, 'controller'], [ServerRequest::fromRequest(ServerRequestFactory::fromGlobals())]);
+            \add_action(\sprintf('load-%s', $hook), function () {
+                return \call_user_func_array([static::class, 'controller'], [ServerRequest::fromRequest(ServerRequestFactory::fromGlobals())]);
             });
         }, 100);
     }
 
     public static function render(): void
     {
+    }
+
+    public static function getUrl($query = null, array $escOptions = []): string
+    {
+        $url = \menu_page_url(static::getPageSlug(), false);
+
+        if ($query) {
+            $url .= '&' . (\is_array($query) ? \http_build_query($query) : (string) $query);
+        }
+
+        return \esc_url($url, ...$escOptions);
     }
 
     protected static function getConfigRaw(): array
@@ -98,16 +109,5 @@ abstract class AbstractPage
             'icon_url'   => '',
             'position'   => null,
         ];
-    }
-
-    public static function getUrl($query = null, array $escOptions = []): string
-    {
-        $url = menu_page_url(static::getPageSlug(), false);
-
-        if ($query) {
-            $url .= '&' . (is_array($query) ? http_build_query($query) : (string) $query);
-        }
-
-        return esc_url($url, ...$escOptions);
     }
 }

@@ -12,11 +12,11 @@ use Rareloop\Lumberjack\Twig\Extensions\SvgHelpersExtension;
 use Rareloop\Lumberjack\Twig\Extensions\TextHelpersExtension;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Timber\Timber as TimberCore;
 use Twig\Environment;
 use Twig\Extra\Html\HtmlExtension;
 use Twig\Extra\String\StringExtension;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class TimberServiceProvider extends ServiceProvider
 {

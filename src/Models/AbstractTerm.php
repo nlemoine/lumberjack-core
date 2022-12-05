@@ -149,7 +149,6 @@ abstract class AbstractTerm extends TimberTerm
      * arguments that mean we're selecting the right taxonomy type
      *
      * @param  array $args standard WP_Term_Query array
-     * @return
      */
     public static function query($args = null)
     {
@@ -204,7 +203,6 @@ abstract class AbstractTerm extends TimberTerm
      * and casts the returning data in instances of ourself.
      *
      * @param  array $args standard WP_Query array
-     * @return
      */
     private static function terms($args = [])
     {

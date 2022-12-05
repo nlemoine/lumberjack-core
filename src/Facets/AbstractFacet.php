@@ -13,6 +13,7 @@ abstract class AbstractFacet
     public const TYPE_COLUMN = 'column';
 
     public const MODE_EXCLUDE = 'exclude';
+
     public const MODE_INCLUDE = 'include';
 
     public ?WP_Query $query = null;
@@ -56,7 +57,8 @@ abstract class AbstractFacet
 
     abstract public function getType(): string;
 
-    public function getMode(): string {
+    public function getMode(): string
+    {
         return $this->mode;
     }
 

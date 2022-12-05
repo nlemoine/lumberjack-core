@@ -21,7 +21,7 @@ class RepeaterBuilder extends GroupBuilder
     {
         parent::__construct($name, $type, $config);
 
-        if (!array_key_exists('button_label', $config)) {
+        if (!\array_key_exists('button_label', $config)) {
             $this->setConfig('button_label', $this->getDefaultButtonLabel());
         }
     }
@@ -33,14 +33,14 @@ class RepeaterBuilder extends GroupBuilder
     public function build()
     {
         $config = parent::build();
-        if (array_key_exists('collapsed', $config)) {
+        if (\array_key_exists('collapsed', $config)) {
             $collapseField = $this->fieldsBuilder->getField($config['collapsed']);
             $fieldKey = $collapseField->getKey();
             if ($collapseField->hasCustomKey()) {
                 $config['collapsed'] = $fieldKey;
                 $config['_has_custom_collapsed_key'] = true;
             } else {
-                $fieldKey = preg_replace('/^field_/', '', $fieldKey);
+                $fieldKey = \preg_replace('/^field_/', '', $fieldKey);
                 $config['collapsed'] = $this->getName() . '_' . $fieldKey;
             }
         }
@@ -56,9 +56,7 @@ class RepeaterBuilder extends GroupBuilder
         return $this->getParentContext();
     }
 
-    /**
-     * @inheritdoc
-     */
+
     public function end()
     {
         return $this->endRepeater();

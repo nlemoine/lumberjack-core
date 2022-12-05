@@ -9,8 +9,8 @@ use Rareloop\Lumberjack\Contracts\HasAcfFields;
 use Rareloop\Lumberjack\Fields\FieldsBuilder;
 use Rareloop\Lumberjack\Models\AbstractPostType;
 use Rareloop\Lumberjack\Models\AbstractTerm;
-use Rareloop\Lumberjack\Models\NavMenuItem;
 use Rareloop\Lumberjack\Models\Attachment;
+use Rareloop\Lumberjack\Models\NavMenuItem;
 use Rareloop\Lumberjack\Models\User;
 use Rareloop\Lumberjack\Template\AbstractTemplate;
 use Rareloop\Lumberjack\Template\FrontPage;
@@ -151,7 +151,7 @@ class CustomFieldsServiceProvider extends ServiceProvider
                 return ['attachment', '==', 'all'];
                 break;
 
-            // post type
+                // post type
             case \is_subclass_of($class, AbstractPostType::class):
                 return ['post_type', '==', $class::getPostType()];
                 break;
@@ -186,7 +186,7 @@ class CustomFieldsServiceProvider extends ServiceProvider
                 return ['block', '==', 'acf/' . $class::getName()];
                 break;
 
-            // user
+                // user
             case \is_subclass_of($class, User::class):
                 return ['user_form', '==', 'all'];
                 break;

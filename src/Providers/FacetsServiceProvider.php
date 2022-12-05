@@ -19,23 +19,23 @@ class FacetsServiceProvider extends ServiceProvider
             return;
         }
 
-        if (!$query->is_archive && empty($query->is_page_for_custom_post_type) ) {
+        if (!$query->is_archive && empty($query->is_page_for_custom_post_type)) {
             return;
         }
 
-        $facets = array_filter(array_map(function(string $facetClass): AbstractFacet {
+        $facets = \array_filter(\array_map(function (string $facetClass): AbstractFacet {
             return new $facetClass();
-        }, $this->getConfig('facets', [])), function($facet) {
+        }, $this->getConfig('facets', [])), function ($facet) {
             return $facet->getMode() === AbstractFacet::MODE_EXCLUDE;
         });
 
-        if(empty($facets)) {
+        if (empty($facets)) {
             return;
         }
 
-        foreach($facets as $facet) {
+        foreach ($facets as $facet) {
             if ($facet->getType() === AbstractFacet::TYPE_TAXONOMY && $query->get($facet->getName())) {
-                if(empty($query->tax_query)) {
+                if (empty($query->tax_query)) {
                     continue;
                 }
                 $this->handleTaxonomyExclusion($query, $facet);
@@ -43,9 +43,10 @@ class FacetsServiceProvider extends ServiceProvider
         }
     }
 
-    protected function handleTaxonomyExclusion(WP_Query &$query, AbstractFacetTaxonomy $facet): void {
-        foreach($query->tax_query->queries as $key => $q) {
-            if(isset($q['taxonomy']) && $q['taxonomy'] === $facet->getKey()) {
+    protected function handleTaxonomyExclusion(WP_Query &$query, AbstractFacetTaxonomy $facet): void
+    {
+        foreach ($query->tax_query->queries as $key => $q) {
+            if (isset($q['taxonomy']) && $q['taxonomy'] === $facet->getKey()) {
                 $query->tax_query->queries[$key]['operator'] = 'NOT IN';
             }
         }

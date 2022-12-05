@@ -26,7 +26,7 @@ class FieldsBuilder extends AcfBuilderFieldsBuilder
             $fields = [$fields];
         }
 
-        if ($fields instanceof FieldsBuilder) {
+        if ($fields instanceof self) {
             $builder = clone $fields;
             $fields = $builder->getFields();
         }

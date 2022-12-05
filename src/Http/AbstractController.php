@@ -95,6 +95,18 @@ abstract class AbstractController implements MiddlewareAwareInterface
     }
 
     /**
+     * Returns a RedirectResponse to the given URL.
+     */
+    protected function redirectSafe(string $url, int $status = 302): RedirectResponse
+    {
+        $url = \wp_sanitize_redirect($url);
+
+        $url = \wp_validate_redirect($url, \apply_filters('wp_safe_redirect_fallback', \admin_url(), $status));
+
+        return new RedirectResponse($url, $status);
+    }
+
+    /**
      * Add flash message.
      *
      * @param string $message

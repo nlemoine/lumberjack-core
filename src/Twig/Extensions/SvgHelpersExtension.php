@@ -2,7 +2,7 @@
 
 namespace Rareloop\Lumberjack\Twig\Extensions;
 
-use Rareloop\Lumberjack\Helpers\ImageHelpers;
+use Rareloop\Lumberjack\Helpers\ImageRuntime;
 use Symfony\Component\Asset\PathPackage;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -24,7 +24,7 @@ class SvgHelpersExtension extends AbstractExtension
             new TwigFunction('inline_svg', [$this, 'inlineSvg'], [
                 'is_safe' => ['html'],
             ]),
-            new TwigFunction('svg_placeholder', [ImageHelpers::class, 'getSvgPlaceholder']),
+            new TwigFunction('svg_placeholder', [ImageRuntime::class, 'getSvgPlaceholder']),
         ];
     }
 
@@ -75,7 +75,7 @@ class SvgHelpersExtension extends AbstractExtension
             $this->rendered[$svg_path]['attributes'] = $attrs;
             $this->rendered[$svg_path]['once'] = $args['renderOnce'];
 
-            $symbol = '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">';
+            $symbol = '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="display:none">';
             $symbol .= '<symbol';
             $symbol .= ' id="' . $svg_id . '"';
             if (isset($attrs['viewBox'])) {
