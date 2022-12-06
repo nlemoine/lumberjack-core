@@ -8,28 +8,43 @@ abstract class AbstractAcfOptionPage extends AbstractPage
 {
     public static function register(): void
     {
-        if (!\function_exists('acf_add_options_page')) {
+        if (!function_exists('acf_add_options_page')) {
             return;
         }
 
-        $config = static::getConfigRaw();
+        add_action('acf/init', array(static::class, 'addAcfOptionPage'));
+    }
 
-        \add_action('acf/init', function () use ($config) {
-            $is_top_level_page = empty($config['parent_slug']);
-            if ($is_top_level_page) {
-                $hook = \acf_add_options_page($config);
-            } else {
-                $hook = \acf_add_options_sub_page($config);
-            }
-        });
+    public static function addAcfOptionPage() {
+        $config = static::getConfig();
+        $addPageFn = 'acf_add_options_page';
+        if (!empty($config['parent_slug'])) {
+            $addPageFn = 'acf_add_options_sub_page';
+        }
+        $addPageFn($config);
+    }
+
+    /**
+     * @see https://www.advancedcustomfields.com/resources/acf_add_options_page/
+     *
+     * @return array
+     */
+    protected static function getConfigKeys(): array {
+        return array_merge(parent::getConfigKeys(), array(
+            'redirect',
+            'post_id',
+            'autoload',
+            'update_button',
+            'updated_message',
+        ));
     }
 
     protected static function getDefaultConfig(): array
     {
         return \array_merge(parent::getDefaultConfig(), [
-            'autoload'        => true,
-            'update_button'   => \__('Save'),
-            'updated_message' => \__('Saved'),
+            'autoload'        => false,
+            'update_button'   => __('Save'),
+            'updated_message' => __('Saved'),
         ]);
     }
 }
