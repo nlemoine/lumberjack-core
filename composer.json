@@ -6,7 +6,6 @@
         "php": ">=7.1.0",
         "blast/facades": "^1.0",
         "brain/hierarchy": "^3.0",
-        "deliciousbrains/wp-migrations": "^2.0",
         "gajus/dindent": "dev-master",
         "google/recaptcha": "^1.2",
         "inpsyde/assets": "^2.8",
