@@ -75,7 +75,7 @@ class SvgHelpersExtension extends AbstractExtension
             $this->rendered[$svg_path]['attributes'] = $attrs;
             $this->rendered[$svg_path]['once'] = $args['renderOnce'];
 
-            $symbol = '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="display:none">';
+            $symbol = '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">';
             $symbol .= '<symbol';
             $symbol .= ' id="' . $svg_id . '"';
             if (isset($attrs['viewBox'])) {
