@@ -8,7 +8,6 @@ class BudEntrypointsLoader extends EncoreEntrypointsLoader
 {
     protected function parseData(array $data, string $resource): array
     {
-
         $directory = trailingslashit(dirname($resource));
         /** @var array{css:string[], js:string[]} $data */
         $data = is_array($data) ? $data : [];
@@ -24,4 +23,13 @@ class BudEntrypointsLoader extends EncoreEntrypointsLoader
 
         return $assets;
     }
+
+    public function loadPoint($resource, string $handle): array
+    {
+        $assets = $this->load($resource);
+        return array_values(array_filter($assets, function ($asset) use ($handle) {
+            return $asset->handle() === $handle;
+        }));
+    }
+
 }
