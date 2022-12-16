@@ -21,8 +21,8 @@ class SessionServiceProvider extends ServiceProvider
             ];
         });
 
-        $this->app->singleton(SessionStorageInterface::class, \DI\create(NativeSessionStorage::class)->constructor(\DI\get('session.options'))->lazy());
-        $this->app->singleton(SessionInterface::class, \DI\create(Session::class)->constructor(\DI\get(SessionStorageInterface::class))->lazy());
+        $this->app->singleton(SessionStorageInterface::class, \DI\create(NativeSessionStorage::class)->constructor(\DI\get('session.options')));
+        $this->app->singleton(SessionInterface::class, \DI\create(Session::class)->constructor(\DI\get(SessionStorageInterface::class)));
         $this->app->singleton('session', $this->app->get(SessionInterface::class));
     }
 }
