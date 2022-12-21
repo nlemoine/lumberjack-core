@@ -174,7 +174,7 @@ class CustomFieldsServiceProvider extends ServiceProvider
 
                 // nav menu item
             case \is_subclass_of($class, NavMenuItem::class):
-                if(\method_exists($class, 'getCustomFieldsLocation')) {
+                if (\method_exists($class, 'getCustomFieldsLocation')) {
                     return ['nav_menu_item', '==', $class::getCustomFieldsLocation()];
                 }
                 return ['nav_menu_item', '==', 'all'];

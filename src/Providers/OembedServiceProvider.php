@@ -9,9 +9,31 @@ class OembedServiceProvider extends ServiceProvider
 {
     public function boot()
     {
+        $GLOBALS['wp_embed']->usecache = false;
         \add_filter('oembed_dataparse', [$this, 'saveOembedData'], 10, 3);
         \add_filter('embed_oembed_html', [$this, 'wrapEmbed'], 10, 4);
         \add_filter('oembed_providers', [$this, 'filterProviders']);
+        \add_filter('oembed_ttl', [$this, 'setOembedTtl'], 10, 3);
+        \add_filter('embed_oembed_discover', [$this, 'setOembedDiscovery']);
+    }
+
+    public function setOembedDiscovery(bool $discover): bool
+    {
+        return (bool) $this->getConfig('oembed.allow_discovery', $discover);
+    }
+
+    /**
+     * Set oEmbed time to live
+     *
+     * @param string $url
+     * @param array $attr
+     * @param int $postId
+     * @return int
+     */
+    public function setOembedTtl($url, $attr, $postId)
+    {
+        // Set to 0 for debugging, will fetch the oembed data on every request
+        return 0;
     }
 
     /**
@@ -21,12 +43,39 @@ class OembedServiceProvider extends ServiceProvider
      */
     public function saveOembedData(string $html, $data, string $url): string
     {
+        // Not in a shortcode embed context
+        // if (!$this->wasCalledFromShortcode) {
+        //     return $html;
+        // }
+
+        $cacheKey = $this->getCacheKey($url);
+
         $post = \get_post();
-        if (empty($post->ID)) {
+        $postID = $post->ID ?? null;
+        if ($postID) {
+            // There's a post context, save it to post meta
+            \update_post_meta($postID, '_oembed_data_' . $cacheKey, (array) $data);
             return $html;
         }
 
-        \update_post_meta($post->ID, '_oembed_data_' . \md5($url), (array) $data);
+        // Oembed cache exists, it has been saved as an "oembed_cache" post type
+        // (e.g. embed rendering took place on a context where no post global were available)
+        $oembedCachePostID = $GLOBALS['wp_embed']->find_oembed_post_id($cacheKey);
+        if ($oembedCachePostID) {
+            $this->updateOembedData((int) $oembedCachePostID, (array) $data);
+            return $html;
+        }
+
+        // The oembed cache has not been saved yet (it happens later on the first request)
+        // Use a one time filter to save data
+        \add_filter('embed_oembed_html', function ($html, $url, $attr, $postID) use ($data, $cacheKey) {
+            $oembedCachePostID = $GLOBALS['wp_embed']->find_oembed_post_id($cacheKey);
+            if ($oembedCachePostID && $GLOBALS['wp_embed']->last_url === $url) {
+                $this->updateOembedData((int) $oembedCachePostID, (array) $data);
+            }
+            \remove_filter('embed_oembed_html', __FUNCTION__, 1);
+            return $html;
+        }, 1, 4);
 
         return $html;
     }
@@ -40,22 +89,22 @@ class OembedServiceProvider extends ServiceProvider
             return $html;
         }
 
-        $embed_data = \get_post_meta($post_id, '_oembed_data_' . \md5($url), true);
+        $data = $this->getEmbedData($url, $post_id);
 
-        if (!isset($embed_data['type'])) {
+        if (!isset($data['type'])) {
             return $html;
         }
 
-        $templates = [
-            \sprintf('embeds/%s.html.twig', \mb_strtolower($embed_data['provider_name'] ?? '')),
-            \sprintf('embeds/%s.html.twig', $embed_data['type'] ?? 'embed'),
+        $templates = \array_filter([
+            isset($data['provider_name']) ? \sprintf('embeds/%s.html.twig', \mb_strtolower($data['provider_name'])) : null,
+            \sprintf('embeds/%s.html.twig', $data['type'] ?? 'embed'),
             'embeds/embed.html.twig',
-        ];
+        ]);
 
         try {
-            $embed_html = $this->get(Timber::class)::compile(
+            $embed_html = Timber::compile(
                 $templates,
-                $embed_data
+                $data
             );
             return empty($embed_html) ? $html : $embed_html;
         } catch (\Throwable $th) {
@@ -70,16 +119,77 @@ class OembedServiceProvider extends ServiceProvider
     public function filterProviders(array $providers): array
     {
         $allowed_providers = $this->getConfig('oembed.allowed_providers', []);
-        if (empty($providers)) {
+        if (empty($allowed_providers)) {
+            return $providers;
+        }
+
+        $allowed_providers_list = [];
+        foreach ($providers as $k => $provider) {
+            $provider_oembed_url = $provider[0] ?? null;
+            if (!$provider_oembed_url) {
+                continue;
+            }
+            foreach ($allowed_providers as $p) {
+                if (\strpos($provider_oembed_url, $p) !== false) {
+                    $allowed_providers_list[$k] = $provider;
+                }
+            }
+        }
+
+        return $allowed_providers_list;
+    }
+
+    /**
+     * Save oEmbed data into post_excerpt
+     */
+    private function updateOembedData(int $postID, array $data)
+    {
+        global $wpdb;
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+        $wpdb->update(
+            $wpdb->posts,
+            [
+                'post_excerpt' => \maybe_serialize($data),
+            ],
+            [
+                'ID' => $postID,
+            ]
+        );
+
+        // Clear cache so we get fresh data when rendering the embed
+        \clean_post_cache($postID);
+    }
+
+    /**
+     * Get embed data
+     *
+     * @return array|null
+     */
+    private function getEmbedData(string $url, int $post_id): array
+    {
+        $cacheKey = $this->getCacheKey($url);
+
+        $data = \get_post_meta($post_id, \sprintf('_oembed_data_%s', $cacheKey), true);
+        if (!empty($data)) {
+            return (array) $data;
+        }
+
+        // No data was found in post ID, try oembed cache
+        $oembedCachePostID = $GLOBALS['wp_embed']->find_oembed_post_id($cacheKey);
+        if (!$oembedCachePostID) {
             return [];
         }
 
-        return \array_filter($providers, function ($provider) use ($allowed_providers) {
-            if (!isset($provider[0])) {
-                return true;
-            }
+        $post = \get_post($oembedCachePostID);
+        return isset($post->post_excerpt) ? (array) \maybe_unserialize($post->post_excerpt) : [];
+    }
 
-            return \in_array($provider[0], $allowed_providers, true);
-        });
+    /**
+     * Get cache key for URL
+     */
+    private function getCacheKey(string $url): string
+    {
+        // phpcs:disable WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
+        return \md5($url . \serialize($GLOBALS['wp_embed']->last_attr));
     }
 }

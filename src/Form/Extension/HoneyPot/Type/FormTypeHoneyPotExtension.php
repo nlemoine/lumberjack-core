@@ -89,10 +89,10 @@ final class FormTypeHoneyPotExtension extends AbstractTypeExtension
     private function createViewOptions(array $options): array
     {
         $formOptions = [
-            'mapped'   => false,
-            'label'    => $options['honeypot_field_label'],
-            'required' => false,
-            'attr'     => [
+            'mapped'         => false,
+            'label'          => $options['honeypot_field_label'],
+            'required'       => false,
+            'attr'           => [
                 'autocomplete' => 'off',
                 'tabindex'     => '-1',
                 'aria-hidden'  => 'true',
