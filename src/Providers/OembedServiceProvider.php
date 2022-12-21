@@ -33,7 +33,7 @@ class OembedServiceProvider extends ServiceProvider
     public function setOembedTtl($url, $attr, $postId)
     {
         // Set to 0 for debugging, will fetch the oembed data on every request
-        return 0;
+        return MONTH_IN_SECONDS;
     }
 
     /**
