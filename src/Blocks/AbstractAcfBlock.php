@@ -2,19 +2,19 @@
 
 namespace Rareloop\Lumberjack\Blocks;
 
-use Timber\Timber;
+use Rareloop\Lumberjack\Timber;
 
 abstract class AbstractAcfBlock
 {
-    protected $block;
+    protected array $block;
 
-    protected $content;
+    protected string $content;
 
-    protected $isPreview;
+    protected bool $isPreview;
 
-    protected $postId;
+    protected ?int $postId;
 
-    public function __construct($block, $content = '', $isPreview = false, $postId = null)
+    public function __construct(array $block, string $content = '', bool $isPreview = false, ?int $postId = null)
     {
         $this->block = $block;
         $this->content = $content;
@@ -22,20 +22,20 @@ abstract class AbstractAcfBlock
         $this->postId = $postId;
     }
 
-    public function context(): array
+    public function context(array $data): array
     {
         return [];
     }
 
     public function render()
     {
-        $data = $this->context();
+        $data = $this->context($this->block['data'] ?? []);
 
         $templates = [
             'blocks/acf/' . static::getName() . '.html.twig',
         ];
         if (\is_admin()) {
-            \array_unshift($templates, 'blocks/acf/' . static::getName() . '-admin.html.twig');
+            \array_unshift($templates, 'blocks/acf/' . static::getName() . '-editor.html.twig');
         }
         $data['block'] = $this->block;
         $data['is_preview'] = $this->isPreview;
@@ -61,7 +61,7 @@ abstract class AbstractAcfBlock
         \acf_register_block_type(\array_merge(static::getBlockConfig(), [
             'render_callback' => function (array $block, string $content, bool $is_preview, int $post_id) {
                 $block = new static($block, $content, $is_preview, $post_id);
-                return $block->render();
+                $block->render();
             },
         ]));
     }
