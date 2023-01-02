@@ -2,7 +2,6 @@
 
 namespace Rareloop\Lumberjack\Twig\Extensions;
 
-use Rareloop\Lumberjack\Helpers\ImageRuntime;
 use Symfony\Component\Asset\PathPackage;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -24,7 +23,7 @@ class SvgHelpersExtension extends AbstractExtension
             new TwigFunction('inline_svg', [$this, 'inlineSvg'], [
                 'is_safe' => ['html'],
             ]),
-            new TwigFunction('svg_placeholder', [ImageRuntime::class, 'getSvgPlaceholder']),
+            new TwigFunction('svg_placeholder', [ImageHelpers::class, 'getSvgPlaceholder']),
         ];
     }
 
