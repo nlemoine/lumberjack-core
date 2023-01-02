@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Twig\Extensions;
 
+use Rareloop\Lumberjack\Helpers\ImageHelpers;
 use Symfony\Component\Asset\PathPackage;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
