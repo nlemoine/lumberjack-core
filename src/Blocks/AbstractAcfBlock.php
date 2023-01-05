@@ -22,7 +22,7 @@ abstract class AbstractAcfBlock
         $this->postId = $postId;
     }
 
-    public function context(array $data): array
+    public function context(array $data): ?array
     {
         return [];
     }
