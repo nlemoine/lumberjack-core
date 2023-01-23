@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use Rareloop\Lumberjack\Form\Extension\Hcaptcha\HcaptchaExtension;
 use Rareloop\Lumberjack\Form\Extension\HoneyPot\HoneyPotExtension;
 use Rareloop\Lumberjack\Form\Extension\InvalidFeedback\InvalidFeedbackExtension;
 use Rareloop\Lumberjack\Form\Extension\MagicQuotes\MagicQuotesExtension;
@@ -78,16 +79,16 @@ class FormServiceProvider extends ServiceProvider
             return $form_factory->getFormFactory();
         });
 
-        $this->app->singleton('form.csrf_manager', function () {
-            if (!$this->app->has(SessionInterface::class)) {
-                throw new \RuntimeException('You must register a session service provider to use the CSRF extension.');
-            }
+        // $this->app->singleton('form.csrf_manager', function () {
+        //     if (!$this->app->has(SessionInterface::class)) {
+        //         throw new \RuntimeException('You must register a session service provider to use the CSRF extension.');
+        //     }
 
-            $csrfGenerator = new UriSafeTokenGenerator();
-            $csrfStorage = new SessionTokenStorage($this->app->get(SessionInterface::class));
+        //     $csrfGenerator = new UriSafeTokenGenerator();
+        //     $csrfStorage = new SessionTokenStorage($this->app->get(SessionInterface::class));
 
-            return new CsrfTokenManager($csrfGenerator, $csrfStorage);
-        });
+        //     return new CsrfTokenManager($csrfGenerator, $csrfStorage);
+        // });
 
         $this->app->singleton('form.extensions', function () {
             $extensions = [];
@@ -119,7 +120,22 @@ class FormServiceProvider extends ServiceProvider
                 $this->app->bind('form.form_themes', $form_themes);
             }
 
-            $extensions[] = new CsrfExtension($this->app->get('form.csrf_manager'));
+            if ($this->app->get('form.hcaptcha.site_key') && $this->app->get('form.hcaptcha.secret_key')) {
+                $hcaptcha_config = $this->getConfig('form.hcaptcha', []);
+                $extensions[] = new HcaptchaExtension(
+                    $this->app->get('form.hcaptcha.site_key'),
+                    $this->app->get('form.hcaptcha.secret_key'),
+                    $hcaptcha_config['global'],
+                    $hcaptcha_config['field'] ?? null,
+                    'Une erreur a eu lieu lors de la validation du captcha, veuillez soumettre à nouveau le formulaire.'
+                );
+
+                $form_themes = $this->app->get('form.form_themes');
+                \array_unshift($form_themes, 'hcaptcha_widget.html.twig');
+                $this->app->bind('form.form_themes', $form_themes);
+            }
+
+            // $extensions[] = new CsrfExtension($this->app->get('form.csrf_manager'));
 
             return $extensions;
         });
@@ -132,11 +148,18 @@ class FormServiceProvider extends ServiceProvider
         $this->app->singleton('form.recaptcha.secret_key', function () {
             return $this->getConfig('form.recaptcha.secret_key', []);
         });
+        $this->app->singleton('form.hcaptcha.site_key', function () {
+            return $this->getConfig('form.hcaptcha.site_key', []);
+        });
+        $this->app->singleton('form.hcaptcha.secret_key', function () {
+            return $this->getConfig('form.hcaptcha.secret_key', []);
+        });
 
         $this->app->singleton('form.paths', function () {
             return \array_filter([
                 $this->getTwigBridgeFormPath(),
                 $this->app->get('form.recaptcha.site_key') && $this->app->get('form.recaptcha.secret_key') ? $this->getRecaptchaExtensionPath() : null,
+                $this->app->get('form.hcaptcha.site_key') && $this->app->get('form.hcaptcha.secret_key') ? $this->getHcaptchaExtensionPath() : null,
             ]);
         });
 
@@ -201,6 +224,19 @@ class FormServiceProvider extends ServiceProvider
     protected function getRecaptchaExtensionPath(): ?string
     {
         $recaptcha_reflection = new \ReflectionClass(RecaptchaExtension::class);
+        $filename = $recaptcha_reflection->getFileName();
+        if (!$filename) {
+            return null;
+        }
+        return \dirname($filename) . '/views';
+    }
+
+    /**
+     * Undocumented function
+     */
+    protected function getHcaptchaExtensionPath(): ?string
+    {
+        $recaptcha_reflection = new \ReflectionClass(HcaptchaExtension::class);
         $filename = $recaptcha_reflection->getFileName();
         if (!$filename) {
             return null;
