@@ -118,6 +118,10 @@ class Context extends \ArrayObject
             $post_type = $taxonomy->object_type[0] ?? null;
         }
 
+        if (\is_array($post_type)) {
+            $post_type = \reset($post_type);
+        }
+
         return $post_type;
     }
 
