@@ -66,6 +66,11 @@ class PolylangServiceProvider extends ServiceProvider
         $postTypes = $this->getConfig('posttypes.register', []);
 
         foreach ($postTypes as $postType) {
+            $config = $postType::getPostTypeConfig();
+            $do_not_translate = $config['do_not_translate'] ?? false;
+            if ($do_not_translate) {
+                continue;
+            }
             if ($is_settings) {
                 unset($post_types[$postType::getPostType()]);
             } else {
@@ -86,6 +91,11 @@ class PolylangServiceProvider extends ServiceProvider
         $taxonomies = $this->getConfig('taxonomies.register', []);
 
         foreach ($taxonomies as $taxonomy) {
+            $config = $taxonomy::getTaxonomyConfig();
+            $do_not_translate = $config['do_not_translate'] ?? false;
+            if ($do_not_translate) {
+                continue;
+            }
             if ($is_settings) {
                 unset($taxonomies[$taxonomy::getTaxonomy()]);
             } else {

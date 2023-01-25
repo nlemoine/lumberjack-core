@@ -173,7 +173,7 @@ abstract class AbstractTerm extends TimberTerm
      * Third parameter of the `register_taxonomy` function:
      * https://developer.wordpress.org/reference/functions/register_taxonomy/
      */
-    protected static function getTaxonomyConfig(): array
+    public static function getTaxonomyConfig(): array
     {
         return [];
     }

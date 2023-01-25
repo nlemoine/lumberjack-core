@@ -226,7 +226,7 @@ abstract class AbstractPostType extends Post
      *
      * @return array|null
      */
-    protected static function getPostTypeConfig(): array
+    public static function getPostTypeConfig(): array
     {
         return [];
     }
