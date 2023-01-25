@@ -2,7 +2,7 @@
     {% if form.vars.site_key %}
         {%- set type = type|default('hidden') -%}
         {{ block('form_widget_simple') }}
-        <div id="{{ id }}-view" data-theme="{{ form.vars.theme }}"></div>
+        <div id="{{ id }}-view" data-theme="{{ form.vars.theme }}" class="hcaptcha-wrapper"></div>
         {%- set validJsId = id|replace({'-':'_'}) -%}
         {%- set callbackName = 'recaptchaCallback_%s'|format(validJsId) -%}
         <script {% if form.vars.script_nonce_csp is defined %}nonce="{{ form.vars.script_nonce_csp }}"{% endif %}>
