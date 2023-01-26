@@ -78,7 +78,7 @@ class BudEntrypointsLoader extends EncoreEntrypointsLoader
                 ? $file
                 : $this->directoryUrl . $sanitizedFile;
 
-            $handle = \md5($fileUrl);
+            $handle = 'asset-' . \md5($fileUrl);
 
             $filePath = $directory . $sanitizedFile;
 
