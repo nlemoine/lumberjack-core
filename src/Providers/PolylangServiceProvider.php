@@ -67,8 +67,8 @@ class PolylangServiceProvider extends ServiceProvider
 
         foreach ($postTypes as $postType) {
             $config = $postType::getPostTypeConfig();
-            $do_not_translate = $config['do_not_translate'] ?? false;
-            if ($do_not_translate) {
+            $translate = $config['translate'] ?? true;
+            if (!$translate) {
                 continue;
             }
             if ($is_settings) {
@@ -92,8 +92,8 @@ class PolylangServiceProvider extends ServiceProvider
 
         foreach ($taxonomies as $taxonomy) {
             $config = $taxonomy::getTaxonomyConfig();
-            $do_not_translate = $config['do_not_translate'] ?? false;
-            if ($do_not_translate) {
+            $translate = $config['translate'] ?? true;
+            if (!$translate) {
                 continue;
             }
             if ($is_settings) {

@@ -240,7 +240,7 @@ class RegisterablePostType extends AbstractPostType
     protected static function getPostTypeConfig(): array
     {
         return [
-            'labels' => [
+            'labels'      => [
                 'name'          => 'Groups',
                 'singular_name' => 'Group',
             ],

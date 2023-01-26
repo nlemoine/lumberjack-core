@@ -2,8 +2,8 @@
 
 namespace Rareloop\Lumberjack\Assets;
 
-use Inpsyde\Assets\Util\AssetHookResolver;
 use Inpsyde\Assets\Asset;
+use Inpsyde\Assets\Util\AssetHookResolver;
 use Inpsyde\WpContext;
 
 class AjaxHookResolver extends AssetHookResolver
@@ -13,9 +13,7 @@ class AjaxHookResolver extends AssetHookResolver
      */
     public $context;
 
-    /**
-     * @param WpContext|null $context
-     */
+
     public function __construct(?WpContext $context = null)
     {
         $this->context = $context ?? WpContext::determine();
@@ -29,12 +27,12 @@ class AjaxHookResolver extends AssetHookResolver
     public function resolve(): array
     {
         $assets = parent::resolve();
-        if(!empty($assets)) {
+        if (!empty($assets)) {
             return $assets;
         }
 
         $isAjax = $this->context->isAjax();
-        if(!$isAjax) {
+        if (!$isAjax) {
             return $assets;
         }
 
@@ -43,5 +41,4 @@ class AjaxHookResolver extends AssetHookResolver
         $assets[] = Asset::HOOK_CUSTOMIZER_PREVIEW;
         return $assets;
     }
-
 }

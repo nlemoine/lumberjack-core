@@ -12,6 +12,10 @@ final class HcaptchaType extends AbstractType
 {
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
+        if (empty($options['site_key'])) {
+            return;
+        }
+
         $view->vars['site_key'] = $options['hcaptcha_site_key'];
         $view->vars['is_ajax'] = $options['is_ajax'];
         $view->vars['theme'] = $options['theme'];
