@@ -12,7 +12,7 @@ final class HcaptchaType extends AbstractType
 {
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
-        if (empty($options['site_key'])) {
+        if (empty($options['hcaptcha_site_key'])) {
             return;
         }
 
