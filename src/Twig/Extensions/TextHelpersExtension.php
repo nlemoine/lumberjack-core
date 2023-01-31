@@ -14,6 +14,9 @@ final class TextHelpersExtension extends AbstractExtension
             new TwigFilter('bisect', [TextHelpers::class, 'bisect'], [
                 'is_safe' => ['html'],
             ]),
+            new TwigFilter('longest_word', [TextHelpers::class, 'longestWord'], [
+                'is_safe' => ['html'],
+            ]),
             new TwigFilter('obfuscate', 'antispambot', [
                 'is_safe' => ['html'],
             ]),

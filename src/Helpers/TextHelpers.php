@@ -47,6 +47,20 @@ class TextHelpers
         ]);
     }
 
+    public static function longestWord(string $text): string
+    {
+        $words = \preg_split('@[' . self::ALL_SPACES . ']@mu', $text);
+        $longest = '';
+
+        foreach ($words as $word) {
+            if (\mb_strlen($word) > \mb_strlen($longest)) {
+                $longest = $word;
+            }
+        }
+
+        return $longest;
+    }
+
     /**
      * Check if a string contains a space
      *
