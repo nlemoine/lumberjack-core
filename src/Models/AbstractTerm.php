@@ -85,7 +85,7 @@ abstract class AbstractTerm extends TimberTerm
         // Waiting for https://github.com/johnbillion/extended-cpts/pull/162
         if ($taxonomy_object && $taxonomy_object->_builtin) {
             $config_builtin = \get_object_vars($taxonomy_object);
-            if (isset($config_builtin['labels'])) {
+            if (empty($config['labels'])) {
                 $config['labels'] = \get_object_vars($config_builtin['labels']);
             }
             $config = \array_merge($config_builtin, $config);
