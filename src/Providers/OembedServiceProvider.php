@@ -100,9 +100,9 @@ class OembedServiceProvider extends ServiceProvider
             \array_unshift($templates, \mb_strtolower($provider_name));
         }
 
+        $templates = \apply_filters('app/oembed/templates', $templates, $data, $html, $url, $attr, $post_id);
         $templates = \array_map(fn ($t) => 'embeds/' . $t . '.html.twig', $templates);
-
-        $data = \apply_filters('app/oembed/data', $data, $url, $attr, $post_id);
+        $data = \apply_filters('app/oembed/data', $data, $html, $url, $attr, $post_id);
 
         try {
             $embed_html = Timber::compile(
