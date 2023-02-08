@@ -28,12 +28,11 @@ class OembedServiceProvider extends ServiceProvider
      * @param string $url
      * @param array $attr
      * @param int $postId
-     * @return int
      */
-    public function setOembedTtl($url, $attr, $postId)
+    public function setOembedTtl($url, $attr, $postId): int
     {
         // Set to 0 for debugging, will fetch the oembed data on every request
-        return $this->getConfig('oembed.ttl', MONTH_IN_SECONDS);
+        return (int) $this->getConfig('oembed.ttl', MONTH_IN_SECONDS);
     }
 
     /**
@@ -90,16 +89,20 @@ class OembedServiceProvider extends ServiceProvider
         }
 
         $data = $this->getEmbedData($url, $post_id);
+        $provider_name = $data['provider_name'] ?? null;
+        $type = $data['type'] ?? null;
 
-        if (!isset($data['type'])) {
-            return $html;
+        $templates = ['embed'];
+        if ($type) {
+            \array_unshift($templates, \mb_strtolower($type));
+        }
+        if ($provider_name) {
+            \array_unshift($templates, \mb_strtolower($provider_name));
         }
 
-        $templates = \array_filter([
-            isset($data['provider_name']) ? \sprintf('embeds/%s.html.twig', \mb_strtolower($data['provider_name'])) : null,
-            \sprintf('embeds/%s.html.twig', $data['type'] ?? 'embed'),
-            'embeds/embed.html.twig',
-        ]);
+        $templates = \array_map(fn ($t) => 'embeds/' . $t . '.html.twig', $templates);
+
+        $data = \apply_filters('app/oembed/data', $data, $url, $attr, $post_id);
 
         try {
             $embed_html = Timber::compile(
@@ -142,7 +145,7 @@ class OembedServiceProvider extends ServiceProvider
     /**
      * Save oEmbed data into post_excerpt
      */
-    private function updateOembedData(int $postID, array $data)
+    private function updateOembedData(int $postID, array $data): void
     {
         global $wpdb;
         // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
