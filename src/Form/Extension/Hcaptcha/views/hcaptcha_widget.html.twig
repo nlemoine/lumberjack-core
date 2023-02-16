@@ -14,8 +14,9 @@
                 }
 
                 var form = input.form;
-                var executeHcaptcha = function() {
-                     hcaptcha.render('{{ placeholder_id }}', {
+                var widgetId = null;
+                var renderHcaptcha = function() {
+                    widgetId = hcaptcha.render('{{ placeholder_id }}', {
                         sitekey: '{{ form.vars.site_key }}',
                         theme: Object.prototype.hasOwnProperty.call(window, 'theme') ? window.theme : 'light',
                         callback: (token) => {
@@ -23,12 +24,17 @@
                         }
                     });
                 }
+                var resetHcaptcha = function() {
+                    if(widgetId) {
+                        hcaptcha.reset(widgetId);
+                    }
+                }
 
-                window.{{ callbackName }} = executeHcaptcha;
+                window.{{ callbackName }} = renderHcaptcha;
 
                 var loadHcaptcha = function() {
                     if(window.hcaptcha) {
-                        executeHcaptcha();
+                        renderHcaptcha();
                         return;
                     }
                     var script = document.createElement('script');
@@ -47,7 +53,7 @@
                                 return;
                             }
                             reloaded = true;
-                            executeHcaptcha();
+                            resetHcaptcha();
                         }, true);
                     };
 
