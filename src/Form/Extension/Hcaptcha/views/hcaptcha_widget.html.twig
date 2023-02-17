@@ -1,6 +1,7 @@
 {% block hcaptcha_widget %}
     {% if form.vars.site_key %}
         {%- set type = type|default('hidden') -%}
+        {%- set is_ajax = is_ajax ?? false -%}
         {%- set placeholder_id = '%s-placeholder'|format(id) -%}
         {{ block('form_widget_simple') }}
         <div id="{{ placeholder_id }}" data-theme="{{ form.vars.theme }}" class="hcaptcha-wrapper"></div>
