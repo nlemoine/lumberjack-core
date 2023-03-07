@@ -9,7 +9,6 @@ use Rareloop\Lumberjack\Facades\Log;
 use Rareloop\Lumberjack\Facades\Router;
 use Rareloop\Lumberjack\Facades\Session;
 use Rareloop\Lumberjack\Http\Responses\RedirectResponse;
-use Rareloop\Lumberjack\Http\Responses\TimberResponse;
 
 class Helpers
 {
@@ -39,48 +38,15 @@ class Helpers
         return Config::get($key, $default);
     }
 
-    public static function view($template, $context = [], $statusCode = 200, $headers = [])
-    {
-        return new TimberResponse($template, $context, $statusCode, $headers);
-    }
-
     public static function route($name, $params = [])
     {
         return Router::url($name, $params);
-    }
-
-    public static function redirect($url, $statusCode = 302, $headers = [])
-    {
-        return new RedirectResponse($url, $statusCode, $headers);
-    }
-
-    public static function report(Exception $e)
-    {
-        return static::app(ExceptionHandlerContract::class)->report($e);
     }
 
     public static function request()
     {
         return static::app('request');
     }
-
-    // public static function session($key = null, $default = null)
-    // {
-    //     if (is_null($key)) {
-    //         return static::app('session');
-    //     }
-
-    //     if (is_array($key)) {
-    //         return Session::put($key);
-    //     }
-
-    //     return Session::get($key, $default);
-    // }
-
-    // public static function back()
-    // {
-    //     return static::redirect(static::session()->previousUrl());
-    // }
 
     public static function logger($message = null, $context = [])
     {
