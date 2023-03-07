@@ -17,17 +17,6 @@ abstract class AbstractPostType extends Post
         Macroable::__callStatic as __macroableCallStatic;
     }
 
-    public function __construct(?int $id = null, bool $preventTimberInit = false)
-    {
-        /**
-         * There are occasions where we do not want the bootstrap the data. At the moment this is
-         * designed to make Query Scopes possible
-         */
-        if (!$preventTimberInit) {
-            parent::__construct($id);
-        }
-    }
-
     public function __call($name, $arguments)
     {
         if (static::hasMacro($name)) {
@@ -122,24 +111,6 @@ abstract class AbstractPostType extends Post
                     $postType => static::class,
                 ],
             );
-        });
-
-        // Set default query
-        \add_filter('pre_get_posts', function (WP_Query $query) {
-            if (\is_admin()) {
-                return;
-            }
-            if (!$query->is_main_query()) {
-                return;
-            }
-            if ($query->is_singular()) {
-                return;
-            }
-            $post_type = static::getPostType();
-            if (!\in_array($post_type, (array) $query->get('post_type'), true)) {
-                return;
-            }
-            \call_user_func([static::class, 'setDefaultQuery'], $query);
         });
     }
 

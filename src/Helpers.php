@@ -2,13 +2,9 @@
 
 namespace Rareloop\Lumberjack;
 
-use Exception;
-use Rareloop\Lumberjack\Contracts\ExceptionHandler as ExceptionHandlerContract;
 use Rareloop\Lumberjack\Facades\Config;
 use Rareloop\Lumberjack\Facades\Log;
 use Rareloop\Lumberjack\Facades\Router;
-use Rareloop\Lumberjack\Facades\Session;
-use Rareloop\Lumberjack\Http\Responses\RedirectResponse;
 
 class Helpers
 {
