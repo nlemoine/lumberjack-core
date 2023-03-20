@@ -6,7 +6,6 @@ use Rareloop\Lumberjack\Exceptions\PostTypeRegistrationException;
 use Timber\Post;
 use Timber\PostQuery;
 use Timber\Timber;
-use WP_Query;
 
 abstract class AbstractPostType extends AbstractPost
 {
@@ -111,7 +110,7 @@ abstract class AbstractPostType extends AbstractPost
      * Convenience function that takes a standard set of WP_Query arguments but mixes it with
      * arguments that mean we're selecting the right post type
      *
-     * @param  array $args standard WP_Query array
+     * @param array $args standard WP_Query array
      */
     public static function query(array $args = []): Iterable
     {

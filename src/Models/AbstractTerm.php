@@ -23,10 +23,6 @@ abstract class AbstractTerm extends Term
      */
     abstract public static function getTaxonomyObjectTypes(): array;
 
-    public static function setDefaultQuery(WP_Query $query): void
-    {
-    }
-
     /**
      * Register this PostType with WordPress
      */
@@ -84,20 +80,6 @@ abstract class AbstractTerm extends Term
                 \remove_permastruct($taxonomy_object->name);
             }
         }
-
-        \add_filter('pre_get_posts', function ($wp_query) {
-            if (\is_admin()) {
-                return;
-            }
-            if (!$wp_query->is_main_query()) {
-                return;
-            }
-            $taxonomy = static::getTaxonomy();
-            if (!$wp_query->is_tax($taxonomy)) {
-                return;
-            }
-            \call_user_func([static::class, 'setDefaultQuery'], $wp_query);
-        });
     }
 
     /**

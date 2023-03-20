@@ -13,7 +13,6 @@ class Timber extends TimberCore
         }
 
         if (\class_exists('WP') && !\defined('TIMBER_LOADED')) {
-            $this->test_compatibility();
             $this->init_constants();
             self::init();
         }
@@ -57,12 +56,5 @@ class Timber extends TimberCore
         $context = \apply_filters('timber/context', $context);
 
         return \array_merge($context, $extra);
-    }
-
-    protected function test_compatibility()
-    {
-        if (\is_admin() || $_SERVER['PHP_SELF'] === '/wp-login.php') {
-            return;
-        }
     }
 }
