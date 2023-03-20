@@ -52,11 +52,11 @@ class TemplateServiceProvider extends ServiceProvider
     public function setTemplateCachePolicy()
     {
         $templates = $this->getConfig('templates', []);
-        foreach ($templates as $template) {
-            if (!\is_page_template($template::getTemplate() . '.php')) {
+        foreach ($templates as $template_class) {
+            if (!\is_page_template($template_class::getTemplate() . '.php')) {
                 return;
             }
-            if (!$template::isCacheable() && !\defined('DONOTCACHEPAGE')) {
+            if (!$template_class::isCacheable() && !\defined('DONOTCACHEPAGE')) {
                 \define('DONOTCACHEPAGE', true);
             }
         }

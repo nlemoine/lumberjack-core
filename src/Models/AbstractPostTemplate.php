@@ -4,9 +4,9 @@ namespace Rareloop\Lumberjack\Models;
 
 abstract class AbstractPostTemplate extends AbstractPost
 {
-    abstract public static function getTemplateName(): string;
+    abstract public static function getTemplate(): string;
 
-    abstract public static function getTemplateLabel(): string;
+    abstract public static function getTemplateName(): string;
 
     /**
      * @return array<string>
