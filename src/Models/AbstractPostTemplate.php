@@ -2,7 +2,7 @@
 
 namespace Rareloop\Lumberjack\Models;
 
-abstract class AbstractTemplate extends AbstractPost
+abstract class AbstractPostTemplate extends AbstractPost
 {
     abstract public static function getTemplateName(): string;
 

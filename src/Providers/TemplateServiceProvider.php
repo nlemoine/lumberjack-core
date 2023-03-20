@@ -2,6 +2,8 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use Rareloop\Lumberjack\Models\AbstractPostTemplate;
+use Rareloop\Lumberjack\Template\AbstractTemplate;
 use WP_Post;
 use WP_Theme;
 
@@ -25,8 +27,12 @@ class TemplateServiceProvider extends ServiceProvider
     {
         $templates = $this->getConfig('templates', []);
 
-        $templates = \array_filter($templates, function (string $template) use ($post_type) {
-            $allowed_post_types = $template::getPostTypes();
+        $templates = \array_filter($templates, static function (string $template_class): bool {
+            return \is_subclass_of($template_class, AbstractPostTemplate::class) || \is_subclass_of($template_class, AbstractTemplate::class);
+        });
+
+        $templates = \array_filter($templates, function (string $template_class) use ($post_type) {
+            $allowed_post_types = $template_class::getPostTypes();
             return \in_array($post_type, $allowed_post_types, true);
         });
 
