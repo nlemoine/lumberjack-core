@@ -3,37 +3,12 @@
 namespace Rareloop\Lumberjack\Models;
 
 use Rareloop\Lumberjack\Exceptions\TaxonomyRegistrationException;
-use Spatie\Macroable\Macroable;
-use Timber\Term as TimberTerm;
+use Timber\Term;
 use Timber\Timber;
 use WP_Query;
 
-abstract class AbstractTerm extends TimberTerm
+abstract class AbstractTerm extends Term
 {
-    use Macroable {
-        Macroable::__call as __macroableCall;
-
-        Macroable::__callStatic as __macroableCallStatic;
-    }
-
-    public function __call($name, $arguments)
-    {
-        if (static::hasMacro($name)) {
-            return $this->__macroableCall($name, $arguments);
-        }
-
-        return parent::__call($name, $arguments);
-    }
-
-    public static function __callStatic($name, $arguments)
-    {
-        if (static::hasMacro($name)) {
-            return static::__macroableCallStatic($name, $arguments);
-        }
-
-        \trigger_error('Call to undefined method ' . __CLASS__ . '::' . $name . '()', E_USER_ERROR);
-    }
-
     /**
      * Return the key used to register the taxonomy with WordPress
      * First parameter of the `register_taxonomy` function:

@@ -3,49 +3,13 @@
 namespace Rareloop\Lumberjack\Models;
 
 use Rareloop\Lumberjack\Exceptions\PostTypeRegistrationException;
-use Spatie\Macroable\Macroable;
 use Timber\Post;
 use Timber\PostQuery;
 use Timber\Timber;
 use WP_Query;
 
-abstract class AbstractPostType extends Post
+abstract class AbstractPostType extends AbstractPost
 {
-    use Macroable {
-        Macroable::__call as __macroableCall;
-
-        Macroable::__callStatic as __macroableCallStatic;
-    }
-
-    public function __construct(?int $id = null, bool $preventTimberInit = false)
-    {
-        /**
-         * There are occasions where we do not want the bootstrap the data. At the moment this is
-         * designed to make Query Scopes possible
-         */
-        if (!$preventTimberInit) {
-            parent::__construct($id);
-        }
-    }
-
-    public function __call($name, $arguments)
-    {
-        if (static::hasMacro($name)) {
-            return $this->__macroableCall($name, $arguments);
-        }
-
-        return parent::__call($name, $arguments);
-    }
-
-    public static function __callStatic($name, $arguments)
-    {
-        if (static::hasMacro($name)) {
-            return static::__macroableCallStatic($name, $arguments);
-        }
-
-        \trigger_error('Call to undefined method ' . __CLASS__ . '::' . $name . '()', E_USER_ERROR);
-    }
-
     /**
      * Return the key used to register the post type with WordPress
      * First parameter of the `register_post_type` function:
@@ -123,33 +87,14 @@ abstract class AbstractPostType extends Post
                 ],
             );
         });
-
-        // Set default query
-        \add_filter('pre_get_posts', function (WP_Query $query) {
-            if (\is_admin()) {
-                return;
-            }
-            if (!$query->is_main_query()) {
-                return;
-            }
-            if ($query->is_singular()) {
-                return;
-            }
-            $post_type = static::getPostType();
-            if (!\in_array($post_type, (array) $query->get('post_type'), true)) {
-                return;
-            }
-            \call_user_func([static::class, 'setDefaultQuery'], $query);
-        });
     }
 
     /**
      * Get all posts of this type
      *
      * @param  integer $perPage The number of items to return (defaults to all)
-     * @return \Illuminate\Support\Collection
      */
-    public static function all($perPage = -1, $orderby = 'menu_order', $order = 'ASC')
+    public static function all($perPage = -1, $orderby = 'menu_order', $order = 'ASC'): Iterable
     {
         $order = \strtoupper($order);
 
@@ -192,10 +137,6 @@ abstract class AbstractPostType extends Post
     public static function getArchiveUrl(): string
     {
         return \get_post_type_archive_link(static::getPostType());
-    }
-
-    public static function setDefaultQuery(WP_Query $query): void
-    {
     }
 
     public function embed($url)
