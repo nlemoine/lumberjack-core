@@ -16,7 +16,7 @@ abstract class AbstractPage
         if (!\is_admin()) {
             return;
         }
-        \add_action('admin_menu', [static::class, 'addMenuPage']);
+        \add_action('admin_menu', [static::class, 'addMenuPage'], 100); // 100 is the priority to ensure we add the page after all other pages have been registered
     }
 
     public static function addMenuPage()
