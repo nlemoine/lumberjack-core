@@ -21,12 +21,13 @@ abstract class AbstractPage
 
     public static function addMenuPage()
     {
+        $config = static::getConfig();
+
         // Use the right function depending on config
         $addPageFn = 'add_menu_page';
         if (!empty($config['parent_slug'])) {
             $addPageFn = 'add_submenu_page';
         }
-        $config = static::getConfig();
         $hook = \call_user_func_array($addPageFn, $config);
         \add_action(\sprintf('load-%s', $hook), [static::class, 'runHooks']);
         \add_action(\sprintf('load-%s', $hook), [static::class, 'controller']);
@@ -121,7 +122,7 @@ abstract class AbstractPage
         }
 
         $isModal = self::isModal();
-        $config['function'] = function () use ($config, $isModal) {
+        $config['callback'] = function () use ($config, $isModal) {
             \call_user_func_array([static::class, 'renderAdminPage'], [$config, $isModal]);
         };
 
@@ -165,7 +166,7 @@ abstract class AbstractPage
             'menu_title',
             'capability',
             'menu_slug',
-            'function',
+            'callback',
             'position',
         ];
     }
