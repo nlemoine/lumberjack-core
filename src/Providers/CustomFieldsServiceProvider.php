@@ -7,6 +7,7 @@ use Rareloop\Lumberjack\Blocks\AbstractAcfBlock;
 use Rareloop\Lumberjack\Config;
 use Rareloop\Lumberjack\Contracts\HasAcfFields;
 use Rareloop\Lumberjack\Fields\FieldsBuilder;
+use Rareloop\Lumberjack\Models\AbstractPostTemplate;
 use Rareloop\Lumberjack\Models\AbstractPostType;
 use Rareloop\Lumberjack\Models\AbstractTerm;
 use Rareloop\Lumberjack\Models\Attachment;
@@ -158,7 +159,7 @@ class CustomFieldsServiceProvider extends ServiceProvider
                 break;
 
                 // template
-            case \is_subclass_of($class, AbstractTemplate::class):
+            case \is_subclass_of($class, AbstractTemplate::class) || \is_subclass_of($class, AbstractPostTemplate::class):
                 return ['page_template', '==', \sprintf('%s.php', $class::getTemplate())];
                 break;
 
