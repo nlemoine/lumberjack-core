@@ -1,8 +1,8 @@
 <?php
 
-namespace Rareloop\Lumberjack\Template;
+namespace Rareloop\Lumberjack\Models;
 
-class FrontPage extends AbstractStaticPage
+class FrontPage extends AbstractStaticPageType
 {
     public static function getPageType(): string
     {

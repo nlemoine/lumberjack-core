@@ -9,6 +9,7 @@ use Rareloop\Lumberjack\Contracts\HasAcfFields;
 use Rareloop\Lumberjack\Fields\FieldsBuilder;
 use Rareloop\Lumberjack\Models\AbstractPostTemplate;
 use Rareloop\Lumberjack\Models\AbstractPostType;
+use Rareloop\Lumberjack\Models\AbstractStaticPageType;
 use Rareloop\Lumberjack\Models\AbstractTerm;
 use Rareloop\Lumberjack\Models\Attachment;
 use Rareloop\Lumberjack\Models\NavMenuItem;
@@ -164,8 +165,8 @@ class CustomFieldsServiceProvider extends ServiceProvider
                 break;
 
                 // static template
-            case \is_subclass_of($class, FrontPage::class):
-                return ['page_type', '==', 'front_page'];
+            case \is_subclass_of($class, AbstractStaticPageType::class) || \is_subclass_of($class, FrontPage::class):
+                return ['page_type', '==', $class::getPageType()];
                 break;
 
                 // taxonomy
