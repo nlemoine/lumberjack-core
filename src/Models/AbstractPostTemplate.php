@@ -16,6 +16,11 @@ abstract class AbstractPostTemplate extends AbstractPost
         return [Page::getPostType()];
     }
 
+    public static function getTemplateFilename(): string
+    {
+        return static::getTemplate() . '.php';
+    }
+
     public static function isCacheable(): bool
     {
         return true;
