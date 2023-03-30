@@ -53,6 +53,9 @@ class TemplateServiceProvider extends ServiceProvider
     {
         $templates = $this->getConfig('templates', []);
         foreach ($templates as $template_class) {
+            if (!\is_subclass_of($template_class, AbstractTemplate::class) || !\is_subclass_of($template_class, AbstractPostTemplate::class)) {
+                continue;
+            }
             if (!\is_page_template($template_class::getTemplate() . '.php')) {
                 return;
             }
