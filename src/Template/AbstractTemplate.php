@@ -10,6 +10,11 @@ abstract class AbstractTemplate
 
     abstract public static function getTemplateName(): string;
 
+    public static function getTemplateFilename(): string
+    {
+        return static::getTemplate() . '.php';
+    }
+
     /**
      * @return array<string>
      */
