@@ -22,21 +22,26 @@ class Dispatcher extends RouteDispatcher
     {
         $method = $request->getMethod();
         $uri = $request->getUri()->getPath();
+        $message = '';
         try {
             $symfonyRequest = (new HttpFoundationFactory())->createRequest($request);
             $this->router->getContext()->fromRequest($symfonyRequest);
             $route = $this->router->matchRequest($symfonyRequest);
         } catch (MethodNotAllowedException $e) {
+            $message = $e->getMessage();
             $allowed = $e->getAllowedMethods();
             $this->setMethodNotAllowedDecoratorMiddleware($allowed);
         } catch (NoConfigurationException $e) {
+            $message = $e->getMessage();
             $this->setNotFoundDecoratorMiddleware();
         } catch (ResourceNotFoundException $e) {
+            $message = $e->getMessage();
             $this->setNotFoundDecoratorMiddleware();
         }
 
-        if (isset($route)) {
-            $route = $this->ensureHandlerIsRoute($route['_controller'], $method, $uri);
+        if (isset($route['_controller'])) {
+            $vars = \array_filter($route, fn ($key) => !\str_starts_with($key, '_'), ARRAY_FILTER_USE_KEY);
+            $route = $this->ensureHandlerIsRoute($route['_controller'], $method, $uri)->setVars($vars);
             $this->setFoundMiddleware($route);
             $request = $this->requestWithRouteAttributes($request, $route);
         }
