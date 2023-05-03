@@ -34,6 +34,13 @@ class RegisterPath
             return null;
         });
 
+        // cache
+        $app->singleton('path.cache', function () use ($app) {
+            $cachePath = $app->get('path.project') . '/var/cache';
+
+            return $cachePath;
+        });
+
         // log
         $app->singleton('path.log', function () use ($app) {
             $logPath = $app->get('path.project') . '/var/log';

@@ -5,6 +5,7 @@ namespace Rareloop\Lumberjack\Http;
 use Laminas\Diactoros\Response\JsonResponse;
 use League\Route\Middleware\MiddlewareAwareInterface;
 use League\Route\Middleware\MiddlewareAwareTrait;
+use Middlewares\BasicAuthentication;
 use Middlewares\Minifier;
 use Psr\Container\ContainerInterface;
 use Psr\Link\LinkInterface;
@@ -31,7 +32,7 @@ abstract class AbstractController implements MiddlewareAwareInterface
         }
 
         if (!empty(\getenv('BASIC_AUTH_USER')) && !empty(\getenv('BASIC_AUTH_PASSWORD'))) {
-            $this->middleware(new \Middlewares\BasicAuthentication([
+            $this->middleware(new BasicAuthentication([
                 \getenv('BASIC_AUTH_USER') => \getenv('BASIC_AUTH_PASSWORD'),
             ]));
         }
