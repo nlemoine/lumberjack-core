@@ -14,6 +14,7 @@ use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Router as SymfonyRouter;
 use Twig\Environment;
 
@@ -35,10 +36,13 @@ class SymfonyRouterServiceProvider extends ServiceProvider
             return new ArrayLoader();
         });
         $this->app->singleton('router.core', function () {
+            $context = new RequestContext();
+            $context->setParameter('_locale', $this->app->get('locale'));
             return new SymfonyRouter(
                 $this->app->get('router.loader'),
                 $this->getConfig('routes', []),
                 $this->app->get('router.options'),
+                $context
             );
         });
         $this->app->singleton('router', function () {
