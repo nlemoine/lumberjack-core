@@ -5,11 +5,12 @@ namespace Rareloop\Lumberjack\Router\Symfony;
 use League\Route\Router as BaseRouter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\Routing\Router as SymfonyRouter;
 
 class Router extends BaseRouter
 {
     public function __construct(
-        private Router $router
+        private SymfonyRouter $router
     ) {
     }
 

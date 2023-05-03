@@ -3,12 +3,14 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Laminas\Diactoros\ServerRequestFactory;
+use League\Route\Http\Exception\MethodNotAllowedException as LeagueMethodNotAllowedException;
+use League\Route\Http\Exception\NotFoundException;
 use League\Route\Strategy\ApplicationStrategy;
 use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\ServerRequest;
 use Rareloop\Lumberjack\Router\Symfony\Loader\ArrayLoader;
 use Rareloop\Lumberjack\Router\Symfony\Router;
-use Rareloop\Lumberjack\Twig\Extensions\RoutingExtension;
+use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -42,7 +44,7 @@ class SymfonyRouterServiceProvider extends ServiceProvider
         $this->app->singleton('router', function () {
             $strategy = new ApplicationStrategy();
             $strategy->setContainer($this->app);
-            $router = new Router($this->get('router.core'));
+            $router = new Router($this->app->get('router.core'));
             $router->setStrategy($strategy);
             return $router;
         });
@@ -64,12 +66,9 @@ class SymfonyRouterServiceProvider extends ServiceProvider
         \add_filter('timber/twig', [$this, 'addTwigExtension']);
     }
 
-    /**
-     * Add the form extension to the Twig environment
-     */
     public function addTwigExtension(Environment $twig): Environment
     {
-        $twig->addExtension(new RoutingExtension($this->get('router')));
+        $twig->addExtension(new RoutingExtension($this->get('router.core')));
         return $twig;
     }
 
@@ -82,7 +81,11 @@ class SymfonyRouterServiceProvider extends ServiceProvider
             $response = $router->dispatch($request);
         } catch (MethodNotAllowedException $e) {
             return;
+        } catch (LeagueMethodNotAllowedException $e) {
+            return;
         } catch (ResourceNotFoundException $e) {
+            return;
+        } catch (NotFoundException $e) {
             return;
         } catch (NoConfigurationException $e) {
             return;
