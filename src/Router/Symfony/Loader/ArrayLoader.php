@@ -97,8 +97,9 @@ class ArrayLoader extends YamlFileLoader
         $routes->setMethods($config['methods'] ?? []);
         $routes->setCondition($config['condition'] ?? null);
 
-        if (isset($config['host'])) {
-            $this->addHost($routes, $config['host']);
+        $host = \parse_url(\home_url(), PHP_URL_HOST);
+        if (\is_string($host)) {
+            $this->addHost($routes, $host);
         }
     }
 }
