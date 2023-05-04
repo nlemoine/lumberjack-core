@@ -72,9 +72,9 @@ abstract class AbstractController implements MiddlewareAwareInterface
      * @param array|string $templates
      * @param integer $status
      */
-    protected function render($templates, array $context = [], int $status = 200): TimberResponse
+    protected function render($templates, array $context = [], int $status = 200, array $headers = []): TimberResponse
     {
-        return new TimberResponse($templates, $context, $status);
+        return new TimberResponse($templates, $context, $status, $headers);
     }
 
     /**
