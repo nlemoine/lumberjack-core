@@ -121,7 +121,7 @@ class PolylangServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->app->singleton('pll', function (): ?PLL_Base {
+        $this->app->singleton('polylang', function (): ?PLL_Base {
             if (\function_exists('PLL')) {
                 return \PLL();
             }
@@ -129,14 +129,21 @@ class PolylangServiceProvider extends ServiceProvider
             return null;
         });
 
-        $this->app->singleton('polylang.languages.slugs', function () {
-            $pll = $this->app->get('pll');
-
-            return $pll ? $pll->model->get_languages_list([
-                'fields' => 'slug',
-            ]) : [$this->app->get('locale.short')];
+        $this->app->singleton('polylang.current_language', function () {
+            return $this->app->get('polylang')->curlang;
         });
-
+        $this->app->singleton('polylang.locales', function () {
+            return \array_column($this->app->get('polylang.languages'), 'locale');
+        });
+        $this->app->singleton('polylang.w3c', function () {
+            return \array_column($this->app->get('polylang.languages'), 'w3c');
+        });
+        $this->app->singleton('polylang.slugs', function () {
+            return \array_column($this->app->get('polylang.languages'), 'slug');
+        });
+        $this->app->singleton('polylang.url_prefix', function () {
+            return $this->getConfig('polylang.url_prefix', 'slug');
+        });
         $this->app->singleton('polylang.languages', function () {
             return \pll_the_languages([
                 'raw'          => 1,
