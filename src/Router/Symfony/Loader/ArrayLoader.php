@@ -8,7 +8,7 @@ use Symfony\Component\Routing\RouteCollection;
 class ArrayLoader extends YamlFileLoader
 {
     public function __construct(
-        private array $prefixes,
+        private ?array $prefixes = null,
         string $env = null
     ) {
     }
@@ -25,9 +25,9 @@ class ArrayLoader extends YamlFileLoader
             return $collection;
         }
 
-        foreach ($config as $name => $config) {
-            $this->validate($config, $name, '');
-            $this->parseRoute($collection, $name, $config, '');
+        foreach ($config as $name => $routeConfig) {
+            $this->validate($routeConfig, $name, '');
+            $this->parseRoute($collection, $name, $routeConfig, '');
         }
         $collection->setSchemes([\parse_url(\home_url(), PHP_URL_SCHEME)]);
 

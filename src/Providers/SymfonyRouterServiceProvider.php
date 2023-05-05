@@ -34,14 +34,14 @@ class SymfonyRouterServiceProvider extends ServiceProvider
             ];
         });
         $this->app->singleton('router.prefixes', function () {
-            $prefixes = [];
             if (!$this->app->has('polylang')) {
-                return $prefixes;
+                return null;
             }
             $pll = $this->app->get('polylang');
             if (!$pll instanceof PLL_Base) {
-                return $prefixes;
+                return null;
             }
+            $prefixes = [];
             $hideDefault = $pll->options['hide_default'] ?? false;
             $defaultLang = $pll->options['default_lang'] ?? null;
             $prefix = $this->app->get('polylang.url_prefix');
@@ -66,7 +66,7 @@ class SymfonyRouterServiceProvider extends ServiceProvider
             }
             return new SymfonyRouter(
                 $this->app->get('router.loader'),
-                $this->getConfig('routes', []),
+                $this->app->get('router.routes', []),
                 $this->app->get('router.options'),
                 null,
                 null,
