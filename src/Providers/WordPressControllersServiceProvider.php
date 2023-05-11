@@ -2,7 +2,6 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Brain\Hierarchy\Finder\ByCallback;
 use Brain\Hierarchy\Hierarchy;
 use Brain\Hierarchy\QueryTemplate;
 use Laminas\Diactoros\ServerRequestFactory;
@@ -10,20 +9,34 @@ use League\Route\Middleware\MiddlewareAwareInterface;
 use Middleland\Dispatcher;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Rareloop\Lumberjack\Application;
+use Rareloop\Lumberjack\Hierarchy\Finder\ControllerClassFinder;
 use Rareloop\Lumberjack\Http\AbstractController;
 use Rareloop\Lumberjack\Http\ServerRequest;
-use function Symfony\Component\String\u;
 use WP_Query;
 
 class WordPressControllersServiceProvider extends ServiceProvider
 {
     protected ?AbstractController $resolvedController = null;
 
-    protected Hierarchy $hierarchy;
-
     protected ?array $resolvedHierarchy = null;
 
     protected int $resolutionCount = 0;
+
+    protected Hierarchy $hierarchy;
+
+    public function __construct(Application $app)
+    {
+        parent::__construct($app);
+        $this->hierarchy = new Hierarchy();
+    }
+
+    public function register()
+    {
+        $this->app->singleton(ControllerClassFinder::class, function () {
+            return new ControllerClassFinder($this->getConfig('app.controllerNamespaces', []));
+        });
+    }
 
     public function boot()
     {
@@ -31,7 +44,6 @@ class WordPressControllersServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->hierarchy = new Hierarchy();
         \add_action('pre_get_posts', [$this, 'handleQuery'], PHP_INT_MAX);
         \add_filter('template_redirect', [$this, 'handleWordPressController'], PHP_INT_MAX);
     }
@@ -77,20 +89,6 @@ class WordPressControllersServiceProvider extends ServiceProvider
         $this->app->shutdown($response);
     }
 
-    public function getControllerClass(string $template): string
-    {
-        if ($template === '404') {
-            $template = 'error-404';
-        }
-
-        $template = $template . '-controller';
-
-        $controllerClass = u($template)->camel()->title();
-        $controllerFqns = 'App\\Http\\Controllers\\' . $controllerClass;
-
-        return \class_exists($controllerFqns) ? $controllerFqns : '';
-    }
-
     public function handleRequest(RequestInterface $request, AbstractController $controller, string $methodName): ResponseInterface
     {
         $middlewares = [];
@@ -131,12 +129,10 @@ class WordPressControllersServiceProvider extends ServiceProvider
             return $this->resolvedController;
         }
 
-        $finder = new ByCallback([$this, 'getControllerClass']);
-
+        $finder = $this->app->get(ControllerClassFinder::class);
         $query_template = new QueryTemplate($finder);
 
         $controller_class = $query_template->findTemplate(null, $trigger_filters);
-
         if (!$controller_class) {
             return null;
         }
