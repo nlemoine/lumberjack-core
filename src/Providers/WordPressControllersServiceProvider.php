@@ -34,7 +34,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(ControllerClassFinder::class, function () {
-            return new ControllerClassFinder($this->getConfig('app.controllerNamespaces', []));
+            return new ControllerClassFinder($this->getConfig('app.controller_namespaces', ['App\\Http\\Controllers\\']));
         });
     }
 
