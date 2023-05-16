@@ -17,6 +17,12 @@ class PolylangServiceProvider extends ServiceProvider
         \add_filter('pll_get_post_types', [$this, 'registerPostTypes'], 10, 2);
         \add_filter('pll_get_taxonomies', [$this, 'registerTaxonomies'], 10, 2);
         \add_filter('acf/load_value', [$this, 'loadTranslatedOption'], 10, 3);
+        \add_action('acf/init', [$this, 'init']);
+    }
+
+    public function init() {
+        // Disable ACFE Multilingual
+        acf_update_setting('acfe/modules/multilang', false);
     }
 
     public function loadTranslatedOption($value, $post_id, $field)
