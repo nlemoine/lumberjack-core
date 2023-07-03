@@ -10,10 +10,19 @@ class ThemeServiceProvider extends ServiceProvider
         \add_action('after_setup_theme', [$this, 'addTranslations']);
     }
 
+    /**
+     * Undocumented function
+     *
+     * @see https://developer.wordpress.org/reference/functions/_add_default_theme_supports/
+     * @return void
+     */
     public function addThemeSupport(): void
     {
         $default_support = [
             'title-tag',
+            'responsive-embeds',
+            'post-thumbnails',
+            'editor-styles',
             'html5' => [
                 'comment-list',
                 'comment-form',
