@@ -13,7 +13,6 @@ use Rareloop\Lumberjack\Twig\Extensions\TextHelpersExtension;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Timber\Timber as TimberCore;
 use Twig\Environment;
 use Twig\Extra\Html\HtmlExtension;
 use Twig\Extra\String\StringExtension;
@@ -22,11 +21,6 @@ class TimberServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $timber = new Timber();
-
-        $this->app->singleton('timber', $timber);
-        $this->app->singleton(TimberCore::class, $timber);
-
         $this->app->singleton('twig', function () {
             return (new Loader())->get_twig();
         });
@@ -42,6 +36,8 @@ class TimberServiceProvider extends ServiceProvider
 
     public function boot(Config $config)
     {
+        Timber::init();
+
         // Paths
         $paths = $config->get('timber.paths');
         if ($paths) {

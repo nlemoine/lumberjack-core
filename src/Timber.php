@@ -3,26 +3,42 @@
 namespace Rareloop\Lumberjack;
 
 use Timber\Timber as TimberCore;
+use Timber\Twig;
 
 class Timber extends TimberCore
 {
-    public function __construct()
+    public static function init()
     {
-        if (!\defined('ABSPATH')) {
+        if (!\defined('ABSPATH')
+            || !\class_exists('\WP')
+            || \defined('TIMBER_LOADED')
+        ) {
             return;
         }
 
-        if (\class_exists('WP') && !\defined('TIMBER_LOADED')) {
-            $this->init_constants();
-            self::init();
-        }
+        $self = new self();
+        $self->init_constants();
+
+        Twig::init();
+
+        \add_action('init', [__CLASS__, 'init_integrations']);
+        \add_filter('timber/post/import_data', [__CLASS__, 'handle_preview'], 10, 2);
+
+        /**
+         * Make an alias for the Timber class.
+         *
+         * This way, developers can use Timber::render() instead of Timber\Timber::render, which
+         * is more user-friendly.
+         */
+        \class_alias('Timber\Timber', 'Timber');
+
+        \define('TIMBER_LOADED', true);
+
+        return $self;
     }
 
     public static function compile($filenames, $data = [], $expires = false, $cache_mode = null, $via_render = false)
     {
-        if (!\defined('TIMBER_LOADED')) {
-            self::init();
-        }
         $loader = new Loader();
         $twig = $loader->get_twig();
 
