@@ -96,6 +96,7 @@ class TimberServiceProvider extends ServiceProvider
             'truncate',
             'time_ago',
             'apply_filters',
+            'size_format',
         ];
         return \array_intersect_key($filters, \array_flip($whitelist));
     }
