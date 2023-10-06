@@ -20,9 +20,10 @@ class PolylangServiceProvider extends ServiceProvider
         \add_action('acf/init', [$this, 'init']);
     }
 
-    public function init() {
+    public function init()
+    {
         // Disable ACFE Multilingual
-        acf_update_setting('acfe/modules/multilang', false);
+        \acf_update_setting('acfe/modules/multilang', false);
     }
 
     public function loadTranslatedOption($value, $post_id, $field)

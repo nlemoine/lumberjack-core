@@ -68,7 +68,7 @@
         "php-mock/php-mock": "^2.0",
         "phpstan/extension-installer": "^1.1",
         "phpunit/phpunit": "^9.0",
-        "symplify/easy-coding-standard": "^11.0",
+        "symplify/easy-coding-standard": "^11.0 || ^12.0",
         "szepeviktor/phpstan-wordpress": "^1.0"
     },
     "autoload": {
@@ -88,12 +88,8 @@
         }
     },
     "scripts": {
-        "lint": [
-            "vendor/bin/ecs check"
-        ],
-        "lint:fix": [
-            "vendor/bin/ecs check --fix"
-        ],
+        "cs": "vendor/bin/ecs check",
+        "cs:fix": "vendor/bin/ecs check --fix",
         "test": [
             "vendor/bin/phpunit --testdox"
         ]

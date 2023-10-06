@@ -3,7 +3,6 @@
 namespace Rareloop\Lumberjack\Bootstrappers;
 
 use DI\NotFoundException;
-use Exception;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Http\Message\ResponseInterface;

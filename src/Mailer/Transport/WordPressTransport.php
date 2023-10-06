@@ -2,7 +2,6 @@
 
 namespace Rareloop\Lumberjack\Mailer\Transport;
 
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -12,6 +11,9 @@ use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\MessageConverter;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
+use Symfony\Component\Mime\Part\TextPart;
 use WP_Error;
 
 class WordPressTransport extends AbstractTransport
@@ -46,18 +48,30 @@ class WordPressTransport extends AbstractTransport
         $email_headers->remove('subject');
         $email_headers->addHeader('content-type', 'text/html');
 
-        $email_array = $email->__serialize();
-        $email_class = \get_class($email);
-        $attachments = [];
-        if ($email_class === TemplatedEmail::class && isset($email_array[3][4])) {
-            $attachments = \array_map(function ($a) {
-                return $a['path'] ?? null;
-            }, $email_array[3][4]);
-        } elseif ($email_class === Email::class && isset($email_array[4])) {
-            $attachments = \array_map(function ($a) {
-                return $a['path'] ?? null;
-            }, $email_array[4][4]);
-        }
+        $attachmentFiles = \array_filter(\array_map(function (DataPart $part) {
+            $partRef = new \ReflectionClass($part);
+            $parent = $partRef->getParentClass();
+            if ($parent === false) {
+                return null;
+            }
+            if ($parent->getName() !== TextPart::class) {
+                return null;
+            }
+
+            try {
+                $bodyRef = $parent->getProperty('body');
+                $bodyRef->setAccessible(true);
+                $file = $bodyRef->getValue($part);
+
+                if (!$file instanceof File) {
+                    return null;
+                }
+                return $file->getPath();
+            } catch (\ReflectionException $e) {
+                return null;
+            }
+            return null;
+        }, $email->getAttachments()));
 
         $setTextPart = function ($phpmailer) use ($email) {
             $phpmailer->AltBody = $email->getTextBody();
@@ -70,7 +84,7 @@ class WordPressTransport extends AbstractTransport
         };
         \add_action('wp_mail_failed', $getErrors);
 
-        $result = \wp_mail($email_to, $email_subject, $email_html, $email_headers->toArray(), $attachments);
+        $result = \wp_mail($email_to, $email_subject, $email_html, $email_headers->toArray(), $attachmentFiles);
         if (!$result) {
             $e = new TransportException(\is_wp_error($error) ? $error->get_error_message() : 'Unknown error');
             throw $e;
@@ -86,23 +100,5 @@ class WordPressTransport extends AbstractTransport
         return \array_filter($envelope->getRecipients(), function (Address $address) use ($email) {
             return \in_array($address, \array_merge($email->getCc(), $email->getBcc()), true) === false;
         });
-    }
-
-    private function prepareAttachments(Email $email): array
-    {
-        $attachments = [];
-        foreach ($email->getAttachments() as $attachment) {
-            $headers = $attachment->getPreparedHeaders();
-            $filename = $headers->getHeaderParameter('Content-Disposition', 'filename');
-
-            $att = [
-                'content' => \str_replace("\r\n", '', $attachment->bodyToString()),
-                'name'    => $filename,
-            ];
-
-            $attachments[] = $att;
-        }
-
-        return $attachments;
     }
 }

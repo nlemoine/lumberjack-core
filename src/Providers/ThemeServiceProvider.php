@@ -14,7 +14,6 @@ class ThemeServiceProvider extends ServiceProvider
      * Undocumented function
      *
      * @see https://developer.wordpress.org/reference/functions/_add_default_theme_supports/
-     * @return void
      */
     public function addThemeSupport(): void
     {

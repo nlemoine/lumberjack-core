@@ -13,10 +13,10 @@ class ControllerClassFinder implements TemplateFinder
     public function __construct(
         private array $namespaces = []
     ) {
-        if (!count($this->namespaces)) {
+        if (!\count($this->namespaces)) {
             $this->namespaces[] = 'App\\Http\\Controllers\\';
         }
-        $this->namespaces = array_values(array_filter($this->namespaces));
+        $this->namespaces = \array_values(\array_filter($this->namespaces));
     }
 
     public function find(string $template, string $type): string
