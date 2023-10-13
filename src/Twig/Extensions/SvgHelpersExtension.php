@@ -32,6 +32,7 @@ class SvgHelpersExtension extends AbstractExtension
     {
         $args = \array_merge([
             'renderOnce' => false,
+            'noSymbol' => false,
         ], $args);
 
         $svg_path = $this->package->getUrl($file);
@@ -56,47 +57,56 @@ class SvgHelpersExtension extends AbstractExtension
             }
             $attrs = [];
 
-            if (\strpos($svg, 'preserveAspectRatio=') !== false) {
-                \preg_match('@preserveAspectRatio="([^"]+)"@', $svg, $matches);
-                if (isset($matches[1]) && empty($attributes['preserveAspectRatio'])) {
-                    $attrs['preserveAspectRatio'] = $matches[1];
-                    $attributes = \array_merge($attributes, $attrs);
+            // Symbol stuff
+            if (!$args['noSymbol']) {
+                if (\strpos($svg, 'preserveAspectRatio=') !== false) {
+                    \preg_match('@preserveAspectRatio="([^"]+)"@', $svg, $matches);
+                    if (isset($matches[1]) && empty($attributes['preserveAspectRatio'])) {
+                        $attrs['preserveAspectRatio'] = $matches[1];
+                        $attributes = \array_merge($attributes, $attrs);
+                    }
                 }
-            }
 
-            if (\strpos($svg, 'viewBox=') !== false) {
-                \preg_match('@viewBox="([^"]+)"@', $svg, $matches);
-                if (isset($matches[1]) && empty($attributes['viewBox'])) {
-                    $attrs['viewBox'] = $matches[1];
-                    $attributes = \array_merge($attributes, $attrs);
+                if (\strpos($svg, 'viewBox=') !== false) {
+                    \preg_match('@viewBox="([^"]+)"@', $svg, $matches);
+                    if (isset($matches[1]) && empty($attributes['viewBox'])) {
+                        $attrs['viewBox'] = $matches[1];
+                        $attributes = \array_merge($attributes, $attrs);
+                    }
                 }
-            }
 
-            $this->rendered[$svg_path]['attributes'] = $attrs;
-            $this->rendered[$svg_path]['once'] = $args['renderOnce'];
+                $this->rendered[$svg_path]['attributes'] = $attrs;
+                $this->rendered[$svg_path]['once'] = $args['renderOnce'];
 
-            $symbol = '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">';
-            $symbol .= '<symbol';
-            $symbol .= ' id="' . $svg_id . '"';
-            if (isset($attrs['viewBox'])) {
-                $symbol .= ' viewBox="' . $attrs['viewBox'] . '"';
+                $symbol = '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">';
+                $symbol .= '<symbol';
+                $symbol .= ' id="' . $svg_id . '"';
+                if (isset($attrs['viewBox'])) {
+                    $symbol .= ' viewBox="' . $attrs['viewBox'] . '"';
+                }
+                if (isset($attrs['preserveAspectRatio'])) {
+                    $symbol .= ' preserveAspectRatio="' . $attrs['preserveAspectRatio'] . '"';
+                }
+                $symbol .= '>';
+                $symbol = \preg_replace("/<svg[^>]*?(\/?)>/si", $symbol, $svg);
+                $symbol = \str_replace('</svg>', '</symbol></svg>', $symbol);
             }
-            if (isset($attrs['preserveAspectRatio'])) {
-                $symbol .= ' preserveAspectRatio="' . $attrs['preserveAspectRatio'] . '"';
-            }
-            $symbol .= '>';
-            $symbol = \preg_replace("/<svg[^>]*?(\/?)>/si", $symbol, $svg);
-            $symbol = \str_replace('</svg>', '</symbol></svg>', $symbol);
         }
 
-        $svg = <<<SVG
-        <svg><use xlink:href="#{$svg_id}"/></svg>
-        SVG;
+        if (!$args['noSymbol']) {
+            $svg = <<<SVG
+            <svg><use xlink:href="#{$svg_id}"/></svg>
+            SVG;
+        }
 
         $svg = \str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $svg);
         $symbol = \str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $symbol);
         if (!empty($attributes)) {
             $svg = \str_replace('<svg', \sprintf('<svg%s', $this->renderAttributes($attributes)), $svg);
+        }
+
+        if ($args['noSymbol']) {
+            return $svg;
         }
 
         return $symbol . $svg;
