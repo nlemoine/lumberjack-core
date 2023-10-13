@@ -44,7 +44,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
             return;
         }
 
-        \add_action('pre_get_posts', [$this, 'handleQuery'], PHP_INT_MAX);
+        \add_action('pre_get_posts', [$this, 'handleQuery'], 20);
         \add_filter('template_redirect', [$this, 'handleWordPressController'], PHP_INT_MAX);
     }
 
