@@ -13,7 +13,6 @@ class AjaxHookResolver extends AssetHookResolver
      */
     public $context;
 
-
     public function __construct(?WpContext $context = null)
     {
         $this->context = $context ?? WpContext::determine();

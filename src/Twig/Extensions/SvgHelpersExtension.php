@@ -32,7 +32,7 @@ class SvgHelpersExtension extends AbstractExtension
     {
         $args = \array_merge([
             'renderOnce' => false,
-            'noSymbol' => false,
+            'noSymbol'   => false,
         ], $args);
 
         $svg_path = $this->package->getUrl($file);
