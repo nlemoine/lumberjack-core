@@ -11,6 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\ServerRequest;
 use Rareloop\Lumberjack\Router\Symfony\Loader\ArrayLoader;
 use Rareloop\Lumberjack\Router\Symfony\Router;
+use Rareloop\Lumberjack\Router\Symfony\Matcher\RedirectableCompiledUrlMatcher;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
@@ -30,6 +31,7 @@ class SymfonyRouterServiceProvider extends ServiceProvider
             return [
                 'debug'     => $this->getConfig('app.debug'),
                 'cache_dir' => $debug ? null : $this->app->get('path.cache') . '/routes',
+                'matcher_class' => RedirectableCompiledUrlMatcher::class,
                 // 'strict_requirements' => false, // TODO: remove when this is solid
             ];
         });
