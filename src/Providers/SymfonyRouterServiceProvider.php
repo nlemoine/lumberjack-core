@@ -91,6 +91,23 @@ class SymfonyRouterServiceProvider extends ServiceProvider
     {
         \add_action('wp', [$this, 'processRequest'], 1000); // Load after inpsyde/assets
         \add_filter('timber/twig', [$this, 'addTwigExtension']);
+        \add_filter('document_title_parts', [$this, 'setTitle'], 100);
+    }
+
+    public function setTitle(array $parts)
+    {
+        try {
+            $route = $this->app->get('current_route');
+            if (!isset($route['_title'])) {
+                return $parts;
+            }
+        } catch(\Exception $e) {
+            return $parts;
+        }
+
+        $parts['title'] = $route['_title'];
+
+        return $parts;
     }
 
     public function processRequest()
