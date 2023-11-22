@@ -95,9 +95,9 @@ class PolylangServiceProvider extends ServiceProvider
      */
     public function registerTaxonomies(array $taxonomies, bool $is_settings): array
     {
-        $taxonomies = $this->getConfig('taxonomies.register', []);
+        $registeredTaxonomies = $this->getConfig('taxonomies.register', []);
 
-        foreach ($taxonomies as $taxonomy) {
+        foreach ($registeredTaxonomies as $taxonomy) {
             $config = $taxonomy::getTaxonomyConfig();
             $translate = $config['translate'] ?? true;
             if (!$translate) {
