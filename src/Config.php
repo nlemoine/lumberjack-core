@@ -6,13 +6,11 @@ use Illuminate\Support\Arr;
 
 class Config
 {
-    private $data = [];
+    private array $data = [];
 
-    public function __construct(string $path = null)
-    {
-        if ($path) {
-            $this->load($path);
-        }
+    public function __construct(
+        private ?string $path = null
+    ) {
     }
 
     public function set(string $key, $value): self
@@ -24,24 +22,28 @@ class Config
 
     public function get(string $key, $default = null)
     {
+        $this->loadData($key);
         return Arr::get($this->data, $key, $default);
     }
 
     public function has(string $key)
     {
+        $this->loadData($key);
         return Arr::has($this->data, $key);
     }
 
-    public function load(string $path): self
+    private function loadData(string $file)
     {
-        $files = \glob($path . '/*.php');
-
-        foreach ($files as $file) {
-            $configData = include $file;
-
-            $this->data[\pathinfo($file)['filename']] = $configData;
+        $filename = \explode('.', $file)[0];
+        if (isset($this->data[$filename])) {
+            return;
         }
-
-        return $this;
+        $filepath = \sprintf('%s/%s.php', $this->path, $filename);
+        try {
+            $configData = include $filepath;
+            $this->data[$filename] = $configData;
+        } catch (\Throwable $th) {
+            $this->data[$filename] = [];
+        }
     }
 }
