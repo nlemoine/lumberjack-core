@@ -8,9 +8,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class HttpRequestHandler extends HttpFoundationRequestHandler
 {
-    public function handleRequest(FormInterface $form, $request = null)
+    public function handleRequest(FormInterface $form, $request = null): void
     {
         $request = Request::createFromGlobals();
-        return parent::handleRequest($form, $request);
+        parent::handleRequest($form, $request);
     }
 }

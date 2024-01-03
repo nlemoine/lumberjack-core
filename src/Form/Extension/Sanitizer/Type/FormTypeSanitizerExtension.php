@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormTypeSanitizerExtension extends AbstractTypeExtension
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['sanitizer'] === false) {
             return;
@@ -22,7 +22,7 @@ class FormTypeSanitizerExtension extends AbstractTypeExtension
     /**
      * Setup form sanitization enabled by default.
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

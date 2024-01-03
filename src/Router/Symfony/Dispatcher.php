@@ -5,7 +5,6 @@ namespace Rareloop\Lumberjack\Router\Symfony;
 use League\Route\Dispatcher as RouteDispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Rareloop\Lumberjack\Helpers;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
