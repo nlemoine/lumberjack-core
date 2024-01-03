@@ -2,9 +2,9 @@
 
 namespace Rareloop\Lumberjack\Bootstrappers;
 
-use function DI\get;
 use Rareloop\Lumberjack\Application;
 use Rareloop\Lumberjack\Config;
+use function DI\get;
 
 class LoadConfiguration
 {

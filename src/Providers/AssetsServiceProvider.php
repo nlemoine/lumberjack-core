@@ -2,9 +2,8 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use function DI\get;
-
 use Inpsyde\Assets\AssetFactory;
+
 use Inpsyde\Assets\AssetManager;
 use Inpsyde\Assets\Loader\ArrayLoader;
 use Inpsyde\Assets\Script;
@@ -18,6 +17,7 @@ use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
+use function DI\get;
 
 class AssetsServiceProvider extends ServiceProvider
 {

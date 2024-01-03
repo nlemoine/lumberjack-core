@@ -5,7 +5,6 @@ namespace Rareloop\Lumberjack\Router\Symfony;
 use League\Route\Dispatcher as RouteDispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Rareloop\Lumberjack\Application;
 use Rareloop\Lumberjack\Helpers;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
@@ -29,7 +28,8 @@ class Dispatcher extends RouteDispatcher
             $symfonyRequest = (new HttpFoundationFactory())->createRequest($request);
             $this->router->getContext()->fromRequest($symfonyRequest);
             $route = $this->router->matchRequest($symfonyRequest);
-            Helpers::app()->bind('current_route', fn () => $route);
+            $GLOBALS['wp_query']->is_404 = false;
+            \do_action('app.route_matched', new CurrentRoute($route, $this->router->getGenerator()));
         } catch (MethodNotAllowedException $e) {
             $message = $e->getMessage();
             $allowed = $e->getAllowedMethods();

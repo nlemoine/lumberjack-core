@@ -2,13 +2,13 @@
 
 namespace Rareloop\Lumberjack\Bootstrappers;
 
-use function DI\get;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Rareloop\Lumberjack\Application;
 use Rareloop\Lumberjack\Config;
+use function DI\get;
 
 class RegisterLogger
 {

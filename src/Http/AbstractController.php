@@ -109,8 +109,6 @@ abstract class AbstractController implements MiddlewareAwareInterface
 
     /**
      * Add flash message.
-     *
-     * @param string $message
      */
     protected function addFlash(string $type, string $message = null)
     {

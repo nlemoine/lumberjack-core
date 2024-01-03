@@ -9,7 +9,7 @@ class RedirectableCompiledUrlMatcher extends CompiledUrlMatcher implements Redir
 {
     public function redirect(string $path, string $route, string $scheme = null): array
     {
-        wp_safe_redirect(home_url($path), 301);
+        \wp_safe_redirect(\home_url($path), 301);
         exit;
     }
 }

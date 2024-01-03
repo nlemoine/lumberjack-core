@@ -9,9 +9,10 @@ use League\Route\Strategy\ApplicationStrategy;
 use PLL_Base;
 use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\ServerRequest;
+use Rareloop\Lumberjack\Router\Symfony\CurrentRoute;
 use Rareloop\Lumberjack\Router\Symfony\Loader\ArrayLoader;
-use Rareloop\Lumberjack\Router\Symfony\Router;
 use Rareloop\Lumberjack\Router\Symfony\Matcher\RedirectableCompiledUrlMatcher;
+use Rareloop\Lumberjack\Router\Symfony\Router;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
@@ -29,8 +30,8 @@ class SymfonyRouterServiceProvider extends ServiceProvider
         $this->app->singleton('router.options', function () {
             $debug = $this->getConfig('app.debug');
             return [
-                'debug'     => $this->getConfig('app.debug'),
-                'cache_dir' => $debug ? null : $this->app->get('path.cache') . '/routes',
+                'debug'         => $this->getConfig('app.debug'),
+                'cache_dir'     => $debug ? null : $this->app->get('path.cache') . '/routes',
                 'matcher_class' => RedirectableCompiledUrlMatcher::class,
                 // 'strict_requirements' => false, // TODO: remove when this is solid
             ];
@@ -91,23 +92,7 @@ class SymfonyRouterServiceProvider extends ServiceProvider
     {
         \add_action('wp', [$this, 'processRequest'], 1000); // Load after inpsyde/assets
         \add_filter('timber/twig', [$this, 'addTwigExtension']);
-        \add_filter('document_title_parts', [$this, 'setTitle'], 100);
-    }
-
-    public function setTitle(array $parts)
-    {
-        try {
-            $route = $this->app->get('current_route');
-            if (!isset($route['_title'])) {
-                return $parts;
-            }
-        } catch(\Exception $e) {
-            return $parts;
-        }
-
-        $parts['title'] = $route['_title'];
-
-        return $parts;
+        \add_action('app.route_matched', [$this, 'onRouteMatched']);
     }
 
     public function processRequest()
@@ -161,5 +146,17 @@ class SymfonyRouterServiceProvider extends ServiceProvider
         $this->app->requestHasBeenHandled();
 
         $this->app->shutdown($response);
+    }
+
+    /**
+     * Hooks to execute when a route is matched
+     */
+    public function onRouteMatched(CurrentRoute $currentRoute)
+    {
+        // Document title
+        \add_filter('document_title_parts', function (array $parts) use ($currentRoute) {
+            $parts['title'] = $currentRoute->title ?? $parts['title'] ?? '';
+            return $parts;
+        }, 1000);
     }
 }
