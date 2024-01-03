@@ -47,7 +47,7 @@ class ArrayLoader extends YamlFileLoader
     /**
      * Parses a route and adds it to the RouteCollection.
      */
-    protected function parseRoute(RouteCollection $collection, string $name, array $config, string $path)
+    protected function parseRoute(RouteCollection $collection, string $name, array $config, string $path): void
     {
         if (isset($config['alias'])) {
             $alias = $collection->addAlias($name, $config['alias']);
