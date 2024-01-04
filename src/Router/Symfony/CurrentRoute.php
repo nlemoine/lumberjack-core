@@ -49,6 +49,6 @@ class CurrentRoute
 
     private function getParams(): array
     {
-        return array_values(array_filter($this->currentRoute, fn ($key) => !str_starts_with($key, '_'), ARRAY_FILTER_USE_KEY));
+        return array_filter($this->currentRoute, fn ($key) => !str_starts_with($key, '_'), ARRAY_FILTER_USE_KEY);
     }
 }
