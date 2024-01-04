@@ -3,6 +3,7 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use PLL_Base;
+use Rareloop\Lumberjack\Helpers;
 
 class PolylangServiceProvider extends ServiceProvider
 {
@@ -18,6 +19,26 @@ class PolylangServiceProvider extends ServiceProvider
         \add_filter('pll_get_taxonomies', [$this, 'registerTaxonomies'], 10, 2);
         \add_filter('acf/load_value', [$this, 'loadTranslatedOption'], 10, 3);
         \add_action('acf/init', [$this, 'init']);
+        \add_filter('pll_translation_url', [$this, 'translateUrl'], 10, 2);
+    }
+
+    /**
+     * Translate custom route url
+     */
+    public function translateUrl(?string $url, string $lang): ?string
+    {
+        if (!empty($url)) {
+            return $url;
+        }
+
+        if (!Helpers::app()->has('router.current_route')) {
+            return $url;
+        }
+
+        $currentRoute = Helpers::app()->get('router.current_route');
+        return $currentRoute->getCanonical([
+            '_locale' => $lang,
+        ]);
     }
 
     public function init()

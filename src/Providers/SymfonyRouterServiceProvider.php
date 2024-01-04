@@ -48,7 +48,15 @@ class SymfonyRouterServiceProvider extends ServiceProvider
             $hideDefault = $pll->options['hide_default'] ?? false;
             $defaultLang = $pll->options['default_lang'] ?? null;
             $prefix = $this->app->get('polylang.url_prefix');
-            $languages_prefixes = \array_column($this->app->get('polylang.languages'), $prefix);
+            // Do not use container here, it will cache untranslated URLs
+            $languages = \pll_the_languages([
+                'raw'          => 1,
+                'hide_current' => 0,
+            ]);
+            if (!\is_array($languages)) {
+                return null;
+            }
+            $languages_prefixes = \array_column($languages, $prefix);
             $prefixes = \array_combine($languages_prefixes, \array_map(function ($l) use ($hideDefault, $defaultLang) {
                 if ($hideDefault && $l === $defaultLang) {
                     return '';
@@ -153,6 +161,8 @@ class SymfonyRouterServiceProvider extends ServiceProvider
      */
     public function onRouteMatched(CurrentRoute $currentRoute)
     {
+        $this->app->bind('router.current_route', $currentRoute);
+
         // Document title
         \add_filter('document_title_parts', function (array $parts) use ($currentRoute) {
             $parts['title'] = $currentRoute->title ?? $parts['title'] ?? '';

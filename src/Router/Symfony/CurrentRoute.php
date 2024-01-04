@@ -4,6 +4,10 @@ namespace Rareloop\Lumberjack\Router\Symfony;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * @property-read string $canonical
+ * @property-read string $name
+ */
 class CurrentRoute
 {
     public function __construct(
@@ -12,21 +16,34 @@ class CurrentRoute
     ) {
     }
 
-    private function __get(string $property): mixed
+    public function __get(string $property): mixed
     {
-        if ($property === 'canonical') {
-            return $this->getCanonical();
+        switch ($property) {
+            case 'canonical':
+                return $this->getCanonical();
+            case 'name':
+                return $this->getName();
         }
 
         return $this->currentRoute['_' . $property] ?? null;
     }
 
-    public function getCanonical(): string
+    public function __isset(string $property): bool
+    {
+        return isset($this->currentRoute['_' . $property]);
+    }
+
+    public function getCanonical(array $params = []): string
     {
         return $this->urlGenerator->generate(
             $this->currentRoute['_route'] ?? '',
-            [],
+            $params,
             UrlGeneratorInterface::ABSOLUTE_URL
         );
+    }
+
+    private function getName(): string
+    {
+        return $this->currentRoute['_route'] ?? '';
     }
 }
