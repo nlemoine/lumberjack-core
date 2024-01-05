@@ -14,8 +14,10 @@ use Symfony\Component\Asset\Packages;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Twig\Environment;
+use Twig\Extension\AbstractExtension;
 use Twig\Extra\Html\HtmlExtension;
 use Twig\Extra\String\StringExtension;
+use Twig\TwigFunction;
 
 class TimberServiceProvider extends ServiceProvider
 {
@@ -144,6 +146,16 @@ class TimberServiceProvider extends ServiceProvider
         $twig->addExtension(new RenderAttributesExtension());
         $twig->addExtension(new TextHelpersExtension());
         $twig->addExtension(new StringExtension($this->has(SluggerInterface::class) ? $this->get(SluggerInterface::class) : null));
+        $twig->addExtension(new class extends AbstractExtension {
+            public function getFunctions(): array
+            {
+                return [
+                    new TwigFunction('nonce_url', 'wp_nonce_url', [
+                        'is_safe' => ['html'],
+                    ]),
+                ];
+            }
+        });
 
         if ($this->has(Packages::class)) {
             $packages = $this->get(Packages::class);
