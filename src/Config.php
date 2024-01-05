@@ -39,7 +39,7 @@ class Config
             return;
         }
         $filepath = \sprintf('%s/%s.php', $this->path, $filename);
-        if (!file_exists($filepath)) {
+        if (!\file_exists($filepath)) {
             $this->data[$filename] = [];
             return;
         }

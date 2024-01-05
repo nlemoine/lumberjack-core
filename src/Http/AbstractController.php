@@ -11,9 +11,11 @@ use Psr\Container\ContainerInterface;
 use Psr\Link\LinkInterface;
 use Rareloop\Lumberjack\Http\Responses\RedirectResponse;
 use Rareloop\Lumberjack\Http\Responses\TimberResponse;
+use Rareloop\Lumberjack\Router\Router;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use WP_Query;
 
@@ -142,9 +144,18 @@ abstract class AbstractController implements MiddlewareAwareInterface
     /**
      * Generate URL.
      */
-    protected function generateUrl(string $route, array $parameters = [], bool $relative = true): string
+    protected function generateUrl(string $route, array $parameters = [], int|bool $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): string
     {
-        return $this->container->get('router')->generate($route, $parameters, $relative);
+        if (!$this->container->has('router.generator')) {
+            throw new \LogicException('You can not use the generateUrl method if the router is not installed.');
+        }
+        $generator = $this->container->get('router.generator');
+        if ($generator instanceof UrlGeneratorInterface) {
+            return $generator->generate($route, $parameters, $referenceType);
+        } elseif ($generator instanceof Router) {
+            return $generator->generate($route, $parameters, $referenceType);
+        }
+        throw new \LogicException('You can not use the generateUrl method if the router is not installed.');
     }
 
     /**

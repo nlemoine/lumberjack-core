@@ -26,6 +26,9 @@ class RouterServiceProvider extends ServiceProvider
         $this->app->singleton('router', function () {
             return $this->app->get(Router::class);
         });
+        $this->app->singleton('router.generator', function () {
+            return $this->app->get(Router::class);
+        });
     }
 
     public function boot()

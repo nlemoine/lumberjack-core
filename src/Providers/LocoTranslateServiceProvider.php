@@ -2,8 +2,6 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
-use Rareloop\Lumberjack\Providers\ServiceProvider;
-
 class LocoTranslateServiceProvider extends ServiceProvider
 {
     public function boot()

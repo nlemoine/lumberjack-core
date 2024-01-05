@@ -37,7 +37,7 @@ class CurrentRoute
     {
         return $this->urlGenerator->generate(
             $this->currentRoute['_route'] ?? '',
-            array_merge($this->getParams(), $params),
+            \array_merge($this->getParams(), $params),
             UrlGeneratorInterface::ABSOLUTE_URL
         );
     }
@@ -49,6 +49,6 @@ class CurrentRoute
 
     private function getParams(): array
     {
-        return array_filter($this->currentRoute, fn ($key) => !str_starts_with($key, '_'), ARRAY_FILTER_USE_KEY);
+        return \array_filter($this->currentRoute, fn ($key) => !\str_starts_with($key, '_'), ARRAY_FILTER_USE_KEY);
     }
 }
