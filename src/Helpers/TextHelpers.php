@@ -23,14 +23,19 @@ class TextHelpers
         $words_first = [];
         $words_second = [];
 
-        $text_without_spaces = \preg_replace('@[' . self::ALL_SPACES . ']@mu', '', $text);
-        $length = \mb_strlen($text_without_spaces);
-        $middle = (float) ($length * $center);
-        foreach ($words as $word) {
-            if (\mb_strlen(\implode('', $words_first)) <= $middle) {
-                $words_first[] = $word;
-            } else {
-                $words_second[] = $word;
+        if (count($words) === 2) {
+            $words_first[] = $words[0];
+            $words_second[] = $words[1];
+        } else {
+            $text_without_spaces = \preg_replace('@[' . self::ALL_SPACES . ']@mu', '', $text);
+            $length = \mb_strlen($text_without_spaces);
+            $middle = (float) ($length * $center);
+            foreach ($words as $word) {
+                if (\mb_strlen(\implode('', $words_first)) <= $middle) {
+                    $words_first[] = $word;
+                } else {
+                    $words_second[] = $word;
+                }
             }
         }
 
