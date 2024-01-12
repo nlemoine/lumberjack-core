@@ -213,7 +213,6 @@ class HelpersTest extends TestCase
     //     $this->assertSame(123, Helpers::session('test'));
     // }
 
-
     // public function can_access_an_item_in_the_session_by_key_with_default()
     // {
     //     $app = new Application;
@@ -224,7 +223,6 @@ class HelpersTest extends TestCase
 
     //     $this->assertSame(123, Helpers::session('test', 123));
     // }
-
 
     // public function can_add_an_item_in_the_session()
     // {
@@ -238,7 +236,6 @@ class HelpersTest extends TestCase
 
     //     $this->assertSame(123, Helpers::session('test'));
     // }
-
 
     // public function can_add_multiple_items_to_the_session()
     // {
@@ -254,7 +251,6 @@ class HelpersTest extends TestCase
     //     $this->assertSame('bar', Helpers::session('foo'));
     // }
 
-
     // public function can_resolve_the_session_manager()
     // {
     //     $app = new Application;
@@ -265,7 +261,6 @@ class HelpersTest extends TestCase
 
     //     $this->assertSame($store, Helpers::session());
     // }
-
 
     // public function can_redirect_back()
     // {

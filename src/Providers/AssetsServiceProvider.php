@@ -3,7 +3,6 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Inpsyde\Assets\AssetFactory;
-
 use Inpsyde\Assets\AssetManager;
 use Inpsyde\Assets\Loader\ArrayLoader;
 use Inpsyde\Assets\Script;

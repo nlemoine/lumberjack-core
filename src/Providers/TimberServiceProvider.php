@@ -146,7 +146,7 @@ class TimberServiceProvider extends ServiceProvider
         $twig->addExtension(new RenderAttributesExtension());
         $twig->addExtension(new TextHelpersExtension());
         $twig->addExtension(new StringExtension($this->has(SluggerInterface::class) ? $this->get(SluggerInterface::class) : null));
-        $twig->addExtension(new class extends AbstractExtension {
+        $twig->addExtension(new class() extends AbstractExtension {
             public function getFunctions(): array
             {
                 return [

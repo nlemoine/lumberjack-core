@@ -20,6 +20,19 @@ class PolylangServiceProvider extends ServiceProvider
         \add_filter('acf/load_value', [$this, 'loadTranslatedOption'], 10, 3);
         \add_action('acf/init', [$this, 'init']);
         \add_filter('pll_translation_url', [$this, 'translateUrl'], 10, 2);
+        \add_filter('pll_home_url_white_list', [$this, 'fixTimberHomeUrl'], 10, 1);
+    }
+
+    /**
+     * Fix Timber home url
+     *
+     * When Timber isn't located in the theme folder, the home url is not translated
+     */
+    public function fixTimberHomeUrl(array $whiteList): array
+    {
+        return \array_merge($whiteList, [[
+            'file' => 'timber/timber/src/Site.php',
+        ]]);
     }
 
     /**

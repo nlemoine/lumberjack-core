@@ -12,9 +12,6 @@ class BudEntrypointsLoader extends EncoreEntrypointsLoader
     /**
      * @param mixed $resource
      *
-     * @return array
-     *
-     * phpcs:disable Inpsyde.CodeQuality.ArgumentTypeDeclaration
      * @psalm-suppress MixedArgument
      */
     public function load($resource, array $entrypoints = []): array
