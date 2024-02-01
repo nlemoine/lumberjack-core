@@ -12,7 +12,7 @@ interface ExceptionHandler
      *
      * @return \Psr\Http\Message\ResponseInterface
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function render(ServerRequestInterface $request, Throwable $e);
 

@@ -3,13 +3,14 @@
 namespace Rareloop\Lumberjack\Facets;
 
 use WP_Query;
+use wpdb;
 
 class FacetsManager
 {
     /**
      * the wp_query on wich we want to get the facets
      *
-     * @var \WP_Query
+     * @var WP_Query
      */
     protected $query;
 
@@ -21,7 +22,7 @@ class FacetsManager
     protected $facets;
 
     /**
-     * @var \wpdb
+     * @var wpdb
      */
     protected $wpdb;
 

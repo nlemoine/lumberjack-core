@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use Exception;
 use Rareloop\Lumberjack\Config;
 use WP_CLI;
 
@@ -18,7 +19,7 @@ class CommandServiceProvider extends ServiceProvider
             try {
                 $cmd = $this->app->get($class);
                 WP_CLI::add_command($command, $cmd);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
             }
         }
     }

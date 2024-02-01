@@ -10,6 +10,7 @@ use Rareloop\Lumberjack\Form\Extension\Recaptcha\RecaptchaExtension;
 use Rareloop\Lumberjack\Form\Extension\RequestHandler\HttpExtension;
 use Rareloop\Lumberjack\Form\Extension\Sanitizer\SanitizerExtension;
 use Rareloop\Lumberjack\Form\FileUploader;
+use ReflectionClass;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
@@ -39,13 +40,13 @@ class FormServiceProvider extends ServiceProvider
             $translator = new Translator($this->app->get('locale.short'));
             $translator->addLoader('xlf', new \Symfony\Component\Translation\Loader\XliffFileLoader());
 
-            $form_reflection = new \ReflectionClass(Forms::class);
+            $form_reflection = new ReflectionClass(Forms::class);
             $filename = $form_reflection->getFileName();
             if ($filename) {
                 $translations = \dirname($filename) . '/Resources/translations/validators.fr.xlf';
                 $translator->addResource('xlf', $translations, $this->app->get('locale.short'));
             }
-            $validator_reflection = new \ReflectionClass(Validation::class);
+            $validator_reflection = new ReflectionClass(Validation::class);
             $filename = $validator_reflection->getFileName();
             if ($filename) {
                 $translations = \dirname($filename) . '/Resources/translations/validators.fr.xlf';
@@ -223,7 +224,7 @@ class FormServiceProvider extends ServiceProvider
      */
     protected function getRecaptchaExtensionPath(): ?string
     {
-        $recaptcha_reflection = new \ReflectionClass(RecaptchaExtension::class);
+        $recaptcha_reflection = new ReflectionClass(RecaptchaExtension::class);
         $filename = $recaptcha_reflection->getFileName();
         if (!$filename) {
             return null;
@@ -236,7 +237,7 @@ class FormServiceProvider extends ServiceProvider
      */
     protected function getHcaptchaExtensionPath(): ?string
     {
-        $recaptcha_reflection = new \ReflectionClass(HcaptchaExtension::class);
+        $recaptcha_reflection = new ReflectionClass(HcaptchaExtension::class);
         $filename = $recaptcha_reflection->getFileName();
         if (!$filename) {
             return null;
@@ -249,7 +250,7 @@ class FormServiceProvider extends ServiceProvider
      */
     protected function getTwigBridgeFormPath(): ?string
     {
-        $app_variable_reflection = new \ReflectionClass('\Symfony\Bridge\Twig\AppVariable');
+        $app_variable_reflection = new ReflectionClass('\Symfony\Bridge\Twig\AppVariable');
         $filename = $app_variable_reflection->getFileName();
         if (!$filename) {
             return null;

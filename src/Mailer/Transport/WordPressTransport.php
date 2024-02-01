@@ -2,6 +2,9 @@
 
 namespace Rareloop\Lumberjack\Mailer\Transport;
 
+use Exception;
+use ReflectionClass;
+use ReflectionException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -33,7 +36,7 @@ class WordPressTransport extends AbstractTransport
         try {
             /** @var Email $email */
             $email = MessageConverter::toEmail($message->getOriginalMessage());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new RuntimeException(\sprintf('Unable to send message with the "%s" transport: ', __CLASS__) . $e->getMessage(), 0, $e);
         }
 
@@ -49,7 +52,7 @@ class WordPressTransport extends AbstractTransport
         $email_headers->addHeader('content-type', 'text/html');
 
         $attachmentFiles = \array_filter(\array_map(function (DataPart $part) {
-            $partRef = new \ReflectionClass($part);
+            $partRef = new ReflectionClass($part);
             $parent = $partRef->getParentClass();
             if ($parent === false) {
                 return null;
@@ -67,7 +70,7 @@ class WordPressTransport extends AbstractTransport
                     return null;
                 }
                 return $file->getPath();
-            } catch (\ReflectionException $e) {
+            } catch (ReflectionException $e) {
                 return null;
             }
             return null;

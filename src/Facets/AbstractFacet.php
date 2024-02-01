@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Facets;
 
+use Exception;
 use WP_Query;
 
 abstract class AbstractFacet
@@ -39,7 +40,7 @@ abstract class AbstractFacet
     public function __construct()
     {
         if (!\in_array($this->getType(), [self::TYPE_TAXONOMY, self::TYPE_META, self::TYPE_COLUMN], true)) {
-            throw new \Exception('Invalid facet type');
+            throw new Exception('Invalid facet type');
         }
         $this->type = $this->getType();
         $this->key = $this->getKey();

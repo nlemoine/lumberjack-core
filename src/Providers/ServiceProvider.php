@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use InvalidArgumentException;
 use Rareloop\Lumberjack\Application;
 use Rareloop\Lumberjack\Config;
 
@@ -70,7 +71,7 @@ abstract class ServiceProvider
             $resolved = $this->resolveAlias($match[1]);
 
             if (!\is_string($resolved) && !\is_numeric($resolved)) {
-                throw new \InvalidArgumentException(\sprintf('The parameter "%s" must be a string or numeric, but was of type "%s".', $match[0], \gettype($resolved)));
+                throw new InvalidArgumentException(\sprintf('The parameter "%s" must be a string or numeric, but was of type "%s".', $match[0], \gettype($resolved)));
             }
 
             return $resolved;

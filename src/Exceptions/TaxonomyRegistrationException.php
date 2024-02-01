@@ -2,6 +2,8 @@
 
 namespace Rareloop\Lumberjack\Exceptions;
 
-class TaxonomyRegistrationException extends \Exception
+use Exception;
+
+class TaxonomyRegistrationException extends Exception
 {
 }

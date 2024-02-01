@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use Exception;
 use PiedWeb\RenderAttributes\TwigExtension as RenderAttributesExtension;
 use Rareloop\Lumberjack\Config;
 use Rareloop\Lumberjack\Loader;
@@ -163,7 +164,7 @@ class TimberServiceProvider extends ServiceProvider
             try {
                 $pathPackage = $packages->getPackage('images_path');
                 $twig->addExtension(new SvgHelpersExtension($pathPackage));
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 if (WP_DEBUG) {
                     throw $e;
                 }

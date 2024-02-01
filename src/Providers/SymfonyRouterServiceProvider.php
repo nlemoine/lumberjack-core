@@ -7,6 +7,7 @@ use League\Route\Http\Exception\MethodNotAllowedException as LeagueMethodNotAllo
 use League\Route\Http\Exception\NotFoundException;
 use League\Route\Strategy\ApplicationStrategy;
 use PLL_Base;
+use PLL_Language_Factory;
 use Psr\Http\Message\ServerRequestInterface;
 use Rareloop\Lumberjack\Http\ServerRequest;
 use Rareloop\Lumberjack\Router\Symfony\CurrentRoute;
@@ -49,10 +50,14 @@ class SymfonyRouterServiceProvider extends ServiceProvider
             $defaultLang = $pll->options['default_lang'] ?? null;
             $prefix = $this->app->get('polylang.url_prefix');
             // Do not use container here, it will cache untranslated URLs
-            $languages = \pll_the_languages([
-                'raw'          => 1,
-                'hide_current' => 0,
-            ]);
+            $languages = \get_transient('pll_languages_list');
+            if ($languages === false) {
+                $languages = $pll->model->get_languages_list();
+            }
+            $languages = \array_values(\array_filter(\array_map(
+                [new PLL_Language_Factory($pll->model->options), 'get'],
+                $languages
+            )));
             if (!\is_array($languages)) {
                 return null;
             }

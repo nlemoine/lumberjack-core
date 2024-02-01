@@ -2,6 +2,8 @@
 
 namespace Rareloop\Lumberjack\Exceptions;
 
-class CannotRedeclarePostTypeOnQueryException extends \Exception
+use Exception;
+
+class CannotRedeclarePostTypeOnQueryException extends Exception
 {
 }

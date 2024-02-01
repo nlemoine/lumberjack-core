@@ -3,6 +3,7 @@
 namespace Rareloop\Lumberjack;
 
 use Illuminate\Support\Arr;
+use Throwable;
 
 class Config
 {
@@ -47,7 +48,7 @@ class Config
         try {
             $configData = include $filepath;
             $this->data[$filename] = $configData;
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $this->data[$filename] = [];
         }
     }

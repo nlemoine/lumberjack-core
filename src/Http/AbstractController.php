@@ -5,6 +5,7 @@ namespace Rareloop\Lumberjack\Http;
 use Laminas\Diactoros\Response\JsonResponse;
 use League\Route\Middleware\MiddlewareAwareInterface;
 use League\Route\Middleware\MiddlewareAwareTrait;
+use LogicException;
 use Middlewares\BasicAuthentication;
 use Middlewares\Minifier;
 use Psr\Container\ContainerInterface;
@@ -115,7 +116,7 @@ abstract class AbstractController implements MiddlewareAwareInterface
     protected function addFlash(string $type, string $message = null)
     {
         if (!$this->container->has('session')) {
-            throw new \LogicException('You can not use the addFlash method if sessions are disabled.');
+            throw new LogicException('You can not use the addFlash method if sessions are disabled.');
         }
 
         $this->container->get('session')->getFlashBag()->add($type, $message);
@@ -147,7 +148,7 @@ abstract class AbstractController implements MiddlewareAwareInterface
     protected function generateUrl(string $route, array $parameters = [], int|bool $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): string
     {
         if (!$this->container->has('router.generator')) {
-            throw new \LogicException('You can not use the generateUrl method if the router is not installed.');
+            throw new LogicException('You can not use the generateUrl method if the router is not installed.');
         }
         $generator = $this->container->get('router.generator');
         if ($generator instanceof UrlGeneratorInterface) {
@@ -155,7 +156,7 @@ abstract class AbstractController implements MiddlewareAwareInterface
         } elseif ($generator instanceof Router) {
             return $generator->generate($route, $parameters, $referenceType);
         }
-        throw new \LogicException('You can not use the generateUrl method if the router is not installed.');
+        throw new LogicException('You can not use the generateUrl method if the router is not installed.');
     }
 
     /**

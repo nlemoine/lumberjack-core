@@ -56,13 +56,13 @@ class RegisterExceptionHandler
             $this->handler->screamAt($this->screamedErrors, true);
             $this->handler->throwAt($this->thrownErrors, true);
             $this->handler->setDefaultLogger($this->app->get(LoggerInterface::class));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
         }
 
         $this->handler->setExceptionHandler([$this, 'handleException']);
     }
 
-    public function handleException(\Throwable $exception)
+    public function handleException(Throwable $exception)
     {
         if ($this->app->runningInConsole()) {
             $this->renderForConsole($exception);
@@ -101,7 +101,7 @@ class RegisterExceptionHandler
     /**
      * Get an instance of the exception handler.
      *
-     * @return \Rareloop\Lumberjack\Contracts\ExceptionHandler
+     * @return ExceptionHandler
      */
     protected function getExceptionHandler()
     {

@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Router\Symfony\Loader;
 
+use InvalidArgumentException;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -14,7 +15,7 @@ class ArrayLoader extends YamlFileLoader
     }
 
     /**
-     * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
+     * @throws InvalidArgumentException When a route can't be parsed because YAML is invalid
      */
     public function load(mixed $config, string $type = null): RouteCollection
     {
@@ -69,7 +70,7 @@ class ArrayLoader extends YamlFileLoader
 
         foreach ($requirements as $placeholder => $requirement) {
             if (\is_int($placeholder)) {
-                throw new \InvalidArgumentException(\sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" of route "%s" in "%s"?', $placeholder, $requirement, $name, $path));
+                throw new InvalidArgumentException(\sprintf('A placeholder name must be a string (%d given). Did you forget to specify the placeholder key for the requirement "%s" of route "%s" in "%s"?', $placeholder, $requirement, $name, $path));
             }
         }
 

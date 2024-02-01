@@ -4,6 +4,7 @@ namespace Rareloop\Lumberjack\Providers;
 
 use Psr\Log\LoggerInterface;
 use Rareloop\Lumberjack\Timber;
+use Throwable;
 
 class OembedServiceProvider extends ServiceProvider
 {
@@ -110,7 +111,7 @@ class OembedServiceProvider extends ServiceProvider
                 $data
             );
             return empty($embed_html) ? $html : $embed_html;
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $this->get(LoggerInterface::class)->error($th);
             return $html;
         }

@@ -2,9 +2,11 @@
 
 namespace Rareloop\Lumberjack;
 
+use ArrayObject;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 
-class Context extends \ArrayObject
+class Context extends ArrayObject
 {
     private $app;
 
@@ -144,7 +146,7 @@ class Context extends \ArrayObject
             if (null === $session = $this->app->get('session')) {
                 return [];
             }
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             return [];
         }
 

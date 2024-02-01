@@ -57,7 +57,7 @@ class Handler implements ExceptionHandler
                 ],
                 500
             );
-        } catch (\Exception $customRenderException) {
+        } catch (Exception $customRenderException) {
             return $this->convertExceptionToResponse($exception);
         }
     }
@@ -69,7 +69,7 @@ class Handler implements ExceptionHandler
     {
         try {
             $projectPath = $this->app->get('paths.project');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $projectPath = null;
         }
 

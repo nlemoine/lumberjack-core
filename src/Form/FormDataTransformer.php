@@ -2,6 +2,8 @@
 
 namespace Rareloop\Lumberjack\Form;
 
+use DateTime;
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -29,12 +31,12 @@ class FormDataTransformer
             } elseif ($field_class === Type\DateType::class) {
                 $form_data[$field->getName()] = [
                     'label' => $field_options['label'] ?? null,
-                    'value' => $field_data instanceof \DateTime ? $field_data->format('d-m-Y') : null,
+                    'value' => $field_data instanceof DateTime ? $field_data->format('d-m-Y') : null,
                 ];
             } elseif ($field_class === Type\TimeType::class) {
                 $form_data[$field->getName()] = [
                     'label' => $field_options['label'] ?? null,
-                    'value' => $field_data instanceof \DateTime ? $field_data->format('H:i') : null,
+                    'value' => $field_data instanceof DateTime ? $field_data->format('H:i') : null,
                 ];
             } elseif ($field_class === Type\CheckboxType::class) {
                 $form_data[$field->getName()] = [
@@ -44,7 +46,7 @@ class FormDataTransformer
             } elseif ($field_class === Type\CountryType::class) {
                 try {
                     $country = Countries::getName($field_data);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $country = $field_data;
                 }
                 $form_data[$field->getName()] = [

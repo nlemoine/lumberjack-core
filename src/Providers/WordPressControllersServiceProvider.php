@@ -13,6 +13,7 @@ use Rareloop\Lumberjack\Application;
 use Rareloop\Lumberjack\Hierarchy\Finder\ControllerClassFinder;
 use Rareloop\Lumberjack\Http\AbstractController;
 use Rareloop\Lumberjack\Http\ServerRequest;
+use Throwable;
 use WP_Query;
 
 class WordPressControllersServiceProvider extends ServiceProvider
@@ -57,7 +58,7 @@ class WordPressControllersServiceProvider extends ServiceProvider
         $controller = null;
         try {
             $controller = $this->resolveController();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
         }
 
         if (!$controller) {

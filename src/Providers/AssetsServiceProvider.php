@@ -7,6 +7,7 @@ use Inpsyde\Assets\AssetManager;
 use Inpsyde\Assets\Loader\ArrayLoader;
 use Inpsyde\Assets\Script;
 use Inpsyde\Assets\Style;
+use LogicException;
 use Rareloop\Lumberjack\Assets\CustomLoader;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\Asset\Packages;
@@ -116,7 +117,7 @@ class AssetsServiceProvider extends ServiceProvider
     private function createPackage(?string $basePath, array $baseUrls, VersionStrategyInterface $versionStrategy): PackageInterface
     {
         if ($basePath && $baseUrls) {
-            throw new \LogicException('An asset package cannot have base URLs and base paths.');
+            throw new LogicException('An asset package cannot have base URLs and base paths.');
         }
         if (!$baseUrls) {
             return new PathPackage($basePath, $versionStrategy);
@@ -133,7 +134,7 @@ class AssetsServiceProvider extends ServiceProvider
     private function createVersion(?string $version, ?string $format, ?string $jsonManifestPath, string $name, bool $strictMode): VersionStrategyInterface
     {
         if ($version && $jsonManifestPath) {
-            throw new \LogicException(\sprintf('Asset package "%s" cannot have version and manifest.', $name));
+            throw new LogicException(\sprintf('Asset package "%s" cannot have version and manifest.', $name));
         }
         if ($version) {
             return new StaticVersionStrategy($version, $format);

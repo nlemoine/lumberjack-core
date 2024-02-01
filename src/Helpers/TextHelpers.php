@@ -23,7 +23,7 @@ class TextHelpers
         $words_first = [];
         $words_second = [];
 
-        if (count($words) === 2) {
+        if (\count($words) === 2) {
             $words_first[] = $words[0];
             $words_second[] = $words[1];
         } else {

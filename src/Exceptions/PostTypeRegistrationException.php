@@ -2,6 +2,8 @@
 
 namespace Rareloop\Lumberjack\Exceptions;
 
-class PostTypeRegistrationException extends \Exception
+use Exception;
+
+class PostTypeRegistrationException extends Exception
 {
 }

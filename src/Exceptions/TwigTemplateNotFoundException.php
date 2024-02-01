@@ -2,6 +2,8 @@
 
 namespace Rareloop\Lumberjack\Exceptions;
 
-class TwigTemplateNotFoundException extends \Exception
+use Exception;
+
+class TwigTemplateNotFoundException extends Exception
 {
 }

@@ -16,6 +16,7 @@ use Rareloop\Lumberjack\Models\NavMenuItem;
 use Rareloop\Lumberjack\Models\User;
 use Rareloop\Lumberjack\Template\AbstractTemplate;
 use Rareloop\Lumberjack\Template\FrontPage;
+use stdClass;
 use StoutLogic\AcfBuilder\TabBuilder;
 
 class CustomFieldsServiceProvider extends ServiceProvider
@@ -235,7 +236,7 @@ class CustomFieldsServiceProvider extends ServiceProvider
         } else {
             $languages = \pll_languages_list();
             $languages = \array_map(function ($lang) {
-                $obj = new \stdClass();
+                $obj = new stdClass();
                 $obj->slug = $lang;
 
                 return $obj;
