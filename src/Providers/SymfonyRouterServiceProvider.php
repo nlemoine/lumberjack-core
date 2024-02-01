@@ -28,11 +28,14 @@ class SymfonyRouterServiceProvider extends ServiceProvider
         $this->app->singleton('router.routes', function () {
             return $this->getConfig('routes', []);
         });
+        $this->app->singleton('router.cache_path', function () {
+            return $this->app->get('path.cache') . '/routes';
+        });
         $this->app->singleton('router.options', function () {
             $debug = $this->getConfig('app.debug');
             return [
                 'debug'         => $this->getConfig('app.debug'),
-                'cache_dir'     => $debug ? null : $this->app->get('path.cache') . '/routes',
+                'cache_dir'     => $debug ? null : $this->app->get('router.cache_path'),
                 'matcher_class' => RedirectableCompiledUrlMatcher::class,
                 // 'strict_requirements' => false, // TODO: remove when this is solid
             ];
@@ -106,6 +109,16 @@ class SymfonyRouterServiceProvider extends ServiceProvider
         \add_action('wp', [$this, 'processRequest'], 1000); // Load after inpsyde/assets
         \add_filter('timber/twig', [$this, 'addTwigExtension']);
         \add_action('app.route_matched', [$this, 'onRouteMatched']);
+        \add_action('delete_transient_pll_languages_list', [$this, 'clearRouteCache']);
+    }
+
+    public function clearRouteCache()
+    {
+        // Clear cache
+        $cache_dir = $this->app->get('router.cache_path');
+        if (\is_dir($cache_dir)) {
+            \array_map('unlink', \glob($cache_dir . '/*'));
+        }
     }
 
     public function processRequest()
