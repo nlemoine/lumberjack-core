@@ -77,7 +77,7 @@ class TimberServiceProvider extends ServiceProvider
     public function configureTwigOptions(array $options): array
     {
         $default_options = [
-            'strict_variables' => false,
+            'strict_variables' => $options['debug'],
             'autoescape'       => 'html',
             'cache'            => $options['debug'] ? false : $this->get('path.cache') . '/twig',
         ];
