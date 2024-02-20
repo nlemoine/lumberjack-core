@@ -146,7 +146,7 @@ class OembedServiceProvider extends ServiceProvider
     /**
      * Save oEmbed data into post_excerpt
      */
-    private function updateOembedData(int $postID, array $data): void
+    protected function updateOembedData(int $postID, array $data): void
     {
         global $wpdb;
         // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
@@ -169,7 +169,7 @@ class OembedServiceProvider extends ServiceProvider
      *
      * @return array|null
      */
-    private function getEmbedData(string $url, int $post_id): array
+    protected function getEmbedData(string $url, int $post_id): array
     {
         $cacheKey = $this->getCacheKey($url);
 
@@ -191,7 +191,7 @@ class OembedServiceProvider extends ServiceProvider
     /**
      * Get cache key for URL
      */
-    private function getCacheKey(string $url): string
+    protected function getCacheKey(string $url): string
     {
         // phpcs:disable WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
         return \md5($url . \serialize($GLOBALS['wp_embed']->last_attr));
