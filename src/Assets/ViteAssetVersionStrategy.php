@@ -4,6 +4,7 @@ namespace Rareloop\Lumberjack\Assets;
 
 use Symfony\Component\Asset\Exception\AssetNotFoundException;
 use Symfony\Component\Asset\Exception\RuntimeException;
+use Symfony\Component\Asset\PathPackage;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 class ViteAssetVersionStrategy implements VersionStrategyInterface
@@ -50,6 +51,10 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         if ('build' === $this->viteMode) {
             $manifestData = $this->getManifestData();
             if (isset($manifestData[$path]['file'])) {
+                $bt = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
+                if (isset($bt[3]['class']) && $bt[3]['class'] === PathPackage::class) {
+                    return $manifestData[$path]['file'];
+                }
                 return $entrypointsData['base'] . $manifestData[$path]['file'];
             }
         } else {
