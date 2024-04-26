@@ -21,6 +21,9 @@ class SvgHelpersExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
+            new TwigFunction('svg', [$this, 'inlineSvg'], [
+                'is_safe' => ['html'],
+            ]),
             new TwigFunction('inline_svg', [$this, 'inlineSvg'], [
                 'is_safe' => ['html'],
             ]),
@@ -114,6 +117,19 @@ class SvgHelpersExtension extends AbstractExtension
 
     public function getFileContents(string $path): ?string
     {
+        if (
+            \str_starts_with($path, 'https://')
+            || \str_starts_with($path, 'http://')
+        ) {
+            $stream_context = [
+                "ssl" => [
+                    "verify_peer"      => false,
+                    "verify_peer_name" => false,
+                ],
+            ];
+            return \file_get_contents($path, false, \stream_context_create($stream_context));
+        }
+
         if (!\is_file($path)) {
             return null;
         }

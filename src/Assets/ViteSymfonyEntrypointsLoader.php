@@ -2,29 +2,28 @@
 
 namespace Rareloop\Lumberjack\Assets;
 
-use Inpsyde\Assets\Asset;
-use Inpsyde\Assets\Loader\EncoreEntrypointsLoader;
-use Inpsyde\Assets\Style;
-use Inpsyde\Assets\BaseAsset;
-use Inpsyde\Assets\Script;
-use Inpsyde\Assets\Exception\FileNotFoundException;
 use Exception;
+use Inpsyde\Assets\Asset;
+use Inpsyde\Assets\BaseAsset;
+use Inpsyde\Assets\Exception\FileNotFoundException;
+use Inpsyde\Assets\Loader\EncoreEntrypointsLoader;
+use Inpsyde\Assets\Script;
+use Inpsyde\Assets\Style;
 
 class ViteSymfonyEntrypointsLoader extends EncoreEntrypointsLoader
 {
-
     private const VITE_CLIENT_HANDLE = 'vite-client';
+
     private const VITE_CLIENT_SCRIPT = '@vite/client';
 
     protected array $entrypointsData;
 
     public function __construct(
         private string $entrypointsPath
-    )
-    {
+    ) {
         if (!\is_readable($this->entrypointsPath)) {
             throw new FileNotFoundException(
-                sprintf(
+                \sprintf(
                     'The given file "%s" does not exists or is not readable.',
                     $this->entrypointsPath
                 )
@@ -43,10 +42,12 @@ class ViteSymfonyEntrypointsLoader extends EncoreEntrypointsLoader
             return $this->entrypointsData;
         }
 
-        $data = wp_json_file_decode($this->entrypointsPath, ['associative' => true]);
+        $data = \wp_json_file_decode($this->entrypointsPath, [
+            'associative' => true,
+        ]);
         if ($data === null) {
             throw new Exception(
-                sprintf(
+                \sprintf(
                     'Error parsing JSON from asset entrypoints file "%s". The file either does not exists, is not readable or contains invalid JSON.',
                     $this->entrypointsPath
                 )
@@ -60,8 +61,6 @@ class ViteSymfonyEntrypointsLoader extends EncoreEntrypointsLoader
      * Undocumented function
      *
      * @param array{entryPoints: array, viteServer: string|null, base: string} $data
-     * @param string|null $entrypointName
-     * @return array
      */
     protected function parseData(array $data, ?string $entrypointName = null): array
     {
@@ -86,10 +85,10 @@ class ViteSymfonyEntrypointsLoader extends EncoreEntrypointsLoader
         // Single entrypoint
         if ($entrypointName !== null && isset($data['entryPoints'][$entrypointName])) {
             $assets = $this->getAssets($entrypointName, $data['entryPoints'][$entrypointName]);
-        // All entrypoints
+            // All entrypoints
         } else {
             foreach ($data['entryPoints'] as $name => $entrypointData) {
-                array_push($assets, ...$this->getAssets($name, $entrypointData));
+                \array_push($assets, ...$this->getAssets($name, $entrypointData));
             }
         }
 
@@ -102,11 +101,11 @@ class ViteSymfonyEntrypointsLoader extends EncoreEntrypointsLoader
                 $asset->withDependencies(self::VITE_CLIENT_HANDLE);
             }
             // Add vite-checker to the end of the assets
-            array_push($assets, $viteClient);
+            \array_push($assets, $viteClient);
         }
 
         if ($viteServer) {
-            $assets = array_map(
+            $assets = \array_map(
                 static function (Asset $asset): Asset {
                     if ($asset instanceof Script) {
                         $asset->isInHeader();
@@ -128,7 +127,7 @@ class ViteSymfonyEntrypointsLoader extends EncoreEntrypointsLoader
         $assets = [];
         $directory = $_SERVER['DOCUMENT_ROOT'] ?? '';
         foreach ($entrypointData as $type => $entrypoint) {
-            if (!in_array($type, ['css', 'js'], true)) {
+            if (!\in_array($type, ['css', 'js'], true)) {
                 continue;
             }
 
@@ -143,7 +142,7 @@ class ViteSymfonyEntrypointsLoader extends EncoreEntrypointsLoader
                 }, $extractedAssets);
             }
 
-            array_push($assets, ...$extractedAssets);
+            \array_push($assets, ...$extractedAssets);
         }
         return $assets;
     }
@@ -166,7 +165,7 @@ class ViteSymfonyEntrypointsLoader extends EncoreEntrypointsLoader
                 ? $file
                 : $this->directoryUrl . $sanitizedFile;
 
-            $filePath = $directory . '/' . ltrim($sanitizedFile, '/');
+            $filePath = $directory . '/' . \ltrim($sanitizedFile, '/');
 
             $asset = $this->buildAsset($handle, $fileUrl, $filePath);
 
@@ -191,17 +190,17 @@ class ViteSymfonyEntrypointsLoader extends EncoreEntrypointsLoader
     protected function buildAsset(string $handle, string $fileUrl, string $filePath): ?Asset
     {
         $extensionsToClass = [
-            'css' => Style::class,
+            'css'  => Style::class,
             'scss' => Style::class,
-            'js' => Script::class,
+            'js'   => Script::class,
         ];
 
         /** @var array{filename?:string, extension?:string} $pathInfo */
-        $pathInfo = pathinfo($filePath);
+        $pathInfo = \pathinfo($filePath);
         $filename = $pathInfo['filename'] ?? '';
         $extension = $pathInfo['extension'] ?? '';
 
-        if (!in_array($extension, array_keys($extensionsToClass), true)) {
+        if (!\in_array($extension, \array_keys($extensionsToClass), true)) {
             return null;
         }
 

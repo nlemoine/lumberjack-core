@@ -24,9 +24,9 @@ class AssetLoader
             return;
         }
 
-        add_action(
+        \add_action(
             AssetManager::ACTION_SETUP,
-            function(AssetManager $assetManager) use ($assets) {
+            function (AssetManager $assetManager) use ($assets) {
                 $assetManager->register(...$assets);
             }
         );
