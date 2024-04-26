@@ -15,8 +15,6 @@ class ViteSymfonyEntrypointsLoader extends EncoreEntrypointsLoader
 
     private const VITE_CLIENT_HANDLE = 'vite-client';
     private const VITE_CLIENT_SCRIPT = '@vite/client';
-    private const VITE_CHECKER_HANDLE = 'vite-plugin-checker-runtime-entry';
-    private const VITE_CHECKER_SCRIPT = '@vite-plugin-checker-runtime-entry';
 
     protected array $entrypointsData;
 
@@ -82,17 +80,6 @@ class ViteSymfonyEntrypointsLoader extends EncoreEntrypointsLoader
                 ->disableAutodiscoverVersion()
                 ->canEnqueue(false)
             ;
-
-            $viteChecker = new Script(
-                self::VITE_CHECKER_HANDLE,
-                $viteServer . $base . self::VITE_CHECKER_SCRIPT
-            );
-            $viteChecker
-                ->withAttributes([
-                    'type' => 'module',
-                ])
-                ->disableAutodiscoverVersion()
-            ;
         }
 
         $assets = [];
@@ -115,7 +102,7 @@ class ViteSymfonyEntrypointsLoader extends EncoreEntrypointsLoader
                 $asset->withDependencies(self::VITE_CLIENT_HANDLE);
             }
             // Add vite-checker to the end of the assets
-            array_push($assets, $viteClient, $viteChecker);
+            array_push($assets, $viteClient);
         }
 
         if ($viteServer) {
