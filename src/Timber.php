@@ -7,7 +7,7 @@ use Timber\Twig;
 
 class Timber extends TimberCore
 {
-    public static function init()
+    public static function init(): void
     {
         if (!\defined('ABSPATH')
             || !\class_exists('\WP')
@@ -33,8 +33,6 @@ class Timber extends TimberCore
         \class_alias('Timber\Timber', 'Timber');
 
         \define('TIMBER_LOADED', true);
-
-        return $self;
     }
 
     public static function compile($filenames, $data = [], $expires = false, $cache_mode = null, $via_render = false)
