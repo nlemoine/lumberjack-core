@@ -281,7 +281,7 @@ class CustomFieldsServiceProvider extends ServiceProvider
 
             foreach ($languages as $lang) {
                 if (\is_admin()) {
-                    $label = \sprintf('<img src="%s" /> %s', $lang->flag_url, $field_label);
+                    $label = \sprintf('<img src="%s" /> %s (%s)', $lang->flag_url, $field_label, $lang->slug);
                     if ($default_language === $lang->slug) {
                         // !$previous_field_is_translatable && $builder->insertField($tab, $field_index);
                         $field->setLabel($label);
