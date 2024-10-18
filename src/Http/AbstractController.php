@@ -30,7 +30,8 @@ abstract class AbstractController implements MiddlewareAwareInterface
     {
         $this->container = $container;
 
-        if (\in_array(\getenv('WP_ENV'), ['production', 'staging'], true)) {
+        $disableMinification = $_ENV['DISABLE_HTML_MIN'] ?? false;
+        if (\in_array(\getenv('WP_ENV'), ['production', 'staging'], true) && !$disableMinification) {
             $this->middleware(Minifier::html());
         }
 
