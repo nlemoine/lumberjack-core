@@ -72,6 +72,12 @@ abstract class AbstractPostType extends AbstractPost
                 if (!\in_array('comments', $config['supports'] ?? [], true) && \strpos($regex, $wp_rewrite->comments_pagination_base) !== false) {
                     return false;
                 }
+
+                // Remove attachment rules
+                if (str_starts_with($query, 'index.php?attachment=')) {
+                    return false;
+                }
+
                 return true;
             }, ARRAY_FILTER_USE_BOTH);
         });
