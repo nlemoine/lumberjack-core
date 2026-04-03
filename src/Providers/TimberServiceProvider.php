@@ -3,12 +3,12 @@
 namespace Rareloop\Lumberjack\Providers;
 
 use Exception;
-use PiedWeb\RenderAttributes\TwigExtension as RenderAttributesExtension;
 use Rareloop\Lumberjack\Config;
 use Rareloop\Lumberjack\Loader;
 use Rareloop\Lumberjack\Models;
 use Rareloop\Lumberjack\Timber;
 use Rareloop\Lumberjack\Twig\Extensions\AssetExtension;
+use Rareloop\Lumberjack\Twig\Extensions\HtmlAttributesExtension;
 use Rareloop\Lumberjack\Twig\Extensions\SvgHelpersExtension;
 use Rareloop\Lumberjack\Twig\Extensions\TextHelpersExtension;
 use Symfony\Component\Asset\Packages;
@@ -144,7 +144,7 @@ class TimberServiceProvider extends ServiceProvider
     public function addTwigExtensions(Environment $twig): Environment
     {
         $twig->addExtension(new HtmlExtension());
-        $twig->addExtension(new RenderAttributesExtension());
+        $twig->addExtension(new HtmlAttributesExtension());
         $twig->addExtension(new TextHelpersExtension());
         $twig->addExtension(new StringExtension($this->has(SluggerInterface::class) ? $this->get(SluggerInterface::class) : null));
         $twig->addExtension(new class() extends AbstractExtension {
