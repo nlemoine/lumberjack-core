@@ -3,14 +3,13 @@
 namespace Rareloop\Lumberjack;
 
 use Closure;
-use DI\ContainerBuilder;
+use DI\Container;
 use Illuminate\Support\Collection;
-use Interop\Container\ContainerInterface as InteropContainerInterface;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class Application implements ContainerInterface, InteropContainerInterface
+class Application implements ContainerInterface
 {
     private $container;
 
@@ -28,7 +27,7 @@ class Application implements ContainerInterface, InteropContainerInterface
 
     public function __construct($basePath = false)
     {
-        $this->container = ContainerBuilder::buildDevContainer();
+        $this->container = new Container();
 
         $this->bind(self::class, $this);
 
@@ -126,7 +125,7 @@ class Application implements ContainerInterface, InteropContainerInterface
      *
      * @return bool
      */
-    public function has($id)
+    public function has($id): bool
     {
         return $this->container->has($id);
     }
@@ -239,7 +238,7 @@ class Application implements ContainerInterface, InteropContainerInterface
         });
     }
 
-    public function shutdown(ResponseInterface $response = null)
+    public function shutdown(?ResponseInterface $response = null)
     {
         if ($response) {
             global $wp;

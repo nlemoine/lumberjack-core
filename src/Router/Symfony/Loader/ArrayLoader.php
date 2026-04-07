@@ -10,14 +10,14 @@ class ArrayLoader extends YamlFileLoader
 {
     public function __construct(
         private ?array $prefixes = null,
-        string $env = null
+        ?string $env = null
     ) {
     }
 
     /**
      * @throws InvalidArgumentException When a route can't be parsed because YAML is invalid
      */
-    public function load(mixed $config, string $type = null): RouteCollection
+    public function load(mixed $config, ?string $type = null): RouteCollection
     {
         $collection = new RouteCollection();
 
@@ -35,7 +35,7 @@ class ArrayLoader extends YamlFileLoader
         return $collection;
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return \is_array($resource);
     }

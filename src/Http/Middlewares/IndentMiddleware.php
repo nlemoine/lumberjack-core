@@ -18,7 +18,7 @@ class IndentMiddleware implements MiddlewareInterface
     private $streamFactory;
 
     public function __construct(
-        StreamFactoryInterface $streamFactory = null
+        ?StreamFactoryInterface $streamFactory = null
     ) {
         $this->streamFactory = $streamFactory ?: Factory::getStreamFactory();
     }

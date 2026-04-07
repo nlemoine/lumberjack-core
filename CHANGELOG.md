@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- **BC:** `Rareloop\Lumberjack\Application` no longer implements `Interop\Container\ContainerInterface`. The interface was deprecated upstream and dropped by `php-di/php-di` 7. Migration: any consumer code type-hinting `Interop\Container\ContainerInterface` against `Application` should switch to `Psr\Container\ContainerInterface`.
+- **BC:** Removed `blast/facades` dependency (last updated ~10 years ago, pulled in abandoned `container-interop/container-interop`). Replaced with an in-tree minimal implementation matching upstream Rareloop/lumberjack-core PR #61: new `Rareloop\Lumberjack\FacadeFactory` class and `Rareloop\Lumberjack\Facades\AbstractFacade` base class. The static API on existing facades (`Config::get()`, `Log::debug()`, etc.) is unchanged. Migration: any consumer code that imported `Blast\Facades\AbstractFacade` or `Blast\Facades\FacadeFactory` should change the namespace to `Rareloop\Lumberjack\Facades\AbstractFacade` and `Rareloop\Lumberjack\FacadeFactory` respectively. Method names unchanged.
+- Bumped `php-di/php-di` constraint from `^6.3.5` to `^7.0` for PHP 8.4 deprecation cleanliness. `ContainerBuilder::buildDevContainer()` was removed in PHP-DI 7; replaced internally with `new Container()`.
+- Replaced abandoned `tightenco/collect` with `illuminate/collections` for PHP 8.4 deprecation cleanliness. Drop-in for code already importing from `Illuminate\Support`.
+
+### Fixed
+
+- Fixed PHP 8.4 "implicitly marking parameter as nullable is deprecated" warnings across 9 method signatures: `Application::shutdown`, `AbstractController::addFlash`, `AssetExtension::getAssetUrl/getAssetVersion`, `IndentMiddleware::__construct`, `ArrayLoader::__construct/load/supports`, `RedirectableCompiledUrlMatcher::redirect`. No behavior change.
+- Added `: bool` return type to `Application::has()` to satisfy stricter `Psr\Container\ContainerInterface` v2.0 LSP contract (now required transitively via PHP-DI 7).
+
 ## 5.0.0
 
 ### Changed

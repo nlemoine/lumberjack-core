@@ -114,7 +114,7 @@ abstract class AbstractController implements MiddlewareAwareInterface
     /**
      * Add flash message.
      */
-    protected function addFlash(string $type, string $message = null)
+    protected function addFlash(string $type, ?string $message = null)
     {
         if (!$this->container->has('session')) {
             throw new LogicException('You can not use the addFlash method if sessions are disabled.');
