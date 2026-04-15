@@ -281,7 +281,9 @@ class CustomFieldsServiceProvider extends ServiceProvider
 
             foreach ($languages as $lang) {
                 if (\is_admin()) {
-                    $label = \sprintf('<img src="%s" /> %s (%s)', $lang->flag_url, $field_label, $lang->slug);
+                    $flag_code = $lang->flag_code ?? (isset($lang->locale) && \str_contains($lang->locale, '_') ? \explode('_', $lang->locale)[1] : $lang->slug);
+                    $flag = $this->getFlagEmoji((string) $flag_code);
+                    $label = \sprintf('%s %s (%s)', $flag, $field_label, $lang->slug);
                     if ($default_language === $lang->slug) {
                         // !$previous_field_is_translatable && $builder->insertField($tab, $field_index);
                         $field->setLabel($label);
@@ -333,5 +335,17 @@ class CustomFieldsServiceProvider extends ServiceProvider
         }
 
         return $builder;
+    }
+
+    /**
+     * Build a regional-indicator flag emoji from a Polylang locale slug
+     */
+    private function getFlagEmoji(string $slug): string
+    {
+        $code = \strtoupper(\substr($slug, 0, 2));
+        if (!\preg_match('/^[A-Z]{2}$/', $code)) {
+            return '';
+        }
+        return \mb_chr(0x1F1E6 + \ord($code[0]) - \ord('A')) . \mb_chr(0x1F1E6 + \ord($code[1]) - \ord('A'));
     }
 }
