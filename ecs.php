@@ -9,9 +9,10 @@ use PhpCsFixer\Fixer\Import\NoLeadingImportSlashFixer;
 use PhpCsFixer\Fixer\Import\SingleImportPerStatementFixer;
 use PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer;
 use PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer;
+use PhpCsFixer\Fixer\Strict\DeclareStrictTypesFixer;
 use PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer;
+use Symplify\CodingStandard\Fixer\Commenting\RemoveUselessDefaultCommentFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
-use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
 return ECSConfig::configure()
     ->withParallel()
@@ -47,15 +48,14 @@ return ECSConfig::configure()
         'scope'  => 'namespaced',
         'strict' => true,
     ])
-    ->withSets([
-        SetList::PSR_12,
-        SetList::ARRAY,
-        SetList::SPACES,
-        SetList::NAMESPACES,
-        SetList::DOCBLOCK,
-        SetList::COMMENTS,
-        // SetList::STRICT,
-    ])
+    ->withPreparedSets(
+        psr12: true,
+        arrays: true,
+        comments: true,
+        docblocks: true,
+        spaces: true,
+        namespaces: true,
+    )
     ->withSkip([
         DeclareStrictTypesFixer::class,
         NotOperatorWithSuccessorSpaceFixer::class,
