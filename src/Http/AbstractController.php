@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use WP_Query;
+use function Env\env;
 
 abstract class AbstractController implements MiddlewareAwareInterface
 {
@@ -30,16 +31,37 @@ abstract class AbstractController implements MiddlewareAwareInterface
     {
         $this->container = $container;
 
-        $disableMinification = $_ENV['DISABLE_HTML_MIN'] ?? false;
-        if (\in_array(\getenv('WP_ENV'), ['production', 'staging'], true) && !$disableMinification) {
+        // Read through oscarotero/env, so that the project decides where the values come from
+        // (getenv() by default, $_ENV or $_SERVER when its .env loader never calls putenv()).
+        if (\in_array($this->environment(), ['production', 'staging'], true) && !env('DISABLE_HTML_MIN')) {
             $this->middleware(Minifier::html());
         }
 
-        if (!empty(\getenv('BASIC_AUTH_USER')) && !empty(\getenv('BASIC_AUTH_PASSWORD'))) {
+        $user = env('BASIC_AUTH_USER');
+        $password = env('BASIC_AUTH_PASSWORD');
+        if (!empty($user) && !empty($password)) {
+            // As strings: env() turns "1234" into an int, and the middleware compares with ===.
             $this->middleware(new BasicAuthentication([
-                \getenv('BASIC_AUTH_USER') => \getenv('BASIC_AUTH_PASSWORD'),
+                (string) $user => (string) $password,
             ]));
         }
+    }
+
+    /**
+     * The environment type from wp_get_environment_type(), unless only WP_ENV is set (Bedrock
+     * without WP_ENVIRONMENT_TYPE): core would then answer production whatever WP_ENV says.
+     */
+    private function environment(): string
+    {
+        // The two sources wp_get_environment_type() reads.
+        if (!\defined('WP_ENVIRONMENT_TYPE') && \getenv('WP_ENVIRONMENT_TYPE') === false) {
+            $env = \defined('WP_ENV') ? WP_ENV : env('WP_ENV');
+            if (\is_string($env) && $env !== '') {
+                return $env;
+            }
+        }
+
+        return \wp_get_environment_type();
     }
 
     public function handleQuery(WP_Query $query)
