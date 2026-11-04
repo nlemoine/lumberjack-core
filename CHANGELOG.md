@@ -12,6 +12,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Replaced abandoned `tightenco/collect` with `illuminate/collections` for PHP 8.4 deprecation cleanliness. Drop-in for code already importing from `Illuminate\Support`.
 - **BC:** `AbstractController` reads `DISABLE_HTML_MIN`, `BASIC_AUTH_USER`, `BASIC_AUTH_PASSWORD` and `WP_ENV` through `oscarotero/env` (new dependency) instead of `getenv()` and `$_ENV`. `Env\env()` reads `getenv()` by default: a project whose `.env` loader never calls `putenv()` (WP Starter, Symfony Dotenv) must set `Env\Env::$options` to read `$_SERVER` or `$_ENV`. `DISABLE_HTML_MIN=false` now keeps minification on.
 - **BC:** HTML minification follows `wp_get_environment_type()` (`production` and `staging`), unless only `WP_ENV` is set, where `WP_ENV` is still used as before. With neither set, core answers `production`, so the HTML is now minified where it was not.
+- Allowed `illuminate/collections` ^13 and bumped `league/route` from `^5.1` to `^7.0`, which requires `psr/http-message` ^2 and `rareloop/psr7-server-request-extension` ^2.2. `opis/closure` is no longer installed and `psr/simple-cache` moves to v3. No change in the public API of the router.
+
+### Removed
+
+- **BC:** Removed `Rareloop\Lumberjack\Http\Middlewares\IndentMiddleware` and its `gajus/dindent` dependency (unmaintained since 2021). Migration: drop any `IndentMiddleware` registration.
+- Removed `Rareloop\Lumberjack\Http\MiddlewareResolver`, which implemented the `rareloop/router` interface dropped from the dependencies and could not be loaded anymore.
+- Removed `Rareloop\Lumberjack\Assets\AjaxHookResolver`, whose `$context` property no longer matched the `inpsyde/assets` parent class and could not be loaded anymore.
 
 ### Fixed
 
