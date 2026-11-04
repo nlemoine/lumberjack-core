@@ -60,7 +60,6 @@
     "require-dev": {
         "antecedent/patchwork": "^2.1.8",
         "brain/monkey": "^2.6",
-        "dms/phpunit-arraysubset-asserts": "^0.4",
         "mikey179/vfsstream": "^1.6.8",
         "mockery/mockery": "^1.4.4",
         "php-mock/php-mock": "^2.0",
