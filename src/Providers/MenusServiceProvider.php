@@ -38,9 +38,6 @@ class MenusServiceProvider extends ServiceProvider
         return $class === MenuItem::class ? NavMenuItem::class : $class;
     }
 
-    /**
-     * Register nav menus
-     */
     public function registerNavMenus(): void
     {
         $menus = $this->getConfig('menus.menus', []);

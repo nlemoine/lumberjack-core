@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Providers;
 
+use function DI\get;
 use Inpsyde\Assets\AssetFactory;
 use Inpsyde\Assets\AssetManager;
 use Inpsyde\Assets\Loader\ArrayLoader;
@@ -17,7 +18,6 @@ use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
-use function DI\get;
 
 class AssetsServiceProvider extends ServiceProvider
 {
@@ -111,9 +111,6 @@ class AssetsServiceProvider extends ServiceProvider
         $this->app->get(AssetManager::class)->setup();
     }
 
-    /**
-     * Create a package
-     */
     private function createPackage(?string $basePath, array $baseUrls, VersionStrategyInterface $versionStrategy): PackageInterface
     {
         if ($basePath && $baseUrls) {
@@ -128,8 +125,6 @@ class AssetsServiceProvider extends ServiceProvider
 
     /**
      * Create a version strategy
-     *
-     * @param boolean $strictMode
      */
     private function createVersion(?string $version, ?string $format, ?string $jsonManifestPath, string $name, bool $strictMode): VersionStrategyInterface
     {

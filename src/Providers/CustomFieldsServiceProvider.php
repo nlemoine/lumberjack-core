@@ -125,17 +125,12 @@ class CustomFieldsServiceProvider extends ServiceProvider
 
     /**
      * Filter objects that implements HasAcfFields interface
-     *
-     * @return boolean
      */
     private function filterFieldsAwareClasses(string $class): bool
     {
         return \in_array(HasAcfFields::class, (array) \class_implements($class), true);
     }
 
-    /**
-     * Configure fields
-     */
     private function configureFields(FieldsBuilder $fields): FieldsBuilder
     {
         $fields->setGroupConfig('instruction_placement', 'field');
@@ -143,8 +138,6 @@ class CustomFieldsServiceProvider extends ServiceProvider
     }
 
     /**
-     * Set fields location
-     *
      * @param string|object $class
      */
     private function getFieldsLocation($class): ?array
@@ -219,9 +212,6 @@ class CustomFieldsServiceProvider extends ServiceProvider
     //     return $fields;
     // }
 
-    /**
-     * Localize fields
-     */
     private function localizeFields(FieldsBuilder $builder): FieldsBuilder
     {
         // Return fields if Polylang isn't there

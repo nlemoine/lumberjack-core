@@ -37,8 +37,6 @@ class OembedServiceProvider extends ServiceProvider
     }
 
     /**
-     * Saves oEmbed data
-     *
      * @param array $data
      */
     public function saveOembedData(string $html, $data, string $url): string
@@ -117,9 +115,6 @@ class OembedServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Filter providers.
-     */
     public function filterProviders(array $providers): array
     {
         $allowed_providers = $this->getConfig('oembed.allowed_providers', []);
@@ -165,8 +160,6 @@ class OembedServiceProvider extends ServiceProvider
     }
 
     /**
-     * Get embed data
-     *
      * @return array|null
      */
     protected function getEmbedData(string $url, int $post_id): array

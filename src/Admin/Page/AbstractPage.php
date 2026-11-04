@@ -220,8 +220,6 @@ abstract class AbstractPage
 
     /**
      * Render dispatcher
-     *
-     * @param boolean $isModal
      */
     private static function renderAdminPage(array $config, bool $isModal): void
     {

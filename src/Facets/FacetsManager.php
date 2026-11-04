@@ -80,9 +80,6 @@ class FacetsManager
         return $this->facets;
     }
 
-    /**
-     * Add facet
-     */
     public function addFacet(AbstractFacet $facet): self
     {
         $this->facets[$facet->getKey()] = $facet;

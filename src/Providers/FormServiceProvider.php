@@ -187,9 +187,6 @@ class FormServiceProvider extends ServiceProvider
         \add_filter('timber/loader/loader', [$this, 'addSymfonyFormThemePath']);
     }
 
-    /**
-     * Add Symfony form theme path
-     */
     public function addSymfonyFormThemePath(FilesystemLoader $loader): FilesystemLoader
     {
         foreach ($this->app->get('form.paths') as $path) {

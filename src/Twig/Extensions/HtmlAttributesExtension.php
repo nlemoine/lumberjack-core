@@ -10,8 +10,12 @@ class HtmlAttributesExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('mergeAttr', [$this, 'mergeAndRender'], ['is_safe' => ['html']]),
-            new TwigFunction('attr', [$this, 'renderAll'], ['is_safe' => ['html']]),
+            new TwigFunction('mergeAttr', [$this, 'mergeAndRender'], [
+                'is_safe' => ['html'],
+            ]),
+            new TwigFunction('attr', [$this, 'renderAll'], [
+                'is_safe' => ['html'],
+            ]),
         ];
     }
 

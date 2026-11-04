@@ -71,9 +71,6 @@ class TimberServiceProvider extends ServiceProvider
         ]);
     }
 
-    /**
-     * Configure Twig options
-     */
     public function configureTwigOptions(array $options): array
     {
         $default_options = [
@@ -138,9 +135,6 @@ class TimberServiceProvider extends ServiceProvider
         return \array_intersect_key($functions, \array_flip($whitelist));
     }
 
-    /**
-     * Add Twig extensions
-     */
     public function addTwigExtensions(Environment $twig): Environment
     {
         $twig->addExtension(new HtmlExtension());

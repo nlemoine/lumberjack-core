@@ -68,8 +68,6 @@ class TextHelpers
 
     /**
      * Check if a string contains a space
-     *
-     * @return boolean
      */
     public static function containsSpace(string $text): bool
     {

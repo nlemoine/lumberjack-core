@@ -5,8 +5,8 @@ namespace Rareloop\Lumberjack\Router\Symfony;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * @property-read string $canonical
- * @property-read string $name
+ * @property string $canonical
+ * @property string $name
  */
 class CurrentRoute
 {

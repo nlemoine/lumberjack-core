@@ -74,7 +74,7 @@ abstract class AbstractPostType extends AbstractPost
                 }
 
                 // Remove attachment rules
-                if (str_starts_with($query, 'index.php?attachment=')) {
+                if (\str_starts_with($query, 'index.php?attachment=')) {
                     return false;
                 }
 
@@ -97,7 +97,7 @@ abstract class AbstractPostType extends AbstractPost
     /**
      * Get all posts of this type
      *
-     * @param  integer $perPage The number of items to return (defaults to all)
+     * @param  int $perPage The number of items to return (defaults to all)
      */
     public static function all($perPage = -1, $orderby = 'menu_order', $order = 'ASC'): Iterable
     {

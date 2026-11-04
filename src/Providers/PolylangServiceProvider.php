@@ -24,8 +24,6 @@ class PolylangServiceProvider extends ServiceProvider
     }
 
     /**
-     * Fix Timber home url
-     *
      * When Timber isn't located in the theme folder, the home url is not translated
      */
     public function fixTimberHomeUrl(array $whiteList): array
@@ -99,8 +97,6 @@ class PolylangServiceProvider extends ServiceProvider
 
     /**
      * Register translatables post types
-     *
-     * @param boolean $is_settings
      */
     public function registerPostTypes(array $post_types, bool $is_settings): array
     {
@@ -124,8 +120,6 @@ class PolylangServiceProvider extends ServiceProvider
 
     /**
      * Register translatables taxonomies
-     *
-     * @param boolean $is_settings
      */
     public function registerTaxonomies(array $taxonomies, bool $is_settings): array
     {

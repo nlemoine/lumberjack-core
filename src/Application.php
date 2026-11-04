@@ -122,8 +122,6 @@ class Application implements ContainerInterface
      * It does however mean that `get($id)` will not throw a `NotFoundExceptionInterface`.
      *
      * @param string $id Identifier of the entry to look for.
-     *
-     * @return bool
      */
     public function has($id): bool
     {
@@ -198,8 +196,6 @@ class Application implements ContainerInterface
      *
      * This is specifically useful for catching errors with WordPress Controllers, e.g. typos in
      * the Controller name
-     *
-     * @return boolean
      */
     public function hasRequestBeenHandled(): bool
     {
@@ -256,7 +252,7 @@ class Application implements ContainerInterface
     /**
      * Is PHP being run from a CLI
      *
-     * @return boolean
+     * @return bool
      */
     public function runningInConsole()
     {

@@ -138,8 +138,6 @@ class SvgHelpersExtension extends AbstractExtension
     }
 
     /**
-     * Render attributes
-     *
      * @param array<string> $attributes
      */
     protected function renderAttributes(array $attributes): string

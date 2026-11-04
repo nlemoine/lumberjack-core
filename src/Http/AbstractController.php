@@ -2,6 +2,7 @@
 
 namespace Rareloop\Lumberjack\Http;
 
+use function Env\env;
 use Laminas\Diactoros\Response\JsonResponse;
 use League\Route\Middleware\MiddlewareAwareInterface;
 use League\Route\Middleware\MiddlewareAwareTrait;
@@ -19,7 +20,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use WP_Query;
-use function Env\env;
 
 abstract class AbstractController implements MiddlewareAwareInterface
 {
@@ -96,7 +96,6 @@ abstract class AbstractController implements MiddlewareAwareInterface
      * Undocumented function
      *
      * @param array|string $templates
-     * @param integer $status
      */
     protected function render($templates, array $context = [], int $status = 200, array $headers = []): TimberResponse
     {
@@ -165,9 +164,6 @@ abstract class AbstractController implements MiddlewareAwareInterface
         return $this->container->has($id);
     }
 
-    /**
-     * Generate URL.
-     */
     protected function generateUrl(string $route, array $parameters = [], int|bool $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): string
     {
         if (!$this->container->has('router.generator')) {
