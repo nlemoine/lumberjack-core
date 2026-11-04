@@ -8,9 +8,9 @@ use League\Route\Middleware\MiddlewareAwareInterface;
 use League\Route\Middleware\MiddlewareAwareTrait;
 use LogicException;
 use Middlewares\BasicAuthentication;
-use Middlewares\Minifier;
 use Psr\Container\ContainerInterface;
 use Psr\Link\LinkInterface;
+use Rareloop\Lumberjack\Http\Middlewares\HtmlMinifier;
 use Rareloop\Lumberjack\Http\Responses\RedirectResponse;
 use Rareloop\Lumberjack\Http\Responses\TimberResponse;
 use Rareloop\Lumberjack\Router\Router;
@@ -34,7 +34,7 @@ abstract class AbstractController implements MiddlewareAwareInterface
         // Read through oscarotero/env, so that the project decides where the values come from
         // (getenv() by default, $_ENV or $_SERVER when its .env loader never calls putenv()).
         if (\in_array($this->environment(), ['production', 'staging'], true) && !env('DISABLE_HTML_MIN')) {
-            $this->middleware(Minifier::html());
+            $this->middleware(new HtmlMinifier());
         }
 
         $user = env('BASIC_AUTH_USER');
