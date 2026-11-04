@@ -10,8 +10,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - **BC:** Removed `blast/facades` dependency (last updated ~10 years ago, pulled in abandoned `container-interop/container-interop`). Replaced with an in-tree minimal implementation matching upstream Rareloop/lumberjack-core PR #61: new `Rareloop\Lumberjack\FacadeFactory` class and `Rareloop\Lumberjack\Facades\AbstractFacade` base class. The static API on existing facades (`Config::get()`, `Log::debug()`, etc.) is unchanged. Migration: any consumer code that imported `Blast\Facades\AbstractFacade` or `Blast\Facades\FacadeFactory` should change the namespace to `Rareloop\Lumberjack\Facades\AbstractFacade` and `Rareloop\Lumberjack\FacadeFactory` respectively. Method names unchanged.
 - Bumped `php-di/php-di` constraint from `^6.3.5` to `^7.0` for PHP 8.4 deprecation cleanliness. `ContainerBuilder::buildDevContainer()` was removed in PHP-DI 7; replaced internally with `new Container()`.
 - Replaced abandoned `tightenco/collect` with `illuminate/collections` for PHP 8.4 deprecation cleanliness. Drop-in for code already importing from `Illuminate\Support`.
+- **BC:** `AbstractController` reads `DISABLE_HTML_MIN`, `BASIC_AUTH_USER`, `BASIC_AUTH_PASSWORD` and `WP_ENV` through `oscarotero/env` (new dependency) instead of `getenv()` and `$_ENV`. `Env\env()` reads `getenv()` by default: a project whose `.env` loader never calls `putenv()` (WP Starter, Symfony Dotenv) must set `Env\Env::$options` to read `$_SERVER` or `$_ENV`. `DISABLE_HTML_MIN=false` now keeps minification on.
+- **BC:** HTML minification follows `wp_get_environment_type()` (`production` and `staging`), unless only `WP_ENV` is set, where `WP_ENV` is still used as before. With neither set, core answers `production`, so the HTML is now minified where it was not.
 
 ### Fixed
+
+- `AbstractController` could never turn on HTML minification nor basic authentication when the `.env` values were not exported with `putenv()`.
 
 - Fixed PHP 8.4 "implicitly marking parameter as nullable is deprecated" warnings across 9 method signatures: `Application::shutdown`, `AbstractController::addFlash`, `AssetExtension::getAssetUrl/getAssetVersion`, `IndentMiddleware::__construct`, `ArrayLoader::__construct/load/supports`, `RedirectableCompiledUrlMatcher::redirect`. No behavior change.
 - Added `: bool` return type to `Application::has()` to satisfy stricter `Psr\Container\ContainerInterface` v2.0 LSP contract (now required transitively via PHP-DI 7).
