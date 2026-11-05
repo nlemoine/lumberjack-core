@@ -45,7 +45,7 @@ class RecaptchaValidationListener implements EventSubscriberInterface
         if ($form->isRoot() && $form->getConfig()->getOption('compound') && !$postRequestSizeExceeded) {
             $data = $event->getData();
 
-            $recaptchaToken = \is_string($data[$this->fieldName] ?? null) ? $data[$this->fieldName] : null;
+            $recaptchaToken = \is_string($data[$this->fieldName] ?? null) ? $data[$this->fieldName] : '';
             $recaptcha = new ReCaptcha($this->secretKey, \ini_get('allow_url_fopen') ? null : new CurlPost());
             $action_name = $form->getName() ?: \get_class($form->getConfig()->getType()->getInnerType());
 

@@ -5,7 +5,7 @@
     "require": {
         "php": "^8.3",
         "brain/hierarchy": "^3.0",
-        "google/recaptcha": "^1.2",
+        "google/recaptcha": "^1.2 || ^2.0",
         "illuminate/collections": "^10.0 || ^11.0 || ^12.0 || ^13.0",
         "inpsyde/assets": "^2.8",
         "inpsyde/wp-context": "^1.2",
