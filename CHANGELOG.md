@@ -26,6 +26,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - `AbstractController` could never turn on HTML minification nor basic authentication when the `.env` values were not exported with `putenv()`.
+- Declared `psr/http-client`, used by `HcaptchaValidationListener` and its default `Psr18Client`. `symfony/http-client` only suggests it, so a project without another package pulling it in (Guzzle, for instance) got a `LogicException` when rendering a form with hCaptcha. Also declared `psr/http-factory` and `psr/http-server-handler`, used directly by `HtmlMinifier` and previously installed only transitively.
 
 - Fixed PHP 8.4 "implicitly marking parameter as nullable is deprecated" warnings across 9 method signatures: `Application::shutdown`, `AbstractController::addFlash`, `AssetExtension::getAssetUrl/getAssetVersion`, `IndentMiddleware::__construct`, `ArrayLoader::__construct/load/supports`, `RedirectableCompiledUrlMatcher::redirect`. No behavior change.
 - Added `: bool` return type to `Application::has()` to satisfy stricter `Psr\Container\ContainerInterface` v2.0 LSP contract (now required transitively via PHP-DI 7).
